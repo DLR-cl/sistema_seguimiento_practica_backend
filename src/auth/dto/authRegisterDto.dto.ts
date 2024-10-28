@@ -1,6 +1,6 @@
-import { IsEmail, IsNotEmpty, IsString } from "class-validator";
-
-export class RegisterDTO {
+import { IsEmail, IsNotEmpty, IsString, IsEnum } from "class-validator";
+import { Tipo_usuario } from "@prisma/client";
+export class AuthRegisterDto {
 
     @IsString()
     @IsNotEmpty()
@@ -18,7 +18,7 @@ export class RegisterDTO {
     @IsNotEmpty()
     rut: string;
 
-    @IsString()
+    @IsEnum(Tipo_usuario)
     @IsNotEmpty()
-    tipo_usuario: string;
+    tipo_usuario: Tipo_usuario;
 }
