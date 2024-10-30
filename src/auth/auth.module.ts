@@ -12,7 +12,7 @@ import { DatabaseModule } from 'src/database/database/database.module';
     JwtModule.register({
       global: true,
       secret: process.env.SECRET,
-      signOptions: { expiresIn: '60seg'}
+      signOptions: { expiresIn: '60s'}
     }),
   ],
   controllers: [AuthController],
