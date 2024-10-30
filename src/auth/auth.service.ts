@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseService } from '../database/database/database.service';
 import { AuthLoginDto } from './dto/authLoginDto.dto';
 import { AuthRegisterDto } from './dto/authRegisterDto.dto';
@@ -17,12 +17,12 @@ export class AuthService {
 
     async loginUser(authLoginDto: AuthLoginDto){
         try{
-            if(!this.findUser(authLoginDto.email)){
+            if(!this.findUser(authLoginDto.correo)){
                 throw new HttpException('Error, no existe un usuario con ese correo', HttpStatus.BAD_REQUEST);
             }
 
             const user = await this.databaseService.usuario.findUnique({
-                where:{ correo: authLoginDto.email, }
+                where:{ correo: authLoginDto.correo, }
                 }
             );
 
@@ -40,20 +40,24 @@ export class AuthService {
 
         }
         catch(error){
-            throw new HttpException('Error al autenticar usuario', HttpStatus.BAD_REQUEST);
+            if(error instanceof BadRequestException){
+                throw error
+            }
+            throw new InternalServerErrorException('Error al hacer log in');
         }
     }
 
 
     async signUp(authRegister: AuthRegisterDto){
         try{
-            if(this.findUser(authRegister.correo)){
+            if(!this.findUser(authRegister.correo)){
                 throw new HttpException('El usuario ya existe', HttpStatus.BAD_GATEWAY);
             };
 
             // hashear la contraseña
             const hashedPassword = await encrypt(authRegister.password);
 
+            // toma los datos necesarios del authregister
             const newUser = await this.databaseService.usuario.create({
                 data: {
                     ...authRegister,
@@ -73,19 +77,28 @@ export class AuthService {
 
 
         } catch (error){
-            throw new HttpException('Error al crear el usuario', HttpStatus.BAD_REQUEST);
+            throw error;
         }
     }
 
     private async findUser(email: string){
-        const user = await this.databaseService.usuario.findUnique({
-            where:{
-                correo: email,
+        try {
+
+            const user = await this.databaseService.usuario.findUnique({
+                where:{
+                    correo: email,
+                }
+            });
+
+            if(!user){
+                return false;
             }
-        });
-        if(!user){
-            return false;
+            return true;
+        }catch(error){
+            if(error instanceof BadRequestException){
+                throw error
+            }
+
         }
-        return true;
     }
 }

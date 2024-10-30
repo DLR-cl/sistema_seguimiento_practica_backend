@@ -4,7 +4,7 @@ export class AuthLoginDto{
 
     @IsEmail()
     @IsNotEmpty()
-    email: string;
+    correo: string;
 
     @IsString()
     @IsNotEmpty()

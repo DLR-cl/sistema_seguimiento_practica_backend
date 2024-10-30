@@ -3,6 +3,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
+import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseModule } from 'src/database/database/database.module';
 
 @Module({
   imports: [
@@ -10,10 +12,10 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({
       global: true,
       secret: process.env.SECRET,
-      signOptions: { expiresIn: '3min'}
+      signOptions: { expiresIn: '60seg'}
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, DatabaseService],
 })
 export class AuthModule {}
