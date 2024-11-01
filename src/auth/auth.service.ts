@@ -8,94 +8,34 @@ import { Tipo_usuario } from '@prisma/client';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { resolveObjectURL } from 'buffer';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private readonly databaseService: DatabaseService,
-        private readonly jtwService: JwtService
+        private readonly _usuarioService: UsersService,
+        private readonly _jwtService: JwtService
     ){}
 
-    async loginUser(authLoginDto: AuthLoginDto){
-        try{
-            const userExiste = await this.findUser(authLoginDto.correo);
-            if(!userExiste){
-                throw new BadRequestException('Error, no existe un usuario con ese correo');
-            }
-
-            const user = await this.databaseService.usuario.findUnique({
-                where:{ correo: authLoginDto.correo, }
-                }
-            );
-
-            const isPasswordMatch = await compare(authLoginDto.password, user.password);
-            if(!isPasswordMatch){
-                throw new BadRequestException('Contraseña inválida.');
-            };
-
-            const { password:_, ...userWithoutPassword } = user;
-            
-            const payload = { ...userWithoutPassword };
-
-            const access_token = await this.jtwService.signAsync(payload);
-            return { access_token };
-
-        }
-        catch(error){
-            if(error instanceof BadRequestException){
-                throw error
-            }
-            throw new InternalServerErrorException('Error al hacer log in');
-        }
-    }
+  
 
 
     async signUp(authRegister: AuthRegisterDto){
-        try{
-            if(!this.findUser(authRegister.correo)){
-                throw new HttpException('El usuario ya existe', HttpStatus.BAD_GATEWAY);
-            };
-
-            // hashear la contraseña
-            const hashedPassword = await encrypt(authRegister.password);
-
-            // toma los datos necesarios del authregister
-            const newUser = await this.databaseService.usuario.create({
-                data: {
-                    ...authRegister,
-                    password: hashedPassword,
-                },
-            });
-
-            const {password: _, ...userWithoutPassword } = newUser;
-
-            const responseDto: ResponseDto = {
-                message: 'Usuario Creado con éxito',
-                status_code: HttpStatus.OK,
-                data: userWithoutPassword,
-            };
-            
-            return responseDto;
-
-
-        } catch (error){
-            throw error;
-        }
+        return this._usuarioService.signUp(authRegister);
     }
 
-    private async findUser(email: string){
-        try {
-            const user = await this.databaseService.usuario.findUnique({
-                where:{
-                    correo: email,
-                }
-            });
-            return !!user;
-        }catch(error){
-            if(error instanceof BadRequestException){
-                throw error
-            }
+    async signIn(authLoginDto: AuthLoginDto){
 
-        }
+            
+            const user = await this._usuarioService.loginUser(authLoginDto);
+
+            const { password: _, ...userWithoutPassword } = user;
+
+            const payload = { ...userWithoutPassword };
+            console.log(payload, "soy el payload");
+
+            const access_token = await this._jwtService.signAsync(payload, {secret: process.env.SECRET_KEY});
+            console.log(access_token);
+            return { access_token };
     }
 }

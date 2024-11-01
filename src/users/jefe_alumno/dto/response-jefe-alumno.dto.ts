@@ -1,6 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 import { Tipo_usuario } from "@prisma/client";
-export class ResponseDto {
+export class ResponseJefeAlumnoDto {
 
     message: string;
     status_code: HttpStatus;
@@ -9,7 +9,7 @@ export class ResponseDto {
         correo: string;
         nombre: string;
         rut: string;
-        tipo_usuario: Tipo_usuario;
+        cargo: string;
     }
     
 }
