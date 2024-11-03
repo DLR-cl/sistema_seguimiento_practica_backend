@@ -1,5 +1,5 @@
 import { Tipo_usuario } from "@prisma/client";
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export class AlumnoPracticaDto {
     @IsString()
@@ -21,4 +21,5 @@ export class AlumnoPracticaDto {
     @IsEnum(Tipo_usuario)
     @IsNotEmpty()
     tipo_usuario: Tipo_usuario;
+
 }

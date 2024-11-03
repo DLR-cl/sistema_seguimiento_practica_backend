@@ -14,7 +14,8 @@ import { UsersService } from 'src/users/users.service';
 export class AuthService {
     constructor(
         private readonly _usuarioService: UsersService,
-        private readonly _jwtService: JwtService
+        private readonly _jwtService: JwtService,
+        private readonly _databaseService: DatabaseService,
     ){}
 
   
@@ -26,16 +27,57 @@ export class AuthService {
 
     async signIn(authLoginDto: AuthLoginDto){
 
-            
-            const user = await this._usuarioService.loginUser(authLoginDto);
+            try {
+                const userExists = await this.findUser(authLoginDto.correo);
+                if(!userExists){
+                    throw new BadRequestException('Error, no existe usuario');
+                }
 
-            const { password: _, ...userWithoutPassword } = user;
+                const user = await this._databaseService.usuario.findUnique({
+                    where: { correo: authLoginDto.correo }
+                });
 
-            const payload = { ...userWithoutPassword };
-            console.log(payload, "soy el payload");
+                const isPasswordMatch = await compare(authLoginDto.password, user.password);
 
-            const access_token = await this._jwtService.signAsync(payload, {secret: process.env.SECRET_KEY});
-            console.log(access_token);
-            return { access_token };
+                if(!isPasswordMatch){
+                    throw new BadRequestException('Contraseña o correo invalido');
+                };
+
+                
+                const { password: _, ...userWithoutPassword } = user;
+
+                const payload = { ...userWithoutPassword };
+                console.log(payload, "soy el payload");
+
+                const access_token = await this._jwtService.signAsync(payload, {secret: process.env.SECRET_KEY});
+                console.log(access_token);
+                return { access_token };
+
+            } catch(error){
+                if(error instanceof BadRequestException){
+                    throw new HttpException({
+                      status: HttpStatus.BAD_REQUEST,
+                      error: error.message,
+                    },HttpStatus.BAD_REQUEST);
+                }
+                throw new InternalServerErrorException('Error interno al hacer login');
+            }
+
     }
+
+    private async findUser(email: string) {
+        try {
+          const user = await this._databaseService.usuario.findUnique({
+            where: {
+              correo: email,
+            }
+          });
+          return !!user;
+        } catch (error) {
+          if (error instanceof BadRequestException) {
+            throw error
+          }
+    
+        }
+      }
 }

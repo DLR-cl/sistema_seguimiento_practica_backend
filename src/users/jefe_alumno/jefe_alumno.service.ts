@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JefeAlumnoDto } from './dto/jefe-alumno.dto';
 import { AuthService } from '../../auth/auth.service';
 import { DatabaseService } from '../../database/database/database.service';
@@ -33,5 +33,30 @@ export class JefeAlumnoService {
         };
 
         return response;
+    }
+
+    public async getJefeAlumno(id: number): Promise<JefeAlumnoDto> {
+            const  jefe = await this._databaseService.jefeAlumno.findUnique({
+                where:{
+                    id_user: id,
+                },
+            });
+            const findUser = await this._databaseService.usuario.findUnique({
+                where: {
+                    id_usuario: id,
+                },
+            })
+
+            if(!findUser){
+                throw new BadRequestException('Error al encontrar usuario');
+            }
+
+            const usuarioJefe: JefeAlumnoDto = {
+                ...findUser,
+                ...jefe
+            }
+
+            return usuarioJefe;
+        
     }
 }

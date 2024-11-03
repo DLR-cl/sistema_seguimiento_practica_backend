@@ -14,34 +14,6 @@ export class UsersService {
     private readonly databaseService: DatabaseService,
     private readonly _jwtService: JwtService) {
   }
-  async loginUser(authLoginDto: AuthLoginDto) {
-    try {
-      const userExiste = await this.findUser(authLoginDto.correo);
-      if (!userExiste) {
-        throw new BadRequestException('Error, no existe un usuario con ese correo');
-      }
-
-      const user = await this.databaseService.usuario.findUnique({
-        where: { correo: authLoginDto.correo, }
-      }
-      );
-
-      const isPasswordMatch = await compare(authLoginDto.password, user.password);
-      if (!isPasswordMatch) {
-        throw new BadRequestException('Contraseña inválida.');
-      };
-
-      console.log("funciono bien");
-      return user;
-
-    }
-    catch (error) {
-      if (error instanceof BadRequestException) {
-        throw error
-      }
-      throw new InternalServerErrorException('Error al hacer log in');
-    }
-  }
 
   async signUp(authRegister: AuthRegisterDto) {
     try {
