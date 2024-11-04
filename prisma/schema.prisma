@@ -13,13 +13,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model usuario {
-  id_alumno Int @id @default(autoincrement())
-  password String @unique @db.VarChar(250)
+model Usuario {
+  id_usuario Int @id @default(autoincrement())
+  password String @db.VarChar(250)
   correo  String @unique @db.VarChar(100)
   nombre String @db.VarChar(200)
-  rut String @unique @db.Char(12)
+  rut String @unique @db.Char(10)
   tipo_usuario Tipo_usuario
+
+
+  alumno_practica AlumnoPractica?
+  jefe_alumno JefeAlumno?
+  academico Academico?
+  @@map("usuario")
+}
+
+
+model AlumnoPractica {
+  id_user   Int   @id
+
+  primer_practica Boolean @default(false) 
+  segunda_practica Boolean @default(false)
+
+  usuario  Usuario @relation(fields: [id_user], references: [id_usuario])
+
+  @@map("alumno_practica")
+}
+
+model JefeAlumno {
+  id_user Int @id
+  cargo String @db.VarChar(60)
+
+  usuario Usuario @relation(fields: [id_user], references: [id_usuario])
+  @@map("jefe_alumno")
+}
+
+model Academico {
+  id_user Int @id
+  usuario Usuario @relation(fields: [id_user], references: [id_usuario])
+  @@map("academico")
 }
 
 

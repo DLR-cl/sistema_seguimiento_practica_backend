@@ -1,54 +1,63 @@
-import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { DatabaseService } from 'src/database/database/database.service';
+import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { DatabaseService } from '../database/database/database.service';
+import { AuthRegisterDto } from 'src/auth/dto/authRegisterDto.dto';
+import { encrypt } from '../auth/libs/bcryp';
+import { compare } from 'bcrypt';
+import { AuthLoginDto } from 'src/auth/dto/authLoginDto.dto';
+import { JwtService } from '@nestjs/jwt';
+
 
 @Injectable()
 export class UsersService {
 
-  constructor(private readonly databaseService : DatabaseService){
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly _jwtService: JwtService) {
   }
-  async create(createUserDto: CreateUserDto) {
 
+  async signUp(authRegister: AuthRegisterDto) {
     try {
-
-      // no user create (mover a otra función)
-      const find_user = await this.databaseService.usuario.findUnique({
-        where: {
-          rut: createUserDto.rut,
-        }
-      });
-
-      if(find_user){
-        throw new HttpException('Ya existe un usuario creado con estos datos', HttpStatus.BAD_REQUEST);
+      if (!this.findUser(authRegister.correo)) {
+        throw new HttpException('El usuario ya existe', HttpStatus.BAD_GATEWAY);
       };
 
-      // si no existe ese usuario
-      const create_user = await this.databaseService.usuario.create({data: find_user});
-      return {
-        status: HttpStatus.OK,
-        message: 'Creación correcta del usuario',
-        data: create_user,
-      }
-    } catch(error) {
-      throw new HttpException('Error al crear un usuario', HttpStatus.BAD_REQUEST);
+      // hashear la contraseña
+      const hashedPassword = await encrypt(authRegister.password);
+
+      // toma los datos necesarios del authregister
+      const newUser = await this.databaseService.usuario.create({
+        data: {
+          ...authRegister,
+          password: hashedPassword,
+        },
+      });
+
+      const { password: _, ...userWithoutPassword } = newUser;
+
+
+      return newUser;
+
+
+    } catch (error) {
+      throw error;
     }
 
-  };
 
-  findAll() {
-    return `This action returns all users`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+  private async findUser(email: string) {
+    try {
+      const user = await this.databaseService.usuario.findUnique({
+        where: {
+          correo: email,
+        }
+      });
+      return !!user;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error
+      }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    }
   }
 }
