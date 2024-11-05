@@ -25,9 +25,16 @@ model Usuario {
   alumno_practica AlumnoPractica?
   jefe_alumno JefeAlumno?
   academico Academico?
+  secretaria Secretaria?
   @@map("usuario")
 }
 
+model Secretaria {
+  id_user Int @id
+  // secretaria puede asignar cosas pero ¿Qué atributos extras posee?
+
+  usuario Usuario @relation(fields: [id_user], references: [id_usuario])
+}
 
 model AlumnoPractica {
   id_user   Int   @id
@@ -36,24 +43,131 @@ model AlumnoPractica {
   segunda_practica Boolean @default(false)
 
   usuario  Usuario @relation(fields: [id_user], references: [id_usuario])
-
+  informe InformeAlumno[]
   @@map("alumno_practica")
 }
 
 model JefeAlumno {
   id_user Int @id
   cargo String @db.VarChar(60)
+  id_empresa Int
+
+  informe InformeConfidencial[]
 
   usuario Usuario @relation(fields: [id_user], references: [id_usuario])
   @@map("jefe_alumno")
+  empresa Empresa @relation(fields: [id_empresa], references: [id_empresa])
 }
 
 model Academico {
   id_user Int @id
   usuario Usuario @relation(fields: [id_user], references: [id_usuario])
+
+  informe_confidencial InformeConfidencial[]
+  informe_alumno InformeAlumno[]
   @@map("academico")
 }
 
+model Empresa {
+  id_empresa Int @id @default(autoincrement())
+  nombre_razon_social String @db.VarChar(100)
+  ubicacion String @db.VarChar(100)
+  rubro String @db.VarChar(100)
+  nombre_gerente String @db.VarChar(200)
+
+  jefe_supervisor JefeAlumno[]
+}
+model Practica {
+  id_practica Int @id
+  tipo_practica TipoPractica // uno o dos
+
+  cantidad_horas Int
+  horas_semanales Int
+  fecha_inicio DateTime
+  fecha_termino DateTime
+  modalidad Modalidad_practica
+
+  // relacion
+  id_alumno Int
+  id_supervisor Int
+  id_informe_practica_alumno Int?
+  id_informe_practica_supervisor Int?
+  // relacion con informeAlumno
+  // relacion con informeConfidencial
+  // preguntas PreguntasPracticaAlumno[]
+}
+
+model InformeAlumno{
+  id_alumno Int 
+  id_academico Int?
+  archivo String @db.VarChar(300)
+  @@id([id_alumno])
+
+  alumno AlumnoPractica @relation(fields: [id_alumno], references: [id_user])
+  academico Academico? @relation(fields: [id_academico], references: [id_user])
+}
+
+model InformeConfidencial {
+  id_informe_confidencial Int @id
+
+  // sobre el alumno y la práctica
+  horas_practicas_regulares Int
+  horas_practicas_extraordinarias Int
+  total_horas Int
+  horas_inasistencia Int
+  nota_evaluacion Int
+  
+  // relacion
+  id_supervisor Int 
+  id_alumno_evaluado Int
+  id_practica Int
+  id_academico Int?
+
+  // preguntas PreguntasPracticaJefe[]
+  preguntas PreguntaPracticaJefe[] // un informe puede tener varias preguntas
+
+  academico Academico? @relation(fields: [id_academico], references: [id_user])
+  supervisor JefeAlumno @relation(fields: [id_supervisor], references: [id_user])
+}
+// falta algo, si bien se obtienen el puntaje de una pregunta en base a la respuesta, falta obtener el puntaje total de una dimension
+
+model PreguntaPracticaJefe {
+  id_pregunta Int @id @default(autoincrement())
+  id_informe Int
+  enunciado_pregunta String @db.VarChar(200)
+  tipo_pregunta Tipo_pregunta
+  id_dimension Int
+
+  puntaje_respuesta Int?
+  
+  respuestas RespuestasInformeSupervisor? // una pregunta puede tener varias respuestas
+
+
+  informe InformeConfidencial @relation(fields: [id_informe], references: [id_informe_confidencial])
+  dimension DimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
+}
+model RespuestasInformeSupervisor {
+  respuesta_texto  String?
+  puntos  Int?
+  pregunta_id Int
+
+  @@id([pregunta_id])
+  pregunta PreguntaPracticaJefe  @relation(fields: [pregunta_id], references: [id_pregunta])
+
+}
+
+model DimensionesEvaluativas {
+  id_dimension Int @id  @default(autoincrement())
+  nombre String @db.VarChar(100)
+  descripcion String @db.VarChar(200)
+  preguntas PreguntaPracticaJefe[]
+}
+
+
+enum TipoPractica {
+  PRACTICA_UNO
+  PRACTICA_DOS
+}
 
 enum Tipo_usuario {
   JEFE_CARRERA
@@ -61,4 +175,14 @@ enum Tipo_usuario {
   JEFE_DEPARTAMENTO
   SECRETARIA
   JEFE_EMPLEADOR
+}
+enum Modalidad_practica {
+  PRESENCIAL
+  SEMI_PRESENCIAL
+  REMOTO
+}
+
+enum Tipo_pregunta {
+  ABIERTA
+  CERRADA
 }
