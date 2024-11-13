@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AlumnoPracticaController } from './alumno_practica.controller';
 import { AlumnoPracticaService } from './alumno_practica.service';
-import { AuthService } from '../../auth/auth.service';
-import { DatabaseService } from '../../database/database/database.service';
-import { UsersService } from '../users.service';
+import { UsersService } from '../users/users.service';
+import { AuthService } from 'src/auth/auth.service';
+import { DatabaseService } from 'src/database/database/database.service';
 
 @Module({
   controllers: [AlumnoPracticaController],

@@ -1,8 +1,9 @@
 import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JefeAlumnoDto } from './dto/jefe-alumno.dto';
-import { AuthService } from '../../auth/auth.service';
-import { DatabaseService } from '../../database/database/database.service';
+
 import { ResponseJefeAlumnoDto } from './dto/response-jefe-alumno.dto';
+import { AuthService } from 'src/auth/auth.service';
+import { DatabaseService } from 'src/database/database/database.service';
 
 @Injectable()
 export class JefeAlumnoService {
@@ -16,10 +17,11 @@ export class JefeAlumnoService {
 
         const usuario = await this._authService.signUp(userWithoutCargo);
 
-        const jefe = await this._databaseService.jefeAlumno.create({
+        const jefe = await this._databaseService.jefesAlumno.create({
             data: {
                 id_user: usuario.id_usuario,
                 cargo: jefe_alumno.cargo,
+                id_empresa: jefe_alumno.id_empresa,
             }
         });
 
@@ -36,12 +38,13 @@ export class JefeAlumnoService {
     }
 
     public async getJefeAlumno(id: number): Promise<JefeAlumnoDto> {
-            const  jefe = await this._databaseService.jefeAlumno.findUnique({
+            const  jefe = await this._databaseService.jefesAlumno.findUnique({
                 where:{
                     id_user: id,
                 },
             });
-            const findUser = await this._databaseService.usuario.findUnique({
+            
+            const findUser = await this._databaseService.usuarios.findUnique({
                 where: {
                     id_usuario: id,
                 },

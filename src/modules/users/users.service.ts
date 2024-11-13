@@ -1,7 +1,7 @@
 import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DatabaseService } from '../database/database/database.service';
+import { DatabaseService } from '../../database/database/database.service';
 import { AuthRegisterDto } from 'src/auth/dto/authRegisterDto.dto';
-import { encrypt } from '../auth/libs/bcryp';
+import { encrypt } from '../../auth/libs/bcryp';
 import { compare } from 'bcrypt';
 import { AuthLoginDto } from 'src/auth/dto/authLoginDto.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -25,7 +25,7 @@ export class UsersService {
       const hashedPassword = await encrypt(authRegister.password);
 
       // toma los datos necesarios del authregister
-      const newUser = await this.databaseService.usuario.create({
+      const newUser = await this.databaseService.usuarios.create({
         data: {
           ...authRegister,
           password: hashedPassword,
@@ -47,7 +47,7 @@ export class UsersService {
 
   private async findUser(email: string) {
     try {
-      const user = await this.databaseService.usuario.findUnique({
+      const user = await this.databaseService.usuarios.findUnique({
         where: {
           correo: email,
         }

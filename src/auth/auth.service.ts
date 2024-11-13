@@ -8,7 +8,7 @@ import { Tipo_usuario } from '@prisma/client';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { resolveObjectURL } from 'buffer';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -33,7 +33,7 @@ export class AuthService {
                     throw new BadRequestException('Error, no existe usuario');
                 }
 
-                const user = await this._databaseService.usuario.findUnique({
+                const user = await this._databaseService.usuarios.findUnique({
                     where: { correo: authLoginDto.correo }
                 });
 
@@ -67,7 +67,7 @@ export class AuthService {
 
     private async findUser(email: string) {
         try {
-          const user = await this._databaseService.usuario.findUnique({
+          const user = await this._databaseService.usuarios.findUnique({
             where: {
               correo: email,
             }

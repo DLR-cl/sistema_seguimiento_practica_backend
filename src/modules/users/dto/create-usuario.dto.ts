@@ -1,7 +1,7 @@
-import { IsEmail, IsNotEmpty, IsString, IsEnum } from "class-validator";
 import { Tipo_usuario } from "@prisma/client";
-export class JefeAlumnoDto {
+import { IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
 
+export class CreateUsuarioDto {
     @IsString()
     @IsNotEmpty()
     password: string;
@@ -9,20 +9,17 @@ export class JefeAlumnoDto {
     @IsEmail()
     @IsNotEmpty()
     correo: string;
-    
+
     @IsString()
     @IsNotEmpty()
     nombre: string;
-    
+
     @IsString()
     @IsNotEmpty()
     rut: string;
 
     @IsEnum(Tipo_usuario)
     @IsNotEmpty()
-    tipo_usuario: Tipo_usuario;
+    tipo_usuario: Tipo_usuario
 
-    @IsString()
-    @IsNotEmpty()
-    cargo: string;
 }

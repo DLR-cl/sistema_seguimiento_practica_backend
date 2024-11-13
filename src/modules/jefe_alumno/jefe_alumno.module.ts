@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { JefeAlumnoController } from './jefe_alumno.controller';
 import { JefeAlumnoService } from './jefe_alumno.service';
-import { AuthService } from '../../auth/auth.service';
-import { DatabaseService } from '../../database/database/database.service';
-import { UsersService } from '../users.service';
+import { AuthService } from 'src/auth/auth.service';
+import { UsersService } from '../users/users.service';
+import { DatabaseService } from 'src/database/database/database.service';
+;
 
 @Module({
     controllers: [JefeAlumnoController],

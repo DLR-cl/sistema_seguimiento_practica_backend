@@ -1,9 +1,11 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
-import { DatabaseService } from '../../database/database/database.service';
+
 import { AlumnoPracticaDto } from './dto/alumno-practica.dto';
-import { AuthService } from '../../auth/auth.service';
+
 import { ResponseAlumnoDto } from './dto/response-alumno.dto';
 import { AlumnoDataDto } from './dto/alumno-data.dto';
+import { DatabaseService } from 'src/database/database/database.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class AlumnoPracticaService {
@@ -17,7 +19,7 @@ export class AlumnoPracticaService {
 
         const usuario = await this._authService.signUp(alumno_practica);
 
-        const alumno = await this._databaseService.alumnoPractica.create({
+        const alumno = await this._databaseService.alumnosPractica.create({
             data: {
                 id_user: usuario.id_usuario,
             }
@@ -35,7 +37,7 @@ export class AlumnoPracticaService {
 
     async getAlumnoPracticante(id: number): Promise<AlumnoDataDto>{
 
-        const findUser = await this._databaseService.usuario.findUnique({
+        const findUser = await this._databaseService.usuarios.findUnique({
             where:{
                 id_usuario: id,
             },
@@ -47,7 +49,7 @@ export class AlumnoPracticaService {
 
         const {password: _, ...userWithoutPassword} = findUser;
 
-        const findAlumno = await this._databaseService.alumnoPractica.findUnique({
+        const findAlumno = await this._databaseService.alumnosPractica.findUnique({
             where: {
                 id_user: id,
             }
