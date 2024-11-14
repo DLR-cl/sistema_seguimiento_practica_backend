@@ -73,7 +73,7 @@ model Empresas {
 model Practicas {
   id_practica Int @id @default(autoincrement())
   tipo_practica TipoPractica // uno o dos
-
+  estado Estado_practica
 // Información dada por la carta
   cantidad_horas Int
   horas_semanales Int
@@ -99,7 +99,11 @@ model InformesAlumno{
   id_practica Int @unique
   id_alumno Int 
   archivo String @db.VarChar(300) //documento con los datos requeridos
+  estado Estado_informe
   id_academico Int?
+
+  fecha_inicio_revision DateTime? @db.Date
+  fecha_termino_revision DateTime? @db.Date
 
   practica Practicas @relation(fields: [id_practica], references: [id_practica])
   alumno AlumnosPractica @relation(fields: [id_alumno], references: [id_user])
@@ -141,6 +145,9 @@ model InformeConfidencial {
   horas_inasistencia Int
   nota_evaluacion Int?
   
+  // tiempos de revision
+  fecha_inicio_revision DateTime? @db.Date
+  fecha_termino_revision DateTime? @db.Date
   // relacion
   id_supervisor Int 
   id_alumno_evaluado Int @unique
@@ -235,4 +242,23 @@ enum Tipo_pregunta {
   CERRADA
   EVALUATIVA
   DESARRROLLO_PROFESIONAL
+}
+
+enum Estado_informe {
+  ENVIADA
+  REVISION
+  APROBADA
+  CORRECCION
+  DESAPROBADA
+}
+
+enum Estado_practica {
+  CURSANDO
+  REVISION_INFORME_ALUMNO
+  CORRECCION_INFORME_ALUMNO
+  ESPERA_INFORME_CONFIDENCIAL
+  REVISION_GENERAL
+  APROBADA
+  DESAPROBADA
+  FINALIZADA
 }

@@ -21,8 +21,9 @@ export class UsersService {
         throw new HttpException('El usuario ya existe', HttpStatus.BAD_GATEWAY);
       };
 
-      // hashear la contraseña
-      const hashedPassword = await encrypt(authRegister.password);
+      // hashear la contraseña: que es los primeros 8 digitos del rut sin puntos
+      const password = authRegister.rut.substring(0,8);
+      const hashedPassword = await encrypt(password);
 
       // toma los datos necesarios del authregister
       const newUser = await this.databaseService.usuarios.create({

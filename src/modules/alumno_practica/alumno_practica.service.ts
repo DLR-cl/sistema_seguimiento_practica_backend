@@ -6,6 +6,8 @@ import { ResponseAlumnoDto } from './dto/response-alumno.dto';
 import { AlumnoDataDto } from './dto/alumno-data.dto';
 import { DatabaseService } from 'src/database/database/database.service';
 import { AuthService } from 'src/auth/auth.service';
+import { Tipo_usuario, TipoPractica, Usuarios } from '@prisma/client';
+import { AlumnosDataDto } from './dto/alumnos-data.dto';
 
 @Injectable()
 export class AlumnoPracticaService {
@@ -61,5 +63,54 @@ export class AlumnoPracticaService {
         }
 
         return alumno;
+    }
+
+    // se debe diferenciar en qué práctica está activo
+    public async alumnoActivo(id_alumno: number): Promise<TipoPractica | null>{
+        const alumno = await this._databaseService.alumnosPractica.findUnique({
+            where:{
+                id_user: id_alumno,
+            }
+        });
+
+        if(alumno!){
+            throw new BadRequestException('Alumno no existe');
+        }
+
+        if(alumno.primer_practica){
+            return TipoPractica.PRACTICA_UNO;
+        }else if(alumno.segunda_practica){
+            return TipoPractica.PRACTICA_DOS;
+        }else{
+            return null;
+        }
+
+    } 
+
+    public async existeAlumno(id_alumno: number){
+        const alumno = await this.getAlumnoPracticante(id_alumno);
+        if(alumno){
+            return true;
+        }
+    }
+
+    public async getAlumnos(){
+        const alumnos: AlumnosDataDto[]= await this._databaseService.usuarios.findMany({
+            where:{
+                tipo_usuario: Tipo_usuario.ALUMNO_PRACTICA
+            },
+            select:{
+                id_usuario: true,
+                nombre: true,
+                correo: true,
+                rut: true,
+                tipo_usuario: true,
+                alumno_practica: true
+            }
+            
+        });
+
+
+        return alumnos;
     }
 }

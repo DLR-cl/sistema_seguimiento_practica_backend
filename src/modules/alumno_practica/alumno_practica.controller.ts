@@ -16,4 +16,9 @@ export class AlumnoPracticaController {
     public getAlumno(@Param('id') id: string){
         return this._alumnoService.getAlumnoPracticante(+id);
     }
+
+    @Get()
+    public getAlumnos(){
+        return this._alumnoService.getAlumnos();
+    }
 }

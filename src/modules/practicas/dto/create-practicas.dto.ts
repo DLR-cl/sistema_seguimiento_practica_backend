@@ -1,4 +1,4 @@
-import { Modalidad_practica, TipoPractica } from "@prisma/client";
+import { Estado_practica, Modalidad_practica, TipoPractica } from "@prisma/client";
 import { IsDate, IsEnum, IsNotEmpty, IsNumber } from "class-validator";
 
 export class createPracticaDto {
@@ -9,6 +9,7 @@ export class createPracticaDto {
     @IsNumber()
     @IsNotEmpty()
     horas_semanales: number;
+
 
     @IsDate()
     @IsNotEmpty()

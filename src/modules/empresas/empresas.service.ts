@@ -2,6 +2,7 @@ import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable } 
 import { DatabaseService } from "src/database/database/database.service";
 import { createEmpresasDto } from "./dto/create-empresas.dto";
 import { Empresas } from "@prisma/client";
+import { EmpresasDataDto } from "./dto/empresas-data.dto";
 
 @Injectable()
 export class EmpresasService {
@@ -33,6 +34,15 @@ export class EmpresasService {
 
     };
 
+    public async getEmpresas(){
+        const empresas: EmpresasDataDto[] = await this._databaseService.empresas.findMany({
+            include:{
+                jefe_supervisor: true,
+            }
+        });
+
+        return empresas
+    }
     private async empresasExiste(nombre_empresa: string){
         const existe = await this._databaseService.empresas.findFirst({
             where:{
@@ -46,4 +56,6 @@ export class EmpresasService {
 
         return true;
     }
+
+    
 }

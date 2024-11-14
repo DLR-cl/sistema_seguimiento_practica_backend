@@ -9,6 +9,7 @@ import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { resolveObjectURL } from 'buffer';
 import { UsersService } from 'src/modules/users/users.service';
+import { jwtConstants } from './libs/constants';
 
 @Injectable()
 export class AuthService {
@@ -49,7 +50,7 @@ export class AuthService {
                 const payload = { ...userWithoutPassword };
                 console.log(payload, "soy el payload");
 
-                const access_token = await this._jwtService.signAsync(payload, {secret: process.env.SECRET_KEY});
+                const access_token = await this._jwtService.signAsync(payload, {secret: jwtConstants.secret });
                 console.log(access_token);
                 return { access_token };
 
