@@ -18,21 +18,15 @@ export class InformeAlumnoService {
 
     public async crearInformeAlumno(informe: CreateInformeAlumnoDto){
         try {
+            if(!await this._alumnoService.existeAlumno(informe.id_alumno)){
+                throw new BadRequestException('No existe alumno')
+            }
+
             if(this._practicaService.existePractica(informe.id_practica)!){
                 throw new BadRequestException('No existe práctica asociada al alumno');
             };
 
-
-            if(this._alumnoService.existeAlumno(informe.id_alumno)){
-                const informeAlumno = await this._databaseService.informesAlumno.create({
-                    data: {
-                        ...informe,
-                        estado: Estado_informe.ENVIADA,
-                    },
-                });
-
-                return informeAlumno;
-            }
+            
 
         } catch(error){
             if(error instanceof BadRequestException){

@@ -16,7 +16,7 @@ export class PracticasService {
     public async generarPractica(practica: createPracticaDto){
         try {
             // si ya existe una práctica definida
-            if(await !this.hayPractica(practica)){
+            if(!await this.hayPractica(practica)!){
                 throw new BadRequestException('Ya existe una práctica registrada con esos datos');
             };
 
@@ -60,7 +60,7 @@ export class PracticasService {
             }
         });
 
-        if(existePractica!){
+        if(!existePractica){
             return false;
         }
         return true;
@@ -73,7 +73,7 @@ export class PracticasService {
             }
         });
 
-        if(existePractica!){
+        if(!existePractica){
             return false;
         }
         return true;
@@ -98,9 +98,17 @@ export class PracticasService {
                     segunda_practica: true,
                 }
             });
-        }
-        
+        }        
+    }
 
-        
+    public async cambiarEstadoPractica(id_practica: number, estado_nuevo: Estado_practica){
+        const practica = await this._databaseService.practicas.update({
+            where: {
+                id_practica: id_practica,
+            },
+            data: {
+                estado: estado_nuevo
+            }
+        });
     }
 }

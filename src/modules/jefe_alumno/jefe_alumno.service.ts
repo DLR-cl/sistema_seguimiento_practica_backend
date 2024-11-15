@@ -69,4 +69,19 @@ export class JefeAlumnoService {
             return usuarioJefe;
         
     }
+
+    public async existeSupervisor(id_supervisor: number){
+        
+        const supervisor = await this._databaseService.jefesAlumno.findUnique({
+            where: {
+                id_user: id_supervisor,
+            }
+        });
+
+        if(!supervisor){
+            return false;
+        }
+
+        return true;
+    }
 }

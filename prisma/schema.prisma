@@ -14,209 +14,216 @@ datasource db {
 }
 
 model Usuarios {
-  id_usuario Int @id @default(autoincrement())
-  password String @db.VarChar(250)
-  correo  String @unique @db.VarChar(100)
-  nombre String @db.VarChar(200)
-  rut String @unique @db.Char(10)
+  id_usuario   Int          @id @default(autoincrement())
+  password     String       @db.VarChar(250)
+  correo       String       @unique @db.VarChar(100)
+  nombre       String       @db.VarChar(200)
+  rut          String       @unique @db.Char(10)
   tipo_usuario Tipo_usuario
 
-
   alumno_practica AlumnosPractica?
-  jefe_alumno JefesAlumno?
-  academico Academico?
+  jefe_alumno     JefesAlumno?
+  academico       Academico?
+
   @@map("usuario")
 }
 
 model AlumnosPractica {
-  id_user   Int   @id
-  primer_practica Boolean @default(false) 
+  id_user          Int     @id
+  primer_practica  Boolean @default(false)
   segunda_practica Boolean @default(false)
 
-  usuario  Usuarios @relation(fields: [id_user], references: [id_usuario],  onDelete: Cascade)
-  informe InformesAlumno[]
+  usuario  Usuarios         @relation(fields: [id_user], references: [id_usuario], onDelete: Cascade)
+  informe  InformesAlumno[]
   practica Practicas[]
+
   @@map("alumno_practica")
 }
 
 model JefesAlumno {
-  id_user Int @id
-  cargo String @db.VarChar(60)
+  id_user    Int    @id
+  cargo      String @db.VarChar(60)
   id_empresa Int
 
-  informe InformeConfidencial[]
+  informe   InformeConfidencial[]
   practicas Practicas[]
 
-  usuario Usuarios @relation(fields: [id_user], references: [id_usuario],  onDelete: Cascade)
-  @@map("jefe_alumno")
+  usuario Usuarios @relation(fields: [id_user], references: [id_usuario], onDelete: Cascade)
   empresa Empresas @relation(fields: [id_empresa], references: [id_empresa])
+
+  @@map("jefe_alumno")
 }
 
 model Academico {
-  id_user Int @id
-  usuario Usuarios @relation(fields: [id_user], references: [id_usuario],  onDelete: Cascade)
+  id_user Int      @id
+  usuario Usuarios @relation(fields: [id_user], references: [id_usuario], onDelete: Cascade)
 
   informe_confidencial InformeConfidencial[]
-  informe_alumno InformesAlumno[]
+  informe_alumno       InformesAlumno[]
+
   @@map("academico")
 }
 
 model Empresas {
-  id_empresa Int @id @default(autoincrement())
+  id_empresa          Int    @id @default(autoincrement())
   nombre_razon_social String @db.VarChar(100)
-  ubicacion String @db.VarChar(100)
-  rubro String @db.VarChar(100)
-  nombre_gerente String @db.VarChar(200)
+  ubicacion           String @db.VarChar(100)
+  rubro               String @db.VarChar(100)
+  nombre_gerente      String @db.VarChar(200)
 
   jefe_supervisor JefesAlumno[]
 }
+
 model Practicas {
-  id_practica Int @id @default(autoincrement())
-  tipo_practica TipoPractica // uno o dos
-  estado Estado_practica
-// Información dada por la carta
-  cantidad_horas Int
+  id_practica     Int                @id @default(autoincrement())
+  tipo_practica   TipoPractica // uno o dos
+  estado          Estado_practica
+  // Información dada por la carta
+  cantidad_horas  Int
   horas_semanales Int
-  fecha_inicio DateTime
-  fecha_termino DateTime
-  modalidad Modalidad_practica
+  fecha_inicio    DateTime
+  fecha_termino   DateTime
+  modalidad       Modalidad_practica
 
   // relacion
-  id_alumno Int 
-  id_supervisor Int
-  id_informe_alumno Int?
-  informe_alumno InformesAlumno?
+  id_alumno            Int
+  id_supervisor        Int
+  id_informe_alumno    Int?
+  informe_alumno       InformesAlumno?
   informe_confidencial InformeConfidencial?
   // relacion con informeAlumno
-  alumno AlumnosPractica @relation(fields: [id_alumno], references: [id_user])
-  jefe_supervisor JefesAlumno @relation(fields: [id_supervisor], references: [id_user])
+  alumno               AlumnosPractica      @relation(fields: [id_alumno], references: [id_user])
+  jefe_supervisor      JefesAlumno          @relation(fields: [id_supervisor], references: [id_user])
   // relacion con informeConfidencial
   // preguntas PreguntasPracticaAlumno[]
 }
 
-model InformesAlumno{
-  id_informe Int @id @default(autoincrement())
-  id_practica Int @unique
-  id_alumno Int 
-  archivo String @db.VarChar(300) //documento con los datos requeridos
-  estado Estado_informe
+model InformesAlumno {
+  id_informe   Int            @id @default(autoincrement())
+  id_practica  Int            @unique
+  id_alumno    Int
+  archivo      String         @db.VarChar(300) //documento con los datos requeridos
+  estado       Estado_informe
   id_academico Int?
 
-  fecha_inicio_revision DateTime? @db.Date
+  fecha_inicio_revision  DateTime? @db.Date
   fecha_termino_revision DateTime? @db.Date
 
-  practica Practicas @relation(fields: [id_practica], references: [id_practica])
-  alumno AlumnosPractica @relation(fields: [id_alumno], references: [id_user])
-  academico Academico? @relation(fields: [id_academico], references: [id_user])
-  
+  practica  Practicas       @relation(fields: [id_practica], references: [id_practica])
+  alumno    AlumnosPractica @relation(fields: [id_alumno], references: [id_user])
+  academico Academico?      @relation(fields: [id_academico], references: [id_user])
+
   respuestas RespuestasInformeAlumno[]
 }
 
 model RespuestasInformeAlumno {
-  id_informe Int
-  id_pregunta Int
-  texto String? @db.VarChar(300)
-  puntaje Int?
-  nombre_asignatura String? @db.VarChar(100)
+  id_informe        Int
+  id_pregunta       Int
+  texto             String?                             @db.VarChar(300)
+  puntaje           Int?
+  nombre_asignatura String?                             @db.VarChar(100)
+  informe           InformesAlumno                      @relation(fields: [id_informe], references: [id_informe])
+  pregunta          PreguntasImplementadasInformeAlumno @relation(fields: [id_pregunta], references: [id_pregunta])
+  asignaturas       AsignaturasEnRespuestasInforme[]
 
   @@id([id_informe, id_pregunta])
-  informe InformesAlumno @relation(fields: [id_informe], references: [id_informe])
-  pregunta PreguntasImplementadasInformeAlumno @relation(fields: [id_pregunta], references: [id_pregunta])
-  asignaturas AsignaturasEnRespuestasInforme[]
 }
+
 model AsignaturasEnRespuestasInforme {
-  id_informe Int
-  id_pregunta Int
+  id_informe        Int
+  id_pregunta       Int
   nombre_asignatura String @db.VarChar(100)
 
-  respuesta RespuestasInformeAlumno @relation(fields: [id_informe, id_pregunta], references: [id_informe, id_pregunta])
-  @@id([id_informe, id_pregunta, nombre_asignatura])
-  asignatura Asignaturas @relation(fields: [nombre_asignatura], references: [nombre])
+  respuesta  RespuestasInformeAlumno @relation(fields: [id_informe, id_pregunta], references: [id_informe, id_pregunta])
+  asignatura Asignaturas             @relation(fields: [nombre_asignatura], references: [nombre])
 
+  @@id([id_informe, id_pregunta, nombre_asignatura])
 }
 
 model InformeConfidencial {
   id_informe_confidencial Int @id @default(autoincrement())
 
   // sobre el alumno y la práctica
-  horas_practicas_regulares Int
+  horas_practicas_regulares       Int
   horas_practicas_extraordinarias Int
-  total_horas Int
-  horas_inasistencia Int
-  nota_evaluacion Int?
-  
+  total_horas                     Int
+  horas_inasistencia              Int
+  nota_evaluacion                 Int?
+
   // tiempos de revision
-  fecha_inicio_revision DateTime? @db.Date
+  fecha_inicio_revision  DateTime? @db.Date
   fecha_termino_revision DateTime? @db.Date
   // relacion
-  id_supervisor Int 
-  id_alumno_evaluado Int @unique
-  id_practica Int @unique
-  id_academico Int?
+  id_supervisor          Int
+  id_alumno_evaluado     Int       @unique
+  id_practica            Int       @unique
+  id_academico           Int?
 
   respuestas RespuestasInformeConfidencial[]
 
-  practica Practicas @relation(fields: [id_practica], references: [id_practica])
-  academico Academico? @relation(fields: [id_academico], references: [id_user])
+  practica   Practicas   @relation(fields: [id_practica], references: [id_practica])
+  academico  Academico?  @relation(fields: [id_academico], references: [id_user])
   supervisor JefesAlumno @relation(fields: [id_supervisor], references: [id_user])
 }
+
 // falta algo, si bien se obtienen el puntaje de una pregunta en base a la respuesta, falta obtener el puntaje total de una dimension
 
 model PreguntasImplementadasInformeAlumno {
   id_pregunta Int
 
   respuestas RespuestasInformeAlumno[]
-  @@id([id_pregunta])
-  
+
   preguntas Preguntas @relation(fields: [id_pregunta], references: [id_pregunta])
+
+  @@id([id_pregunta])
 }
+
 model Preguntas {
-  id_pregunta Int @id @default(autoincrement())
-  id_informe Int
-  enunciado_pregunta String @db.VarChar(200)
-  tipo_pregunta Tipo_pregunta
-  id_dimension Int
+  id_pregunta        Int           @id @default(autoincrement())
+  id_informe         Int
+  enunciado_pregunta String        @db.VarChar(200)
+  tipo_pregunta      Tipo_pregunta
+  id_dimension       Int
 
   puntaje_respuesta Int?
-  
-  preguntas_implementadas_informe PreguntasImplementadasInformeAlumno[]
-  preguntas_implementadas_confidencial PreguntasImplementadasInformeConfidencial[]
-  
-  dimension DimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
 
+  preguntas_implementadas_informe      PreguntasImplementadasInformeAlumno[]
+  preguntas_implementadas_confidencial PreguntasImplementadasInformeConfidencial[]
+
+  dimension DimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
 }
 
 model PreguntasImplementadasInformeConfidencial {
   id_pregunta Int
-  respuesta RespuestasInformeConfidencial[]
+  respuesta   RespuestasInformeConfidencial[]
+  pregunta    Preguntas                       @relation(fields: [id_pregunta], references: [id_pregunta])
+
   @@id([id_pregunta])
-  pregunta Preguntas @relation(fields: [id_pregunta], references: [id_pregunta])
 }
+
 model RespuestasInformeConfidencial {
-  respuesta_texto  String? @db.VarChar(300)
-  puntos  Int?
-  pregunta_id Int
-  informe_id Int
+  respuesta_texto String? @db.VarChar(300)
+  puntos          Int?
+  pregunta_id     Int
+  informe_id      Int
+
+  informe  InformeConfidencial                       @relation(fields: [informe_id], references: [id_informe_confidencial])
+  pregunta PreguntasImplementadasInformeConfidencial @relation(fields: [pregunta_id], references: [id_pregunta])
 
   @@id([pregunta_id, informe_id])
-
-  informe InformeConfidencial @relation(fields: [informe_id], references: [id_informe_confidencial])
-  pregunta PreguntasImplementadasInformeConfidencial  @relation(fields: [pregunta_id], references: [id_pregunta])
 }
 
-
 model DimensionesEvaluativas {
-  id_dimension Int @id  @default(autoincrement())
-  nombre String @db.VarChar(100)
-  descripcion String @db.VarChar(200)
-  preguntas Preguntas[]
+  id_dimension Int         @id @default(autoincrement())
+  nombre       String      @db.VarChar(100)
+  descripcion  String      @db.VarChar(200)
+  preguntas    Preguntas[]
 }
 
 model Asignaturas {
   nombre String @id @db.VarChar(100)
-  
+
   respuestas AsignaturasEnRespuestasInforme[]
-  
 }
 
 enum TipoPractica {
@@ -231,6 +238,7 @@ enum Tipo_usuario {
   SECRETARIA
   JEFE_EMPLEADOR
 }
+
 enum Modalidad_practica {
   PRESENCIAL
   SEMI_PRESENCIAL
