@@ -8,11 +8,13 @@ import { JefeAlumnoController } from '../jefe_alumno/jefe_alumno.controller';
 import { JefeAlumnoService } from '../jefe_alumno/jefe_alumno.service';
 import { AlumnoPracticaModule } from '../alumno_practica/alumno_practica.module';
 import { JefeAlumnoModule } from '../jefe_alumno/jefe_alumno.module';
+import { AuthModule } from 'src/auth/auth.module';
+import { DatabaseModule } from 'src/database/database/database.module';
 
 @Module({
-  controllers: [UsersController, JefeAlumnoController],
-  providers: [UsersService, DatabaseService, JefeAlumnoService, AuthService],
+  controllers: [UsersController],
+  providers: [UsersService],
   exports: [UsersService],
-  imports: [AlumnoPracticaModule, JefeAlumnoModule]
+  imports: [DatabaseModule]
 })
 export class UsersModule {}

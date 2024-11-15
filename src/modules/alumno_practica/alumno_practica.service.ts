@@ -4,8 +4,8 @@ import { AlumnoPracticaDto } from './dto/alumno-practica.dto';
 
 import { ResponseAlumnoDto } from './dto/response-alumno.dto';
 import { AlumnoDataDto } from './dto/alumno-data.dto';
-import { DatabaseService } from 'src/database/database/database.service';
-import { AuthService } from 'src/auth/auth.service';
+import { DatabaseService } from '../../database/database/database.service';
+import { AuthService } from '../../auth/auth.service';
 import { Tipo_usuario, TipoPractica, Usuarios } from '@prisma/client';
 import { AlumnosDataDto } from './dto/alumnos-data.dto';
 
@@ -73,7 +73,7 @@ export class AlumnoPracticaService {
             }
         });
 
-        if(alumno!){
+        if(!alumno){
             throw new BadRequestException('Alumno no existe');
         }
 
@@ -107,7 +107,7 @@ export class AlumnoPracticaService {
                 tipo_usuario: true,
                 alumno_practica: true
             }
-            
+
         });
 
 

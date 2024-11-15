@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateInformeAlumnoDto } from './dto/create-informe-alumno.dto';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../database/database/database.service';
 import { Estado_informe, Estado_practica, TipoPractica } from '@prisma/client';
 import { AlumnoPracticaService } from '../alumno_practica/alumno_practica.service';
 import { PracticasService } from '../practicas/practicas.service';
@@ -48,7 +48,7 @@ export class InformeAlumnoService {
             if(this.existeInforme(asignacion.id_informe)!){
                 throw new BadRequestException('No existe informe');
             }
-            
+
             const asignarInforme = await this._databaseService.informesAlumno.update({
                 where:{
                     id_informe: asignacion.id_informe

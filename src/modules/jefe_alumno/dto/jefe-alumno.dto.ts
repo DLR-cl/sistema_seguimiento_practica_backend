@@ -2,10 +2,6 @@ import { IsEmail, IsNotEmpty, IsString, IsEnum } from "class-validator";
 import { Tipo_usuario } from "@prisma/client";
 export class JefeAlumnoDto {
 
-    @IsString()
-    @IsNotEmpty()
-    password: string;
-
     @IsEmail()
     @IsNotEmpty()
     correo: string;

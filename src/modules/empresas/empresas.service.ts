@@ -1,5 +1,5 @@
 import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { DatabaseService } from "src/database/database/database.service";
+import { DatabaseService } from "../../database/database/database.service";
 import { createEmpresasDto } from "./dto/create-empresas.dto";
 import { Empresas } from "@prisma/client";
 import { EmpresasDataDto } from "./dto/empresas-data.dto";
@@ -13,8 +13,8 @@ export class EmpresasService {
     public async crearEmpresas(empresa: createEmpresasDto): Promise<Empresas>{
         
         try{
-
-            if(this.empresasExiste(empresa.nombre_razon_social)){
+            let existe = await this.empresasExiste(empresa.nombre_razon_social);
+            if(existe){
                 throw new BadRequestException('Empresa ya existente');
             }
 
@@ -49,7 +49,7 @@ export class EmpresasService {
                 nombre_razon_social: nombre_empresa
             }
         });
-
+        console.log(!existe, "hola");
         if(!existe){
             return false;
         }

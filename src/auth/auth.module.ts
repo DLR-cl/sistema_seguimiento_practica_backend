@@ -8,6 +8,7 @@ import { UsersService } from 'src/modules/users/users.service';
 import { constants } from 'buffer';
 import { jwtConstants } from './libs/constants';
 import { AuthGuard } from './guards/auth.guard';
+import { DatabaseModule } from 'src/database/database/database.module';
 
 
 @Module({
@@ -18,8 +19,10 @@ import { AuthGuard } from './guards/auth.guard';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '60s'}
     }),
+    DatabaseModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, DatabaseService, UsersService, AuthGuard],
+  providers: [AuthService, AuthGuard],
+  exports: [AuthService],
 })
 export class AuthModule {}

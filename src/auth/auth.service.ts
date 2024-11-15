@@ -8,7 +8,7 @@ import { Tipo_usuario } from '@prisma/client';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { resolveObjectURL } from 'buffer';
-import { UsersService } from 'src/modules/users/users.service';
+import { UsersService } from '../modules/users/users.service';
 import { jwtConstants } from './libs/constants';
 
 @Injectable()

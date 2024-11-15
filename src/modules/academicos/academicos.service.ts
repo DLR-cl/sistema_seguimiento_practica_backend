@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../database/database/database.service';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
 import { access } from 'fs';
 
