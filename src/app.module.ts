@@ -10,6 +10,7 @@ import { PracticasModule } from './modules/practicas/practicas.module';
 import { JefeAlumnoModule } from './modules/jefe_alumno/jefe_alumno.module';
 import { AlumnoPracticaDto } from './modules/alumno_practica/dto/alumno-practica.dto';
 import { InformeAlumnoModule } from './modules/informe_alumno/informe_alumno.module';
+import { InformeConfidencialModule } from './modules/informe-confidencial/informe-confidencial.module';
 
 
 @Module({
@@ -24,8 +25,8 @@ import { InformeAlumnoModule } from './modules/informe_alumno/informe_alumno.mod
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    InformeAlumnoModule  
-    
+    InformeAlumnoModule,
+    InformeConfidencialModule
   ],
   controllers: [AppController],
   providers: [AppService],

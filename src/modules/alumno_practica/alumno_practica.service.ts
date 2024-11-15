@@ -88,10 +88,17 @@ export class AlumnoPracticaService {
     } 
 
     public async existeAlumno(id_alumno: number){
-        const alumno = await this.getAlumnoPracticante(id_alumno);
-        if(alumno){
-            return true;
+        const alumno = await this._databaseService.alumnosPractica.findUnique({
+            where: {
+                id_user: id_alumno,
+            }
+        });
+
+        if(!alumno){
+            return false;
         }
+
+        return true;
     }
 
     public async getAlumnos(){
