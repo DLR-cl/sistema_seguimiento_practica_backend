@@ -17,7 +17,7 @@ export class UsersService {
 
   async signUp(authRegister: AuthRegisterDto) {
     try {
-      if (!await this.findUser(authRegister.correo)) {
+      if (await this.findUser(authRegister.correo)) {
         throw new BadRequestException('Ya existe cuenta con ese correo');
       };
 
