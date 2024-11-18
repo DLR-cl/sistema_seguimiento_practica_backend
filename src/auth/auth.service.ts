@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from '../database/database/database.service';
 import { AuthLoginDto } from './dto/authLoginDto.dto';
 import { AuthRegisterDto } from './dto/authRegisterDto.dto';
@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { resolveObjectURL } from 'buffer';
 import { UsersService } from '../modules/users/users.service';
 import { jwtConstants } from './libs/constants';
+import { decrypt } from 'dotenv';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +24,7 @@ export class AuthService {
 
 
     async signUp(authRegister: AuthRegisterDto){
-        return this._usuarioService.signUp(authRegister);
+        return await this._usuarioService.signUp(authRegister);
     }
 
     async signIn(authLoginDto: AuthLoginDto){
@@ -33,35 +34,34 @@ export class AuthService {
                 if(!userExists){
                     throw new BadRequestException('Error, no existe usuario');
                 }
-
+                console.log(authLoginDto.password);
                 const user = await this._databaseService.usuarios.findUnique({
                     where: { correo: authLoginDto.correo }
                 });
 
+
                 const isPasswordMatch = await compare(authLoginDto.password, user.password);
 
                 if(!isPasswordMatch){
-                    throw new BadRequestException('Contraseña o correo invalido');
+                    throw new UnauthorizedException('Contraseña o Correo Inválidos');
                 };
 
                 
                 const { password: _, ...userWithoutPassword } = user;
-
                 const payload = { ...userWithoutPassword };
-                console.log(payload, "soy el payload");
-
                 const access_token = await this._jwtService.signAsync(payload, {secret: jwtConstants.secret });
-                console.log(access_token);
+
                 return { access_token };
 
             } catch(error){
                 if(error instanceof BadRequestException){
-                    throw new HttpException({
-                      status: HttpStatus.BAD_REQUEST,
-                      error: error.message,
-                    },HttpStatus.BAD_REQUEST);
+                  throw error;
+                }else if(error instanceof UnauthorizedException){
+                  throw error;
+                }else{
+                  throw new InternalServerErrorException('Error interno al hacer login');
                 }
-                throw new InternalServerErrorException('Error interno al hacer login');
+
             }
 
     }

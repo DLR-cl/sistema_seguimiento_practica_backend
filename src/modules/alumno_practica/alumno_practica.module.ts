@@ -12,6 +12,6 @@ import { UsersModule } from '../users/users.module';
   controllers: [AlumnoPracticaController],
   providers: [AlumnoPracticaService],
   exports: [AlumnoPracticaService],
-  imports: [AuthModule, DatabaseModule]
+  imports: [AuthModule, DatabaseModule, UsersModule]
 })
 export class AlumnoPracticaModule {}

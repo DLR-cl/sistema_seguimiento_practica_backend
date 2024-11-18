@@ -17,14 +17,15 @@ export class UsersService {
 
   async signUp(authRegister: AuthRegisterDto) {
     try {
-      if (!this.findUser(authRegister.correo)) {
-        throw new HttpException('El usuario ya existe', HttpStatus.BAD_GATEWAY);
+      if (!await this.findUser(authRegister.correo)) {
+        throw new BadRequestException('Ya existe cuenta con ese correo');
       };
 
       // hashear la contraseña: que es los primeros 8 digitos del rut sin puntos
       const password = authRegister.rut.substring(0,8);
+      console.log(password)
       const hashedPassword = await encrypt(password);
-
+      console.log(hashedPassword);
       // toma los datos necesarios del authregister
       const newUser = await this.databaseService.usuarios.create({
         data: {
@@ -33,14 +34,16 @@ export class UsersService {
         },
       });
 
+      console.log(newUser);
       const { password: _, ...userWithoutPassword } = newUser;
-
 
       return newUser;
 
 
     } catch (error) {
-      throw error;
+      if(error instanceof BadRequestException){
+        throw error;
+      }
     }
 
 
@@ -53,12 +56,34 @@ export class UsersService {
           correo: email,
         }
       });
-      return !!user;
+      if(user){
+        return false;
+      }
+      return true;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error
       }
 
+    }
+  }
+
+  public async findUsuario(id_user: number){
+    try {
+      const user = await this.databaseService.usuarios.findUnique({
+        where: {
+          id_usuario: id_user,
+        }
+      });
+
+      if(!user){
+        return false;
+      }
+      return true;
+    } catch (error) {
+      if(error instanceof BadRequestException){
+        throw error;
+      }
     }
   }
 }

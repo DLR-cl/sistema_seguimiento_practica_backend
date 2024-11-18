@@ -8,19 +8,21 @@ import { DatabaseService } from '../../database/database/database.service';
 import { AuthService } from '../../auth/auth.service';
 import { Tipo_usuario, TipoPractica, Usuarios } from '@prisma/client';
 import { AlumnosDataDto } from './dto/alumnos-data.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AlumnoPracticaService {
 
     constructor(
         private readonly _databaseService: DatabaseService,
-        private readonly _authService: AuthService
+        private readonly _authService: AuthService,
+        private readonly _userService: UsersService
     ){}
 
     async createAlumnoPractica(alumno_practica: AlumnoPracticaDto){
 
-        const usuario = await this._authService.signUp(alumno_practica);
-
+        const usuario = await this._userService.signUp(alumno_practica);
+        console.log(usuario);
         const alumno = await this._databaseService.alumnosPractica.create({
             data: {
                 id_user: usuario.id_usuario,
@@ -51,6 +53,7 @@ export class AlumnoPracticaService {
 
         const {password: _, ...userWithoutPassword} = findUser;
 
+        // cambiarlo, exportar modulo de alumnos
         const findAlumno = await this._databaseService.alumnosPractica.findUnique({
             where: {
                 id_user: id,
