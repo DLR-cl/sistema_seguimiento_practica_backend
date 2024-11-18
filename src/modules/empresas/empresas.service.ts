@@ -40,10 +40,13 @@ export class EmpresasService {
             include:{
                 jefe_supervisor: {
                     include: {
-                        usuario: true
+                        usuario: {
+                            select: {
+                                nombre: true,
+                            }
+                        }
                     }
                 },
-                
             }
         });
 

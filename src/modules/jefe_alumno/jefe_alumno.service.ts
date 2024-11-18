@@ -6,12 +6,14 @@ import { AuthService } from 'src/auth/auth.service';
 import { DatabaseService } from '../../database/database/database.service';
 import { Usuarios } from '@prisma/client';
 import { AuthRegisterDto } from 'src/auth/dto/authRegisterDto.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class JefeAlumnoService {
     constructor(
         private readonly _authService: AuthService,
-        private readonly _databaseService: DatabaseService
+        private readonly _databaseService: DatabaseService,
+        private readonly _userService: UsersService,
     ){}
     async registrarJefe(jefe_alumno: JefeAlumnoDto){
 
@@ -22,7 +24,7 @@ export class JefeAlumnoService {
             tipo_usuario: jefe_alumno.tipo_usuario
         };
 
-        const usuario = await this._authService.signUp(user);
+        const usuario = await this._userService.signUp(user);
 
         const jefe = await this._databaseService.jefesAlumno.create({
             data: {

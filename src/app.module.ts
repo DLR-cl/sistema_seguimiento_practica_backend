@@ -11,6 +11,7 @@ import { JefeAlumnoModule } from './modules/jefe_alumno/jefe_alumno.module';
 import { AlumnoPracticaDto } from './modules/alumno_practica/dto/alumno-practica.dto';
 import { InformeAlumnoModule } from './modules/informe_alumno/informe_alumno.module';
 import { InformeConfidencialModule } from './modules/informe-confidencial/informe-confidencial.module';
+import { PreguntasModule } from './modules/preguntas/preguntas.module';
 
 
 @Module({
@@ -26,7 +27,8 @@ import { InformeConfidencialModule } from './modules/informe-confidencial/inform
       isGlobal: true,
     }),
     InformeAlumnoModule,
-    InformeConfidencialModule
+    InformeConfidencialModule,
+    PreguntasModule
   ],
   controllers: [AppController],
   providers: [AppService],

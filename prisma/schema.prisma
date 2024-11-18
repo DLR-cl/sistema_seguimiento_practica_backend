@@ -121,7 +121,6 @@ model RespuestasInformeAlumno {
   id_pregunta       Int
   texto             String?                             @db.VarChar(300)
   puntaje           Int?
-  nombre_asignatura String?                             @db.VarChar(100)
   informe           InformesAlumno                      @relation(fields: [id_informe], references: [id_informe])
   pregunta          PreguntasImplementadasInformeAlumno @relation(fields: [id_pregunta], references: [id_pregunta])
   asignaturas       AsignaturasEnRespuestasInforme[]
