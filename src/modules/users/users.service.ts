@@ -56,7 +56,7 @@ export class UsersService {
           correo: email,
         }
       });
-      if(user){
+      if(!user){
         return false;
       }
       return true;
