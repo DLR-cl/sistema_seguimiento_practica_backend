@@ -35,5 +35,34 @@ export class InformeConfidencialService {
     };
 
 
+    public async getInformeConfidencialBySupervisor(id_supervisor: number){
+        try {
+            const informes = await this._databaseService.informeConfidencial.findMany({
+                where: {
+                    id_supervisor: id_supervisor,
+                }
+            });
+        } catch (error) {
+
+        }
+    }
+    
+    public async asignarInformeConfidencial(id_informe:number, id_academico: number){
+        try {
+            const asignacion = await this._databaseService.informeConfidencial.update({
+                where: {
+                    id_informe_confidencial: id_informe,
+                },
+                data: {
+                    id_academico: id_academico
+                }
+            });
+
+            return 'cambiazo';
+        } catch (error) {
+            
+        }
+    }
+
     
 }

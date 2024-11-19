@@ -111,4 +111,28 @@ export class PracticasService {
             }
         });
     }
+
+    public async getPracticasActivas(){
+        try {
+            const practicas = await this._databaseService.practicas.findMany({
+                where: {
+                    fecha_termino: null,
+                }
+            });
+
+            return practicas;
+
+        } catch (error) {
+            
+        }
+    }
+
+    public async getAllPracticas(){
+        try {
+            const practicas = await this._databaseService.practicas.findMany();
+            return practicas
+        }catch(error){
+        }
+    }
+
 }

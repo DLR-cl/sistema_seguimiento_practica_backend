@@ -7,6 +7,7 @@ import { PreguntasImplementadasInformeAlumnoModule } from '../preguntas-implemen
 @Module({
   providers: [RespuestasInformeAlumnoService],
   controllers: [RespuestasInformeAlumnoController],
-  imports: [InformeAlumnoModule, PreguntasImplementadasInformeAlumnoModule]
+  imports: [InformeAlumnoModule, PreguntasImplementadasInformeAlumnoModule],
+  exports: [RespuestasInformeAlumnoService]
 })
 export class RespuestasInformeAlumnoModule {}

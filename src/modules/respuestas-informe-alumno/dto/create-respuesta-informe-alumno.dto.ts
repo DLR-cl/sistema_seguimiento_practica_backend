@@ -1,4 +1,4 @@
-import { IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsArray, IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateRespuestaInformAlumnoDto {
     @IsNotEmpty()
@@ -12,7 +12,7 @@ export class CreateRespuestaInformAlumnoDto {
     @IsOptional()
     @IsString()
     texto?: string;
-    
+
     @IsOptional()
     @IsNumber()
     puntaje?: number;
@@ -20,4 +20,10 @@ export class CreateRespuestaInformAlumnoDto {
     @IsOptional()
     @IsString()
     nombre_asignatura?: string;
+}
+
+export class ListaRespuestaDto {
+    @IsArray()
+    @IsNotEmpty()
+    respuestas: CreateRespuestaInformAlumnoDto[];
 }
