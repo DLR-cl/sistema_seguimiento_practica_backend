@@ -86,4 +86,23 @@ export class JefeAlumnoService {
 
         return true;
     }
+
+    public async getEstadoPracticasAsociadas(id_supervisor: number){
+        try {
+            const practicas = await this._databaseService.jefesAlumno.findUnique({
+                where: {
+                    id_user: id_supervisor,
+                },
+                include: {
+                    informe: true,
+                    practicas: true,
+                }
+            });
+
+            c
+
+        } catch (error) {
+            
+        }
+    }
 }

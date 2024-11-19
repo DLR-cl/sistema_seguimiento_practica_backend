@@ -119,8 +119,6 @@ export class AlumnoPracticaService {
             }
 
         });
-
-
         return alumnos;
     }
 }

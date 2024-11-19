@@ -88,7 +88,6 @@ model Practicas {
   // relacion
   id_alumno            Int
   id_supervisor        Int
-  id_informe_alumno    Int?
   informe_alumno       InformesAlumno?
   informe_confidencial InformeConfidencial?
   // relacion con informeAlumno

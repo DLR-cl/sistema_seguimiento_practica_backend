@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
 import { CreateInformeConfidencialDto } from './dto/create-informe-confidencial.dto';
 import { AlumnoPracticaService } from '../alumno_practica/alumno_practica.service';
@@ -35,16 +35,24 @@ export class InformeConfidencialService {
     };
 
 
-    public async getInformeConfidencialBySupervisor(id_supervisor: number){
+    public async getInformeConfidencial(id_informe: number){
         try {
-            const informes = await this._databaseService.informeConfidencial.findMany({
+            const informe = await this._databaseService.informeConfidencial.findUnique({
                 where: {
-                    id_supervisor: id_supervisor,
+                    id_informe_confidencial: id_informe
                 }
             });
-        } catch (error) {
-
+            if(!informe){
+                throw new BadRequestException('No existe informe');
+            }
+            return informe;
+        } catch (error) {  
+            if(error instanceof BadRequestException){
+                throw error
+            }
+            throw new InternalServerErrorException('Error interno al obtener informe')
         }
+
     }
     
     public async asignarInformeConfidencial(id_informe:number, id_academico: number){
@@ -59,6 +67,20 @@ export class InformeConfidencialService {
             });
 
             return 'cambiazo';
+        } catch (error) {
+            
+        }
+    }
+
+    public async getInformesConfidenciales(id_supervisor: number){
+        try {
+            const informes = await this._databaseService.informeConfidencial.findMany({
+                where: {
+                    id_supervisor: id_supervisor,
+                }
+            });
+
+            return informes;
         } catch (error) {
             
         }

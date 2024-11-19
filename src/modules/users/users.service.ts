@@ -5,6 +5,7 @@ import { encrypt } from '../../auth/libs/bcryp';
 import { compare } from 'bcrypt';
 import { AuthLoginDto } from 'src/auth/dto/authLoginDto.dto';
 import { JwtService } from '@nestjs/jwt';
+import { isRole } from 'src/utils/user.roles';
 
 
 @Injectable()
@@ -21,6 +22,9 @@ export class UsersService {
         throw new BadRequestException('Ya existe cuenta con ese correo');
       };
 
+      if(!isRole(authRegister.tipo_usuario)){
+        throw new BadRequestException('Rol inválido')
+      }
       // hashear la contraseña: que es los primeros 8 digitos del rut sin puntos
       const password = authRegister.rut.substring(0,8);
       console.log(password)

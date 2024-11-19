@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { CreateInformeConfidencialDto } from './dto/create-informe-confidencial.dto';
 import { InformeConfidencialService } from './informe-confidencial.service';
 
@@ -12,5 +12,15 @@ export class InformeConfidencialController {
     @Post('generar')
     public generarInformeConfidencial(@Body() informe: CreateInformeConfidencialDto){
         return this._informeConfidencialService.generarInformeConfidencial(informe);
+    }
+    
+    @Get('informes/:id_supervisor')
+    public async getInformesBySupervisor(@Param('id_supervisor', ParseIntPipe) id_supervisor: number){
+        return await this._informeConfidencialService.getInformesConfidenciales(id_supervisor);
+    }
+
+    @Get(':id_informe')
+    public async getInforme(@Param('id_informe', ParseIntPipe) id_informe: number){
+        return await this._informeConfidencialService.getInformeConfidencial(id_informe);
     }
 }
