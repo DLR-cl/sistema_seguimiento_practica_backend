@@ -16,7 +16,7 @@ export class PracticasService {
     public async generarPractica(practica: createPracticaDto){
         try {
             // si ya existe una práctica definida
-            if(!await this.hayPractica(practica)){
+            if(await this.hayPractica(practica)){
                 throw new BadRequestException('Ya existe una práctica registrada con esos datos');
             };
 
