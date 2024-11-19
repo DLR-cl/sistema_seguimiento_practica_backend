@@ -1,11 +1,8 @@
 import { Tipo_pregunta } from "@prisma/client";
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, min } from "class-validator";
 
 export class CrearPreguntaDto {
 
-    @IsNotEmpty()
-    @IsNumber()
-    id_informe: number;
 
     @IsNotEmpty()
     @IsString()
@@ -18,5 +15,11 @@ export class CrearPreguntaDto {
     @IsNotEmpty()
     @IsNumber()
     id_dimension: number;
+
+    @IsOptional()
+    @IsNumber()
+    @IsPositive()
+    puntaje_respuestas?: number;
+    
 
 }
