@@ -169,7 +169,7 @@ model InformeConfidencial {
 
 model PreguntasImplementadasInformeAlumno {
   id_pregunta Int
-
+  
   respuestas RespuestasInformeAlumno[]
 
   preguntas Preguntas @relation(fields: [id_pregunta], references: [id_pregunta])
@@ -179,7 +179,6 @@ model PreguntasImplementadasInformeAlumno {
 
 model Preguntas {
   id_pregunta        Int           @id @default(autoincrement())
-  id_informe         Int
   enunciado_pregunta String        @db.VarChar(200)
   tipo_pregunta      Tipo_pregunta
   id_dimension       Int
