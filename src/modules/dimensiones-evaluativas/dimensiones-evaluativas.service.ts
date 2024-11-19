@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
 import { CrearDimensionDto } from './dto/crear-dimension.dto';
+import { RespuestasInformeAlumno } from '@prisma/client';
 
 @Injectable()
 export class DimensionesEvaluativasService {
     constructor(
-        private readonly _databaseService: DatabaseService
+        private readonly _databaseService: DatabaseService,
+        private readonly _respuestasInformeAlumno: RespuestasInformeAlumno,
     ){}
 
     public async crearDimension(dimension: CrearDimensionDto){
@@ -35,30 +37,22 @@ export class DimensionesEvaluativasService {
 
     public async getPuntajeByDimension(id_dimension: number){
         try {
-            const preguntas = await this._databaseService.preguntas.findMany({
-                where: {
-                    id_dimension: id_dimension
+            const totalPuntajeAlumnos = await this._databaseService.respuestasInformeAlumno.aggregate({
+                _sum: {
+                    puntaje: true,
                 },
-                include: {
-                    preguntas_implementadas_confidencial: {
-                        include: {
-                            respuesta: true,
+                where: {
+                    pregunta: {
+                        preguntas:{
+                            id_dimension: id_dimension,
+                        }
+                    }
+                }
+            });
 
-                        }
-                    }
-                }
-            })
-            let puntaje: number = 0;
-            for(let preg of preguntas){
-                for(let impl of preg.preguntas_implementadas_confidencial){
-                    for(let punt of impl.respuesta){
-                        if(punt.puntos !== null){
-                            puntaje += punt.puntos;
-                        }
-                    }
-                }
-            };
             
+            return totalPuntajeAlumnos;
+
         } catch (error) {
             
         }

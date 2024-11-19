@@ -5,3 +5,9 @@ export class crearAsignaturaDto {
     @IsString()
     nombre: string;
 }
+
+export class crearAsignaturasDto {
+    @IsNotEmpty()
+    @IsString()
+    asignaturas: crearAsignaturaDto[];
+}

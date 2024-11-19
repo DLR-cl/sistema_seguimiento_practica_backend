@@ -16,7 +16,7 @@ export class PracticasService {
     public async generarPractica(practica: createPracticaDto){
         try {
             // si ya existe una práctica definida
-            if(!await this.hayPractica(practica)!){
+            if(!await this.hayPractica(practica)){
                 throw new BadRequestException('Ya existe una práctica registrada con esos datos');
             };
 
@@ -132,6 +132,26 @@ export class PracticasService {
             const practicas = await this._databaseService.practicas.findMany();
             return practicas
         }catch(error){
+        }
+    }
+
+    public async getPractica(id_practica: number){
+        try {
+            if(!this.existePractica(id_practica)){
+                throw new BadRequestException('No existe practica solicitada')
+            }
+
+            const practica = await this._databaseService.practicas.findUnique({
+                where: {
+                    id_practica: id_practica
+                }
+            });
+
+            return practica;
+        } catch (error) {
+            if(error instanceof BadRequestException){
+                throw error;
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
 import { PracticasService } from "./practicas.service";
 import { createPracticaDto } from "./dto/create-practicas.dto";
 
@@ -12,4 +12,10 @@ export class PracticasController {
     public generarPractica(@Body() practica: createPracticaDto){
         return this._practicaService.generarPractica(practica);
     }
+
+    @Get(':id')
+    public async getPractica(@Param('id', ParseIntPipe) id_practica: number){
+        return await this._practicaService.getPractica(id_practica);
+    }
+
 }
