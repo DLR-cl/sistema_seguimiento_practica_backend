@@ -20,6 +20,4 @@ export class CrearPreguntaDto {
     @IsNumber()
     @IsPositive()
     puntaje_respuestas?: number;
-    
-
 }

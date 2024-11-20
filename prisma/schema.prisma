@@ -178,7 +178,7 @@ model PreguntasImplementadasInformeAlumno {
 
 model Preguntas {
   id_pregunta        Int           @id @default(autoincrement())
-  enunciado_pregunta String        @db.VarChar(200)
+  enunciado_pregunta String        @unique @db.VarChar(200)
   tipo_pregunta      Tipo_pregunta
   id_dimension       Int
   puntaje_respuesta Int?
