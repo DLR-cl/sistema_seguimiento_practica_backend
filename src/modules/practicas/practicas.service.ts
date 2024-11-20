@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, NotAcceptableException } from "@nestjs/common";
 import { createPracticaDto } from "./dto/create-practicas.dto";
 import { DatabaseService } from "../../database/database/database.service";
 import { PracticaResponseDto } from "./dto/practica-response.dto";
@@ -15,6 +15,7 @@ export class PracticasService {
 
     public async generarPractica(practica: createPracticaDto){
         try {
+            
             // si ya existe una práctica definida
             if(await this.hayPractica(practica)){
                 throw new BadRequestException('Ya existe una práctica registrada con esos datos');
@@ -56,7 +57,8 @@ export class PracticasService {
                 id_alumno: practica.id_alumno,
                 id_supervisor: practica.id_supervisor,
                 tipo_practica: practica.tipo_practica,
-                fecha_inicio: practica.fecha_inicio
+                fecha_inicio: practica.fecha_inicio,
+                estado: Estado_practica.CURSANDO
             }
         });
 

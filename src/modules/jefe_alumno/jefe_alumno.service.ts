@@ -7,6 +7,8 @@ import { DatabaseService } from '../../database/database/database.service';
 import { Usuarios } from '@prisma/client';
 import { AuthRegisterDto } from 'src/auth/dto/authRegisterDto.dto';
 import { UsersService } from '../users/users.service';
+import { InformesPractica, InforPractica } from '../practicas/entities/list-practica.entity';
+import { info } from 'console';
 
 @Injectable()
 export class JefeAlumnoService {
@@ -95,14 +97,43 @@ export class JefeAlumnoService {
                 },
                 include: {
                     informe: true,
-                    practicas: true,
+                    practicas: {
+                        include: {
+                            alumno: {
+                                include: {
+                                    usuario: true
+                                }
+                            },
+                            informe_confidencial: true,
+                        }
+                    },
                 }
             });
-
-            c
-
-        } catch (error) {
             
+            let informes: InforPractica[] = [];
+
+            for(let informe of practicas.practicas){
+                let estado: boolean = false;
+                if(informe.informe_confidencial !== null){
+                    estado = true;
+                }
+
+                let inforPractica: InforPractica = {
+                    id_practica: informe.id_practica,
+                    nombre_alumno: informe.alumno.usuario.nombre,
+                    estado_entrega: estado,
+                    tipo_practica: informe.tipo_practica
+                }
+
+                informes.push(inforPractica);
+            }
+            const listaInformes:InformesPractica = {
+                informes_data: informes,
+            };
+
+            return listaInformes;
+        } catch (error) {
+            throw error
         }
     }
 }

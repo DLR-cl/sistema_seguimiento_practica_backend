@@ -10,5 +10,5 @@ export class InforPractica {
 }
 
 export class InformesPractica {
-    informes_data: inforPractica[];
+    informes_data: InforPractica[];
 }
