@@ -12,6 +12,7 @@ import { AlumnoPracticaDto } from './modules/alumno_practica/dto/alumno-practica
 import { InformeAlumnoModule } from './modules/informe_alumno/informe_alumno.module';
 import { InformeConfidencialModule } from './modules/informe-confidencial/informe-confidencial.module';
 import { PreguntasModule } from './modules/preguntas/preguntas.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 @Module({
@@ -28,7 +29,8 @@ import { PreguntasModule } from './modules/preguntas/preguntas.module';
     }),
     InformeAlumnoModule,
     InformeConfidencialModule,
-    PreguntasModule
+    PreguntasModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,9 +1,10 @@
-import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, UseGuards } from "@nestjs/common";
+import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, Logger, UseGuards } from "@nestjs/common";
 import { DatabaseService } from "../../database/database/database.service";
 import { createEmpresasDto } from "./dto/create-empresas.dto";
 import { Empresas } from "@prisma/client";
 import { EmpresasDataDto } from "./dto/empresas-data.dto";
 import { AuthGuard } from "src/auth/guards/auth.guard";
+import { Cron, CronExpression } from "@nestjs/schedule";
 
 @Injectable()
 export class EmpresasService {
@@ -11,6 +12,12 @@ export class EmpresasService {
         private readonly _databaseService: DatabaseService,
     ){}
 
+    private readonly logger = new Logger(EmpresasService.name);
+    
+    @Cron(CronExpression.EVERY_10_SECONDS)
+    handleCron(){
+        this.logger.debug('Hola soy el handler del tiempo');
+    }
     public async crearEmpresas(empresa: createEmpresasDto): Promise<Empresas>{
         
         try{

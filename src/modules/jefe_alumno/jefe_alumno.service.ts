@@ -17,6 +17,7 @@ export class JefeAlumnoService {
         private readonly _databaseService: DatabaseService,
         private readonly _userService: UsersService,
     ){}
+
     async registrarJefe(jefe_alumno: JefeAlumnoDto){
 
         const user: AuthRegisterDto = {
@@ -116,15 +117,18 @@ export class JefeAlumnoService {
                 let estado: boolean = false;
                 if(informe.informe_confidencial !== null){
                     estado = true;
+                    let disponible = informe.informe_confidencial.id_informe_confidencial;
                 }
+                let disponible = null;
 
                 let inforPractica: InforPractica = {
                     id_practica: informe.id_practica,
+                    id_informe_confidencial: disponible,
                     nombre_alumno: informe.alumno.usuario.nombre,
                     estado_entrega: estado,
                     tipo_practica: informe.tipo_practica
                 }
-
+                console.log(inforPractica);
                 informes.push(inforPractica);
             }
             const listaInformes:InformesPractica = {

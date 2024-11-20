@@ -181,7 +181,6 @@ model Preguntas {
   enunciado_pregunta String        @db.VarChar(200)
   tipo_pregunta      Tipo_pregunta
   id_dimension       Int
-
   puntaje_respuesta Int?
 
   preguntas_implementadas_informe      PreguntasImplementadasInformeAlumno[]
