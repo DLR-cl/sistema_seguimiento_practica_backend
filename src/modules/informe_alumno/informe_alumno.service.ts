@@ -25,9 +25,8 @@ export class InformeAlumnoService {
             if(this._practicaService.existePractica(informe.id_practica)!){
                 throw new BadRequestException('No existe práctica asociada al alumno');
             };
-
+                        
             
-
         } catch(error){
             if(error instanceof BadRequestException){
                 throw error;
@@ -60,31 +59,6 @@ export class InformeAlumnoService {
             }
         }
 
-    }
-
-    public async enlazarInforme(enlace: CreateEnlaceDto){
-        try {
-
-            // debe existir informe y practica
-            const practicaAsociada = await this._databaseService.practicas.update(
-                {
-                    where: {
-                        id_practica: enlace.id_practica,
-                    },
-                    data: {
-                        id_informe_alumno: enlace.id_informe,
-                        estado: Estado_practica.REVISION_INFORME_ALUMNO
-                    }
-                }
-            );
-
-            return practicaAsociada;
-
-        }catch(error){
-            if(error instanceof BadRequestException){
-                throw error;
-            }
-        }
     }
 
     public async aprobarInforme(id_informe: number ,aprobacion: Estado_informe){
