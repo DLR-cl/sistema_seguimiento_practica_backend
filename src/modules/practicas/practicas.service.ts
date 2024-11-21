@@ -4,6 +4,7 @@ import { DatabaseService } from "../../database/database/database.service";
 import { PracticaResponseDto } from "./dto/practica-response.dto";
 import { AlumnoPracticaService } from "../alumno_practica/alumno_practica.service";
 import { Estado_practica, TipoPractica } from "@prisma/client";
+import { Cron, CronExpression } from "@nestjs/schedule";
 
 @Injectable()
 export class PracticasService {
@@ -154,6 +155,30 @@ export class PracticasService {
             if(error instanceof BadRequestException){
                 throw error;
             }
+        }
+    }
+
+    @Cron('* 0 8 * * 1-5', {
+        name: 'check-estado-practica',
+        timeZone: 'America/Santiago',
+    })
+    private async checkEstadoPractica(){
+        try {
+
+            const practicas = await this._databaseService.practicas.findMany({
+                where: {
+                    estado: Estado_practica.CURSANDO,
+                }
+            });
+            const fecha_actual = new Date();
+            for(let practica of practicas){
+                let dias_restante = practica.fecha_termino.getDate() - practica.fecha_inicio.getDate()
+                if(practica.fecha_termino.getDate <= fecha_actual.getDate){
+
+                }
+            }
+        } catch (error) {
+            
         }
     }
 
