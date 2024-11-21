@@ -13,10 +13,8 @@ import { InformeAlumnoModule } from './modules/informe_alumno/informe_alumno.mod
 import { InformeConfidencialModule } from './modules/informe-confidencial/informe-confidencial.module';
 import { PreguntasModule } from './modules/preguntas/preguntas.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { PreguntasImplementadasConfidencialController } from './modules/preguntas-implementadas-confidencial/preguntas-implementadas-confidencial.controller';
 import { PreguntasImplementadasConfidencialModule } from './modules/preguntas-implementadas-confidencial/preguntas-implementadas-confidencial.module';
 import { PreguntasImplementadasInformeAlumnoModule } from './modules/preguntas-implementadas-informe-alumno/preguntas-implementadas-informe-alumno.module';
-import { DimensionesEvaluativasController } from './modules/dimensiones-evaluativas/dimensiones-evaluativas.controller';
 import { DimensionesEvaluativasModule } from './modules/dimensiones-evaluativas/dimensiones-evaluativas.module';
 
 

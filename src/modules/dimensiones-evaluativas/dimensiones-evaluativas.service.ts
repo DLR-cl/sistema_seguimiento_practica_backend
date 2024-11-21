@@ -1,13 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
 import { CrearDimensionDto } from './dto/crear-dimension.dto';
-import { RespuestasInformeAlumno } from '@prisma/client';
 
 @Injectable()
 export class DimensionesEvaluativasService {
     constructor(
         private readonly _databaseService: DatabaseService,
-        private readonly _respuestasInformeAlumno: RespuestasInformeAlumno,
     ){}
 
     public async crearDimension(dimension: CrearDimensionDto){
