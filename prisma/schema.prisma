@@ -183,8 +183,8 @@ model Preguntas {
   id_dimension       Int
   puntaje_respuesta Int?
 
-  preguntas_implementadas_informe      PreguntasImplementadasInformeAlumno[]
-  preguntas_implementadas_confidencial PreguntasImplementadasInformeConfidencial[]
+  preguntas_implementadas_informe      PreguntasImplementadasInformeAlumno?
+  preguntas_implementadas_confidencial PreguntasImplementadasInformeConfidencial?
 
   dimension DimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
 }

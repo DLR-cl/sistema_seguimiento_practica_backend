@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CrearDimensionDto } from './dto/crear-dimension.dto';
 import { DimensionesEvaluativasService } from './dimensiones-evaluativas.service';
+import { get } from 'http';
 
 @Controller('dimensiones-evaluativas')
 export class DimensionesEvaluativasController {
@@ -11,5 +12,10 @@ export class DimensionesEvaluativasController {
     @Post('crear')
     public async crearDimension(@Body() dimension: CrearDimensionDto){
         return await this._dimensionesService.crearDimension(dimension);
+    }
+
+    @Get()
+    public async obtenerDimensiones(){
+        return await this._dimensionesService.obtenerDimensiones()
     }
 }

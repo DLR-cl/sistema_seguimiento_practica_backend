@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
-import { AsignarPreguntasDto } from './dto/asignar-preguntas.dto';
+import { AsignarPreguntaDto, AsignarPreguntasDto } from './dto/asignar-preguntas.dto';
 import { Preguntas } from '@prisma/client';
 
 @Injectable()
@@ -30,6 +30,16 @@ export class PreguntasImplementadasInformeAlumnoService {
         }
     }
 
+    public async asignarPregunta(pregunta: AsignarPreguntaDto){
+        try {
+            const implementacion = await this._databaseService.preguntasImplementadasInformeAlumno.create({
+                data: pregunta,
+            });
+
+        } catch (error) {
+            
+        }
+    }
     public async existePregunta(id_pregunta: number){
         try {
             const exist = await this._databaseService.preguntas.findUnique({
@@ -48,5 +58,16 @@ export class PreguntasImplementadasInformeAlumnoService {
                 throw error;
             }
         }
+    }
+
+    public async obtenerPreguntas(){
+        return await this._databaseService.preguntasImplementadasInformeAlumno.findMany(
+            {
+                include: {
+                    preguntas: true,
+                }
+            }
+        );
+
     }
 }

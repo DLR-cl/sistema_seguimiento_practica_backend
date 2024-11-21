@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
 import { CrearDimensionDto } from './dto/crear-dimension.dto';
 import { RespuestasInformeAlumno } from '@prisma/client';
@@ -12,13 +12,16 @@ export class DimensionesEvaluativasService {
 
     public async crearDimension(dimension: CrearDimensionDto){
         try {
+            if(await this.existeDimension(dimension.nombre)){
+                throw new BadRequestException('Ya existe una dimension con ese nombre');
+            }
             const crearDimension = await this._databaseService.dimensionesEvaluativas.create({
                 data: dimension
             });
 
             return crearDimension;
         } catch (error) {
-            
+            throw error;
         }
     }
 
@@ -56,5 +59,22 @@ export class DimensionesEvaluativasService {
         } catch (error) {
             
         }
+    }
+
+    public async existeDimension(nombre: string){
+        const dimension = await this._databaseService.dimensionesEvaluativas.findFirst({
+            where: {
+                nombre: nombre,
+            }
+        });
+
+        if(!dimension){
+            return false;
+        }
+        return true;
+    }
+
+    public async obtenerDimensiones(){
+        return this._databaseService.dimensionesEvaluativas.findMany();
     }
 }
