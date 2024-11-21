@@ -172,7 +172,7 @@ export class PracticasService {
             });
             const fecha_actual = new Date();
             for(let practica of practicas){
-                let dias_restante = practica.fecha_termino.getDate() - practica.fecha_inicio.getDate()
+                
                 if(practica.fecha_termino.getDate <= fecha_actual.getDate){
 
                 }
