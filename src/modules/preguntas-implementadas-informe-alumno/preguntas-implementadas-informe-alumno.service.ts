@@ -22,6 +22,7 @@ export class PreguntasImplementadasInformeAlumnoService {
                 data: asignarPreguntas.preguntas
             });
 
+            return pregunta;
 
         } catch (error) {
             if(error instanceof BadRequestException){
@@ -35,7 +36,7 @@ export class PreguntasImplementadasInformeAlumnoService {
             const implementacion = await this._databaseService.preguntasImplementadasInformeAlumno.create({
                 data: pregunta,
             });
-
+            return implementacion;
         } catch (error) {
             
         }
