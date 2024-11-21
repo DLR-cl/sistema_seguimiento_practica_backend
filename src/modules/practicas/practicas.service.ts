@@ -171,12 +171,16 @@ export class PracticasService {
                 }
             });
             const fecha_actual = new Date();
-            for(let practica of practicas){
-                
-                if(practica.fecha_termino.getDate <= fecha_actual.getDate){
+            practicas.forEach((practica) => {
+                const fechaTermino = new Date(practica.fecha_termino);
+                const diferenciaDias = Math.ceil(
+                    (fechaTermino.getTime() - fecha_actual.getTime()) / (1000 * 60 * 60 * 24),
+                );
 
+                if(diferenciaDias == 3){
+                    console.log("te quedan 3 días de practica")
                 }
-            }
+            });
         } catch (error) {
             
         }

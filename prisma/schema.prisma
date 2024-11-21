@@ -181,7 +181,6 @@ model Preguntas {
   enunciado_pregunta String        @unique @db.VarChar(200)
   tipo_pregunta      Tipo_pregunta
   id_dimension       Int
-  puntaje_respuesta Int?
 
   preguntas_implementadas_informe      PreguntasImplementadasInformeAlumno?
   preguntas_implementadas_confidencial PreguntasImplementadasInformeConfidencial?
@@ -265,4 +264,10 @@ enum Estado_practica {
   APROBADA
   DESAPROBADA
   FINALIZADA
+}
+
+enum Tipo_asignatura {
+  FORMACION_BASICA
+  FORMACION_GENERAL
+  FORMACION_PROFESIONAL
 }
