@@ -16,8 +16,4 @@ export class CrearPreguntaDto {
     @IsNumber()
     id_dimension: number;
 
-    @IsOptional()
-    @IsNumber()
-    @IsPositive()
-    puntaje_respuestas?: number;
 }

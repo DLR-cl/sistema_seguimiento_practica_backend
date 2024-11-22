@@ -30,13 +30,14 @@ export class PreguntasService {
 
     public async crearPreguntas(preguntas: CrearPreguntasDto){
         try {
+            console.log(preguntas);
             const nuevasPreguntas = await this._databaseService.preguntas.createMany({
                 data: preguntas.preguntas,
             })
-
+            console.log(preguntas.preguntas);
             return nuevasPreguntas;
         } catch (error) {
-            
+            throw error;
         }
     }
     public async getAllPreguntas(){
