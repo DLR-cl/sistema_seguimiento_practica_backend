@@ -41,4 +41,16 @@ export class PreguntasImplementadasConfidencialService {
             }
         })
     };
+
+    public async actualizarPreguntas(preguntas: AsignarPreguntasDto){
+        try {
+            const preguntasCambiadas = await this._databaseService.preguntasImplementadasInformeAlumno.updateMany({
+                data: preguntas.preguntas,
+            });
+
+            return preguntasCambiadas;
+        } catch (error) {
+            throw error;
+        }
+    }
 }
