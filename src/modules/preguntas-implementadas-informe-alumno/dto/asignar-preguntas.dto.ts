@@ -4,7 +4,7 @@ import { IsArray, IsNotEmpty, IsNumber } from "class-validator";
 export class AsignarPreguntasDto{
     @IsNotEmpty()
     @IsArray()
-    preguntas: Preguntas[]
+    preguntas: AsignarPreguntaDto[];
 }
 
 export class AsignarPreguntaDto {
