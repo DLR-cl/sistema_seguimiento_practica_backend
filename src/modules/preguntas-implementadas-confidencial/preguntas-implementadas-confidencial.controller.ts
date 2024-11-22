@@ -22,7 +22,7 @@ export class PreguntasImplementadasConfidencialController {
         return await this._preguntasConfidencial.mostrarPreguntas();
     }
 
-    @Put('actualizarPreguntas')
+    @Put('actualizar-varios')
     public async actualizarPreguntas(preguntas: AsignarPreguntasDto){
         return this._preguntasConfidencial.actualizarPreguntas(preguntas);
     }
