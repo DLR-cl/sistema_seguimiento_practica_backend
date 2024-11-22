@@ -16,6 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { PreguntasImplementadasConfidencialModule } from './modules/preguntas-implementadas-confidencial/preguntas-implementadas-confidencial.module';
 import { PreguntasImplementadasInformeAlumnoModule } from './modules/preguntas-implementadas-informe-alumno/preguntas-implementadas-informe-alumno.module';
 import { DimensionesEvaluativasModule } from './modules/dimensiones-evaluativas/dimensiones-evaluativas.module';
+import { MailModule } from './mail/mail.module';
 
 
 @Module({
@@ -37,6 +38,7 @@ import { DimensionesEvaluativasModule } from './modules/dimensiones-evaluativas/
     PreguntasImplementadasConfidencialModule,
     PreguntasImplementadasInformeAlumnoModule,
     DimensionesEvaluativasModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

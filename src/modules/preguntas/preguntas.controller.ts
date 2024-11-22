@@ -16,8 +16,8 @@ export class PreguntasController {
     }
 
     @Post('crear-varios')
-    public async crearVariasPreguntas(@Body() pregunta: CrearPreguntasDto){
-        
+    public async crearVariasPreguntas(@Body() preguntas: CrearPreguntasDto){
+        return await this._preguntaService.crearPreguntas(preguntas);
     }
   
 }

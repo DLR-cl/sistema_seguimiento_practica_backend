@@ -33,6 +33,8 @@ export class PreguntasService {
             const nuevasPreguntas = await this._databaseService.preguntas.createMany({
                 data: preguntas.preguntas,
             })
+
+            return nuevasPreguntas;
         } catch (error) {
             
         }
