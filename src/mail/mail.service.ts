@@ -44,6 +44,24 @@ export class MailService {
         }
     }
 
-    async sendEmail(dto: SendEmailDto){}
+    async sendEmail(dto: SendEmailDto){
+        const { recipients, subject, html } = dto;
+
+        const transport = this.emailTransport();
+
+        const options: nodemailer.SendMailOptions = {
+            from: mailConstant.mail_user,
+            to: recipients,
+            subject: subject,
+            html: html,
+        };
+
+        try {
+            await transport.sendMail(options);
+            console.log('correo enviado con exito')
+        } catch (error) {
+            console.log('Correo no enviado', error);
+        }
+    }
 }
 
