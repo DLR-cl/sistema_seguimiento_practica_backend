@@ -5,6 +5,8 @@ import { PracticaResponseDto } from "./dto/practica-response.dto";
 import { AlumnoPracticaService } from "../alumno_practica/alumno_practica.service";
 import { Estado_practica, TipoPractica } from "@prisma/client";
 import { Cron, CronExpression } from "@nestjs/schedule";
+import { MailService } from "src/mail/mail.service";
+import { SendEmailDto } from "src/mail/dto/mail.dto";
 
 @Injectable()
 export class PracticasService {
@@ -12,6 +14,7 @@ export class PracticasService {
     constructor(
         private readonly _databaseService: DatabaseService,
         private readonly _alumnoService: AlumnoPracticaService,
+        private readonly _emailService: MailService,
     ){}
 
     public async generarPractica(practica: createPracticaDto){
@@ -158,13 +161,23 @@ export class PracticasService {
         }
     }
 
-
+    @Cron('0 30 11 * * 1-5', {
+        name: 'practica_dias',
+        timeZone: 'America/Santiago'
+    })
     private async checkEstadoPractica(){
         try {
 
             const practicas = await this._databaseService.practicas.findMany({
                 where: {
                     estado: Estado_practica.CURSANDO,
+                },
+                include: {
+                    alumno: {
+                        include: {
+                            usuario: true,
+                        }
+                    }
                 }
             });
             const fecha_actual = new Date();
@@ -175,11 +188,16 @@ export class PracticasService {
                 );
 
                 if(diferenciaDias == 3){
-                    console.log("te quedan 3 días de practica")
+                    const message: SendEmailDto = {
+                        recipients: [practica.alumno.usuario.correo],
+                        subject: 'Alerta de duración de práctica',
+                        html: 'Estimado/a actualmente le queda 3 días de práctica, en caso de extender su práctica por favor solicite dicha extension a la brevedad, en caso que no ignore este correo, gracias',
+                    }
+                    this._emailService.sendEmail(message);
                 }
             });
         } catch (error) {
-            
+            throw error;
         }
     }
 

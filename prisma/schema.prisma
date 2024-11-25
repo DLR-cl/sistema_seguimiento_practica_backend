@@ -229,6 +229,10 @@ model DimensionesEvaluativas {
 
 model Asignaturas {
   nombre String @id @db.VarChar(100)
+  tipo_asignatura Tipo_asignatura
+  semestre Int 
+  codigo String
+
 
   respuestas AsignaturasEnRespuestasInforme[]
 }

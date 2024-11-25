@@ -9,11 +9,12 @@ import { DatabaseModule } from "src/database/database/database.module";
 import { AlumnoPracticaModule } from "../alumno_practica/alumno_practica.module";
 import { AuthModule } from "src/auth/auth.module";
 import { UsersModule } from "../users/users.module";
+import { MailModule } from "src/mail/mail.module";
 
 @Module({
     controllers: [PracticasController],
     providers: [PracticasService],
     exports: [PracticasService],
-    imports: [DatabaseModule, AlumnoPracticaModule, AuthModule, UsersModule]
+    imports: [DatabaseModule, AlumnoPracticaModule, AuthModule, UsersModule, MailModule]
 })
 export class PracticasModule {}

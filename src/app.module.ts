@@ -40,15 +40,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
     PreguntasImplementadasInformeAlumnoModule,
     DimensionesEvaluativasModule,
     MailModule,
-    MailerModule.forRoot({
-      transport: {
-        host: process.env.MAIL_HOST,
-        auth: {
-          user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASSWORD,
-        }
-      }
-    })
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,45 +4,29 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { mailConstant } from 'src/constants/email.constant';
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { SendEmailDto } from './dto/mail.dto';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class MailService {
-    constructor(
-        private readonly mailerService: MailerService
-    ){}
 
+    constructor(
+        private readonly _configService: ConfigService,
+    ){}
     emailTransport(){
         const tranporter = nodemailer.createTransport({
-            host: mailConstant.mail_host,
-            port: Number(mailConstant.mail_port),
+            host: this._configService.get<string>('MAIL_HOST'),
+            port: this._configService.get<number>('MAIL_PORT'),
             secure: false,
             auth: {
-                user: mailConstant.mail_user,
-                pass: mailConstant.mail_password,
+                user: this._configService.get<string>('MAIL_USER'),
+                pass: this._configService.get<string>('MAIL_PASSWORD'),
             },
+            tls: {rejectUnauthorized: false},
+            logger: true,
+            debug: true,
         })
         return tranporter;
     }
 
-
-    async sendMail(){
-        try {
-            console.log('correo enviado')
-            await this.mailerService.sendMail({
-                to: 'juan.yampara.rojas@alumnos.uta.cl',
-                from: '"Bienvenido al club de la comedia" <yampara64@gmail.com>',
-                subject: 'Test',
-                text: '',
-                html: '<p>Mensaje de test para el sistema de correo </p>',
-            });
-            return {
-                success: true,
-            }
-        } catch(error){
-            return {
-                success: false,
-            }
-        }
-    }
 
     async sendEmail(dto: SendEmailDto){
         const { recipients, subject, html } = dto;
@@ -50,7 +34,7 @@ export class MailService {
         const transport = this.emailTransport();
 
         const options: nodemailer.SendMailOptions = {
-            from: mailConstant.mail_user,
+            from: this._configService.get<string>('MAIL_USER'),
             to: recipients,
             subject: subject,
             html: html,
