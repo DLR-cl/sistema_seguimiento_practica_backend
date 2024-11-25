@@ -17,6 +17,7 @@ import { PreguntasImplementadasConfidencialModule } from './modules/preguntas-im
 import { PreguntasImplementadasInformeAlumnoModule } from './modules/preguntas-implementadas-informe-alumno/preguntas-implementadas-informe-alumno.module';
 import { DimensionesEvaluativasModule } from './modules/dimensiones-evaluativas/dimensiones-evaluativas.module';
 import { MailModule } from './mail/mail.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 
 @Module({
@@ -39,6 +40,15 @@ import { MailModule } from './mail/mail.module';
     PreguntasImplementadasInformeAlumnoModule,
     DimensionesEvaluativasModule,
     MailModule,
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.MAIL_HOST,
+        auth: {
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASSWORD,
+        }
+      }
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

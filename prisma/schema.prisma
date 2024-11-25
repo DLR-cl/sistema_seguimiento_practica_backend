@@ -19,12 +19,13 @@ model Usuarios {
   correo       String       @unique @db.VarChar(100)
   nombre       String       @db.VarChar(200)
   rut          String       @unique @db.Char(10)
+  
   tipo_usuario Tipo_usuario
-
+  comentarios comentariosPractica[]
   alumno_practica AlumnosPractica?
   jefe_alumno     JefesAlumno?
   academico       Academico?
-
+  
   @@map("usuario")
 }
 
@@ -111,10 +112,21 @@ model InformesAlumno {
   practica  Practicas       @relation(fields: [id_practica], references: [id_practica])
   alumno    AlumnosPractica @relation(fields: [id_alumno], references: [id_user])
   academico Academico?      @relation(fields: [id_academico], references: [id_user])
-
   respuestas RespuestasInformeAlumno[]
+  comentarios comentariosPractica[]
 }
 
+model comentariosPractica {
+  comentario String @db.VarChar(300)
+
+  id_informe Int
+  id_usuario Int 
+
+  informe InformesAlumno @relation(fields: [id_informe], references: [id_informe])
+  usuario Usuarios @relation(fields: [id_usuario], references: [id_usuario])
+  @@id([id_informe, id_usuario])
+  
+}
 model RespuestasInformeAlumno {
   id_informe        Int
   id_pregunta       Int

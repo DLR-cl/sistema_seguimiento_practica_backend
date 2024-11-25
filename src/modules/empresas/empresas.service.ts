@@ -13,11 +13,7 @@ export class EmpresasService {
     ){}
 
     private readonly logger = new Logger(EmpresasService.name);
-    
-    @Cron(CronExpression.EVERY_10_SECONDS)
-    handleCron(){
-        this.logger.debug('Hola soy el handler del tiempo');
-    }
+
     public async crearEmpresas(empresa: createEmpresasDto): Promise<Empresas>{
         
         try{

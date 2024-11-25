@@ -158,10 +158,7 @@ export class PracticasService {
         }
     }
 
-    @Cron('* 0 8 * * 1-5', {
-        name: 'check-estado-practica',
-        timeZone: 'America/Santiago',
-    })
+
     private async checkEstadoPractica(){
         try {
 
