@@ -9,9 +9,4 @@ export class CreateInformeAlumnoDto {
     @IsNotEmpty()
     @IsNumber()
     id_alumno: number;
-
-    @IsNotEmpty()
-    @IsString()
-    archivo: string;
-
 }
