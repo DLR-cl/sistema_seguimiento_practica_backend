@@ -1,9 +1,11 @@
-import { BadRequestException, Body, Controller, FileTypeValidator, MaxFileSizeValidator, ParseFilePipe, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { CreateInformeAlumnoDto } from './dto/create-informe-alumno.dto';
 import { InformeAlumnoService } from './informe_alumno.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
+import { InformeDto } from './dto/informe_pdf.dto';
+import { Response } from 'express';
 
 
 @Controller('informe-alumno')
@@ -14,8 +16,8 @@ export class InformeAlumnoController {
     ) { }
 
     @Post('crear-informe')
-    public crearInformeAlumno(@Body() informe: CreateInformeAlumnoDto) {
-        this._informeAlumnoService.crearInformeAlumno(informe);
+    public async crearInformeAlumno(@Body() informe: CreateInformeAlumnoDto) {
+        return await this._informeAlumnoService.crearInformeAlumno(informe);
     }
 
     @Post('upload')
@@ -23,10 +25,8 @@ export class InformeAlumnoController {
         storage: diskStorage({
             destination: './uploads',
             filename: (req, file, callback) => {
-                const fileNameSplit = file.originalname.split(".");
-                console.log(file);
-                const fileExt = fileNameSplit[fileNameSplit.length - 1];
-                callback(null, `${Date.now()}.${fileExt}`);
+
+                callback(null, file.originalname);
             },
         }),
     }))
@@ -38,13 +38,35 @@ export class InformeAlumnoController {
             ],
             exceptionFactory: (errors) => new BadRequestException('Archivo inválido')
         })
-    ) file: Express.Multer.File) {
-        return {
-            message: 'Archiva subido exitosamente',
-            filename: file.originalname,
-            path: file.path
-        }
+    ) file: Express.Multer.File, @Body() body: {id: string}) {
+        const { id } = body;
+        const path = require('path');
+        const fs = require('fs');
+
+        const originalPath = path.resolve(file.path);
+        const extension = extname(file.originalname);
+        const nuevoNombre = `informe-${id}${extension}`;
+        const filePath = join(__dirname, '..', '..', '..', 'uploads', nuevoNombre);
+        fs.renameSync(originalPath, filePath);
+
+        return await this._informeAlumnoService.asociarArchivoAlumno(+body.id, nuevoNombre)
     }
     // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio
     // del servicio que se cambiará parte del informe añadiendole la ruta en la cual se encuentra.
+
+    @Get(':id/archivo')
+    async getArchivo(@Param('id') id: string, @Res() res:Response){
+        try {
+            
+            const filePath = await this._informeAlumnoService.getArchivo(+id);
+            return res.sendFile(filePath);
+        } catch (error) {
+            if(error instanceof NotFoundException){
+                throw error;
+            }
+            throw new NotFoundException('Hubo un problema al procesar el archivo');
+        }
+
+
+    }
 }

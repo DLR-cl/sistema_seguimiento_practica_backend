@@ -13,7 +13,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from '../users/users.module';
 
 @Module({
-  providers: [InformeAlumnoService],
+  providers: [InformeAlumnoService,Object],
   controllers: [InformeAlumnoController],
   exports: [InformeAlumnoService],
   imports: [DatabaseModule, AlumnoPracticaModule, PracticasModule, AuthModule, UsersModule]

@@ -8,4 +8,6 @@ export class CreateEnlaceDto{
     @IsNotEmpty()
     @IsNumber()
     id_practica: number;
+
+
 }
