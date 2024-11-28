@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
 import { AsignarPreguntaDto, AsignarPreguntasDto } from './dto/asignar-preguntas.dto';
 import { Preguntas } from '@prisma/client';
@@ -37,6 +37,16 @@ export class PreguntasImplementadasInformeAlumnoService {
     public async asignarPregunta(pregunta_id: number){
         try {
             const existe = await this._preguntaService.obtenerPreguntaById(pregunta_id);
+            const yaAsignado = await this._databaseService.preguntasImplementadasInformeAlumno.findUnique({
+                where: {
+                    id_pregunta: pregunta_id,
+                }
+            })
+
+            if(yaAsignado){
+                throw new BadRequestException('La pregunta ya se encuentra asignada');
+            }
+            
             if(!existe){
                 throw new BadRequestException('No existe pregunta a relacionar')
             }
