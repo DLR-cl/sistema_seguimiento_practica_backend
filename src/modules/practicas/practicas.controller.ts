@@ -10,6 +10,7 @@ export class PracticasController {
 
     @Post('generar')
     public generarPractica(@Body() practica: createPracticaDto){
+        
         return this._practicaService.generarPractica(practica);
     }
 

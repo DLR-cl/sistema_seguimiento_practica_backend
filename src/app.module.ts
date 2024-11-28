@@ -18,6 +18,8 @@ import { PreguntasImplementadasInformeAlumnoModule } from './modules/preguntas-i
 import { DimensionesEvaluativasModule } from './modules/dimensiones-evaluativas/dimensiones-evaluativas.module';
 import { MailModule } from './mail/mail.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { SwaggerModule } from '@nestjs/swagger';
+import { AsignaturasModule } from './modules/asignaturas/asignaturas.module';
 
 
 @Module({
@@ -40,6 +42,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
     PreguntasImplementadasInformeAlumnoModule,
     DimensionesEvaluativasModule,
     MailModule,
+    SwaggerModule,
+    AsignaturasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

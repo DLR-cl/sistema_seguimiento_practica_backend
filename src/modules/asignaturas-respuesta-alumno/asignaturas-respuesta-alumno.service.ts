@@ -33,9 +33,10 @@ export class AsignaturasRespuestaAlumnoService {
 
     public async getAllRespuestasAsignaturas(){
         try {
-            const asignaturas = await this._databaseService.asignaturasEnRespuestasInforme.findMany();
+            const asignaturasRespuesta = await this._databaseService.asignaturasEnRespuestasInforme.findMany();
+            return asignaturasRespuesta;
         } catch (error) {
-            
+            throw error;
         }
     }
 

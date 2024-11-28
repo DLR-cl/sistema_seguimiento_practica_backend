@@ -121,4 +121,30 @@ export class AlumnoPracticaService {
         });
         return alumnos;
     }
+
+    public async activarPractica(id_alumno: number, tipo_practica: TipoPractica){
+
+        if(tipo_practica == TipoPractica.PRACTICA_UNO){
+            const alumno = await this._databaseService.alumnosPractica.update({
+                where: {
+                    id_user: id_alumno,
+                },
+                data: {
+                    primer_practica: true,
+                }
+            })
+        }else if(tipo_practica == TipoPractica.PRACTICA_DOS){
+            const alumno = await this._databaseService.alumnosPractica.update({
+                where: {
+                    id_user: id_alumno,
+                },
+                data: {
+                    segunda_practica: true,
+                }
+            });
+        }else {
+            throw new BadRequestException('tipo de práctica no válido para activar la práctica');
+        }
+    }
+
 }

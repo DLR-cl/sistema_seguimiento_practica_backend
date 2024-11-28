@@ -60,11 +60,9 @@ export class AsignaturasService {
     public async getAllAsignaturas(){
         try {
             const asignaturas: Asignaturas[] = await this._databaseService.asignaturas.findMany();
-
+            return asignaturas;
         } catch (error) {
-            if(error instanceof InternalServerErrorException){
-                throw error;
-            }
+            throw error;
         }
     }
 }

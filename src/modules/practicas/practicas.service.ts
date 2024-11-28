@@ -19,9 +19,8 @@ export class PracticasService {
 
     public async generarPractica(practica: createPracticaDto){
         try {
-            
             // si ya existe una práctica definida
-            if(await this.hayPractica(practica)){
+            if(await this.hayPracticaActiva(practica)){
                 throw new BadRequestException('Ya existe una práctica registrada con esos datos');
             };
 
@@ -55,15 +54,22 @@ export class PracticasService {
         }
     }
 
-    public async hayPractica(practica: createPracticaDto){
+    public async hayPracticaActiva(practica: createPracticaDto){
         const existePractica = await this._databaseService.practicas.findFirst({
             where:{
                 id_alumno: practica.id_alumno,
                 id_supervisor: practica.id_supervisor,
                 tipo_practica: practica.tipo_practica,
                 fecha_inicio: practica.fecha_inicio,
-                estado: Estado_practica.CURSANDO
+                NOT: {
+                    OR: [
+                        {
+                            estado: Estado_practica.FINALIZADA,
+                        },
+                    ]
+                }
             }
+            
         });
 
         if(!existePractica){
@@ -86,25 +92,16 @@ export class PracticasService {
     }
 
     public async activarPractica(id_alumno: number, tipo_practica: TipoPractica){
-        if(tipo_practica == TipoPractica.PRACTICA_UNO){
-            const alumno = await this._databaseService.alumnosPractica.update({
-                where: {
-                    id_user: id_alumno,
-                },
-                data: {
-                    primer_practica: true,
-                }
-            });
-        }else {
-            const alumno = await this._databaseService.alumnosPractica.update({
-                where: {
-                    id_user: id_alumno,
-                },
-                data: {
-                    segunda_practica: true,
-                }
-            });
-        }        
+
+       try {
+        const activacion = await this._alumnoService.activarPractica(id_alumno, tipo_practica);
+        return activacion;
+       } catch (error) {
+        if(error instanceof BadRequestException){
+            throw error;
+        }
+        throw new InternalServerErrorException('Error interno al activar la practica');
+       }
     }
 
     public async cambiarEstadoPractica(id_practica: number, estado_nuevo: Estado_practica){

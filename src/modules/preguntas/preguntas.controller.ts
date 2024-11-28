@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CrearPreguntaDto } from './dto/crear-pregunta.dto';
 import { PreguntasService } from './preguntas.service';
 import { CrearPreguntasDto } from './dto/crear-preguntas.dto';
@@ -23,6 +23,11 @@ export class PreguntasController {
     @Get()
     public async obtenerPreguntas(){
         return this._preguntaService.getAllPreguntas();
+    }
+
+    @Get('dimension/:dimension')
+    public async obtenerPreguntasPorDimension(@Param('dimension')id_dimension: string){
+        return await this._preguntaService.obtenerPreguntasPorDimension(+id_dimension);
     }
   
 }

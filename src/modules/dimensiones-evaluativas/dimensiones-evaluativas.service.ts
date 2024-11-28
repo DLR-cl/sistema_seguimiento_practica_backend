@@ -23,19 +23,13 @@ export class DimensionesEvaluativasService {
         }
     }
 
-    public async getPreguntasByDimension(id_dimension: number){
-        try {
-            const preguntas = await this._databaseService.preguntas.findMany({
-                where: {
-                    id_dimension: id_dimension
-                }
-            });
 
-            return preguntas;
-        } catch (error) {
-        }
+    public async getDimension(id_dimension: number){
+        return await this._databaseService.dimensionesEvaluativas.findUnique({
+            where: { id_dimension: id_dimension}
+        })
     }
-
+    // mover a respuestasInforme
     public async getPuntajeByDimension(id_dimension: number){
         try {
             const totalPuntajeAlumnos = await this._databaseService.respuestasInformeAlumno.aggregate({

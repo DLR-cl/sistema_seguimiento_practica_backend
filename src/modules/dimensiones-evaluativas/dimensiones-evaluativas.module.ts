@@ -7,6 +7,7 @@ import { RespuestasInformeAlumnoModule } from '../respuestas-informe-alumno/resp
 @Module({
   providers: [DimensionesEvaluativasService],
   imports: [DatabaseModule],
-  controllers: [DimensionesEvaluativasController]
+  controllers: [DimensionesEvaluativasController],
+  exports: [DimensionesEvaluativasService]
 })
 export class DimensionesEvaluativasModule {}

@@ -230,7 +230,8 @@ model DimensionesEvaluativas {
 model Asignaturas {
   nombre String @id @db.VarChar(100)
   tipo_asignatura Tipo_asignatura
-  semestre Int 
+  semestre Int
+  //color String;  
   codigo String
 
 
@@ -277,8 +278,6 @@ enum Estado_practica {
   CORRECCION_INFORME_ALUMNO
   ESPERA_INFORME_CONFIDENCIAL
   REVISION_GENERAL
-  APROBADA
-  DESAPROBADA
   FINALIZADA
 }
 

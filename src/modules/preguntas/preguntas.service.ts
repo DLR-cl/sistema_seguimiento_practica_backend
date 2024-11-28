@@ -3,11 +3,14 @@ import { DatabaseService } from 'src/database/database/database.service';
 import { ModificarPreguntaDto } from './dto/modificar-pregunta.dto';
 import { CrearPreguntaDto } from './dto/crear-pregunta.dto';
 import { CrearPreguntasDto } from './dto/crear-preguntas.dto';
+import { DimensionesEvaluativasService } from '../dimensiones-evaluativas/dimensiones-evaluativas.service';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class PreguntasService {
     constructor(
-        private readonly _databaseService: DatabaseService
+        private readonly _databaseService: DatabaseService,
+        private readonly _dimensionesService: DimensionesEvaluativasService
     ){}
 
 
@@ -82,5 +85,24 @@ export class PreguntasService {
         }
 
         return true;
+    }
+
+    public async obtenerPreguntasPorDimension(id_dimension: number){
+        try {
+            const dimension = await this._dimensionesService.getDimension(id_dimension);
+            if(!dimension){
+                throw new BadRequestException('La dimension que busca no existe en el sistema')
+            };
+
+            const preguntas = await this._databaseService.preguntas.findMany({
+                where: {
+                    id_dimension: id_dimension,
+                }
+            })
+
+            return preguntas;
+        } catch (error) {
+            
+        }
     }
 }
