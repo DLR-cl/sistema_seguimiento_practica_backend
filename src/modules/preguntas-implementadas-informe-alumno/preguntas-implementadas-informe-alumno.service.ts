@@ -20,7 +20,7 @@ export class PreguntasImplementadasInformeAlumnoService {
                 if(!existe){
                     throw new BadRequestException('Pregunta no existe');
                     }
-                }
+                };
 
             const preguntasAsignadas = await this._databaseService.preguntasImplementadasInformeAlumno.createMany({
                     data: asignarPreguntas.preguntas,
@@ -42,7 +42,7 @@ export class PreguntasImplementadasInformeAlumnoService {
                 where: {
                     id_pregunta: pregunta_id,
                 }
-            })
+            });
 
             if(yaAsignado){
                 throw new BadRequestException('La pregunta ya se encuentra asignada');
@@ -80,18 +80,21 @@ export class PreguntasImplementadasInformeAlumnoService {
                 },
             }
         );
-
         const preguntas: responsePreguntas[] = preguntasWithoutMap.flatMap(implementada => implementada.preguntas);
 
         return preguntas
     }
 
     public async obtenerPreguntaImplementada(id_pregunta: number){
-        return await this._databaseService.preguntasImplementadasInformeAlumno.findUnique({
+        const preguntaImplementada = await this._databaseService.preguntasImplementadasInformeAlumno.findUnique({
             where: {
-                id_pregunta: id_pregunta
+                id_pregunta: id_pregunta,
             },
+            include: {
+                preguntas: true,
+            }
         });
-        
+        const pregunta: responsePreguntas = preguntaImplementada.preguntas;
+        return pregunta;
     }
 }

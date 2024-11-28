@@ -23,15 +23,25 @@ export class RespuestasInformeAlumnoService {
                 }
                 // asume que una respuesta contempla asignaturas
                 if(res.asignaturas){
-                    asignaturas = res.asignaturas
-
+                    const asign = await this.asignarRespuestasAsignaturasRespuesta(asignaturas, res.id_pregunta, res.id_informe);
+                }else if(res.puntaje){
+                    const nuevaRespuesta = await this._databaseService.respuestasInformeAlumno.create({
+                        data: {
+                            id_informe: res.id_informe,
+                            id_pregunta: res.id_pregunta,
+                            puntaje: res.puntaje,
+                        }
+                    });
+                }else{
+                    const nuevaRespuesta = await this._databaseService.respuestasInformeAlumno.create({
+                        data: {
+                            id_informe: res.id_informe,
+                            id_pregunta: res.id_pregunta,
+                            texto: res.texto
+                        }
+                    })
                 }
             }
-
-            const asign = await this.asignarRespuestasAsignaturasRespuesta(asignaturas, respuestas.respuestas[0].id_pregunta, respuestas.respuestas[0].id_informe);
-            const nuevaRespuesta = await this._databaseService.respuestasInformeAlumno.createMany({
-                data: respuestas.respuestas
-            });
 
             return "creado con éxito";
         } catch (error) {
