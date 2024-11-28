@@ -19,7 +19,7 @@ export class PreguntasImplementadasInformeAlumnoController {
     }
 
     @Post('asociar-varios')
-    public async implementarPreguntas(pregunta: AsignarPreguntasDto){
+    public async implementarPreguntas(@Body() pregunta: AsignarPreguntasDto){
         return await this._preguntaAlumnoService.asignarPreguntas(pregunta);
     }
 }

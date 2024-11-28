@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
-import { AsignaturaRespuestaDto, AsignaturasRespuestaDto, CreateRespuestaInformAlumnoDto, ListaRespuestaDto } from './dto/create-respuesta-informe-alumno.dto';
+import { CreateRespuestaInformAlumnoDto, ListaRespuestaDto } from './dto/create-respuesta-informe-alumno.dto';
 import { InformeAlumnoService } from '../informe_alumno/informe_alumno.service';
 
 import { PreguntasImplementadasInformeAlumnoService } from '../preguntas-implementadas-informe-alumno/preguntas-implementadas-informe-alumno.service';
@@ -15,14 +15,20 @@ export class RespuestasInformeAlumnoService {
 
     public async crearRespuesta(respuestas: ListaRespuestaDto){
         try {
-            
+            let asignaturas: string[];
             for(let res of respuestas.respuestas){
                 const validar = await this.validarRespuestas(res);
                 if(!validar){
                     throw new BadRequestException('No existe pregunta o informe asociado');
                 }
+                // asume que una respuesta contempla asignaturas
+                if(res.asignaturas){
+                    asignaturas = res.asignaturas
+
+                }
             }
 
+            const asign = await this.asignarRespuestasAsignaturasRespuesta(asignaturas, respuestas.respuestas[0].id_pregunta, respuestas.respuestas[0].id_informe);
             const nuevaRespuesta = await this._databaseService.respuestasInformeAlumno.createMany({
                 data: respuestas.respuestas
             });
@@ -35,10 +41,22 @@ export class RespuestasInformeAlumnoService {
         }
     }
 
-    public async asignarRespuestasAsignaturasRespuesta(asignaturas: AsignaturasRespuestaDto){
+    public async asignarRespuestasAsignaturasRespuesta(asignaturas: string[], id_informe: number, id_pregunta: number){
         try {
+
+            const array = [];
+
+            for(let asig of asignaturas){
+                let typeAsig = {
+                    id_informe: id_informe,
+                    id_pregunta: id_pregunta,
+                    nombre_asignatura: asig,
+                }
+
+                array.push(typeAsig);
+            }
             const asignar = await this._databaseService.asignaturasEnRespuestasInforme.createMany({
-                data: asignaturas.asignaturas
+                data: array
             })
 
             return asignar;

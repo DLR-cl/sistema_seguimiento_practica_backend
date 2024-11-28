@@ -18,8 +18,8 @@ export class CreateRespuestaInformAlumnoDto {
     puntaje?: number;
 
     @IsOptional()
-    @IsString()
-    nombre_asignatura?: string;
+    @IsArray()
+    asignaturas?: string[];
 }
 
 export class ListaRespuestaDto {
@@ -28,22 +28,3 @@ export class ListaRespuestaDto {
     respuestas: CreateRespuestaInformAlumnoDto[];
 }
 
-export class AsignaturaRespuestaDto {
-    @IsNotEmpty()
-    @IsNumber()
-    id_informe: number;
-
-    @IsNotEmpty()
-    @IsNumber()
-    id_pregunta: number;
-
-    @IsNotEmpty()
-    @IsString()
-    nombre_asignatura: string;
-}
-
-export class AsignaturasRespuestaDto {
-    @IsNotEmpty()
-    @IsArray()
-    asignaturas: AsignaturaRespuestaDto[];
-}
