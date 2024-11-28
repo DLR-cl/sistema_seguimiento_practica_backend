@@ -1,28 +1,31 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
 import { AsignarPreguntaDto, AsignarPreguntasDto } from './dto/asignar-preguntas.dto';
 import { Preguntas } from '@prisma/client';
+import { PreguntasService } from '../preguntas/preguntas.service';
 
 @Injectable()
 export class PreguntasImplementadasInformeAlumnoService {
     constructor(
         private readonly _databaseService: DatabaseService,
-    ){}
+        private readonly _preguntaService: PreguntasService,
+    ){ }
 
     public async asignarPreguntas(asignarPreguntas: AsignarPreguntasDto){
         try {
             
             for(let preg of asignarPreguntas.preguntas){
-                if(!await this.existePregunta(preg.id_pregunta)){
+                const existe = await this._preguntaService.obtenerPreguntaById(preg.id_pregunta);
+                if(!existe){
                     throw new BadRequestException('Pregunta no existe');
+                    }
                 }
-            }
 
-            const pregunta = await this._databaseService.preguntasImplementadasInformeAlumno.createMany({
-                data: asignarPreguntas.preguntas
+            const preguntasAsignadas = await this._databaseService.preguntasImplementadasInformeAlumno.createMany({
+                    data: asignarPreguntas.preguntas,
             });
 
-            return pregunta;
+            return preguntasAsignadas;
 
         } catch (error) {
             if(error instanceof BadRequestException){
@@ -33,33 +36,23 @@ export class PreguntasImplementadasInformeAlumnoService {
 
     public async asignarPregunta(pregunta: AsignarPreguntaDto){
         try {
+            const existe = await this._preguntaService.obtenerPreguntaById(pregunta.id_pregunta);
+            if(!existe){
+                throw new BadRequestException('No existe pregunta a relacionar')
+            }
             const implementacion = await this._databaseService.preguntasImplementadasInformeAlumno.create({
                 data: pregunta,
             });
             return implementacion;
         } catch (error) {
-            
-        }
-    }
-    public async existePregunta(id_pregunta: number){
-        try {
-            const exist = await this._databaseService.preguntas.findUnique({
-                where: {
-                    id_pregunta: id_pregunta
-                }
-            })
-
-            if(!exist){
-                return false;
-            }
-
-            return true;
-        } catch (error) {
             if(error instanceof BadRequestException){
                 throw error;
             }
+
+            throw new InternalServerErrorException('Error interno al asignar la pregunta al informe');
         }
     }
+
 
     public async obtenerPreguntas(){
         return await this._databaseService.preguntasImplementadasInformeAlumno.findMany(
@@ -69,6 +62,14 @@ export class PreguntasImplementadasInformeAlumnoService {
                 }
             }
         );
+    }
 
+    public async obtenerPreguntaImplementada(id_pregunta: number){
+        return await this._databaseService.preguntasImplementadasInformeAlumno.findUnique({
+            where: {
+                id_pregunta: id_pregunta
+            },
+        });
+        
     }
 }

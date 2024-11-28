@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
-import { CreateRespuestaInformAlumnoDto, ListaRespuestaDto } from './dto/create-respuesta-informe-alumno.dto';
+import { AsignaturaRespuestaDto, AsignaturasRespuestaDto, CreateRespuestaInformAlumnoDto, ListaRespuestaDto } from './dto/create-respuesta-informe-alumno.dto';
 import { InformeAlumnoService } from '../informe_alumno/informe_alumno.service';
 
 import { PreguntasImplementadasInformeAlumnoService } from '../preguntas-implementadas-informe-alumno/preguntas-implementadas-informe-alumno.service';
@@ -13,14 +13,18 @@ export class RespuestasInformeAlumnoService {
         private readonly _preguntasAlumnoService: PreguntasImplementadasInformeAlumnoService
     ){}
 
-    public async crearRespuesta(respuesta: ListaRespuestaDto){
+    public async crearRespuesta(respuestas: ListaRespuestaDto){
         try {
             
-            if(!await this.validarRespuestas(respuesta.respuestas[0])){
-                throw new BadRequestException('No existe pregunta o informe asociado a la respuesta');
+            for(let res of respuestas.respuestas){
+                const validar = await this.validarRespuestas(res);
+                if(!validar){
+                    throw new BadRequestException('No existe pregunta o informe asociado');
+                }
             }
+
             const nuevaRespuesta = await this._databaseService.respuestasInformeAlumno.createMany({
-                data: respuesta.respuestas
+                data: respuestas.respuestas
             });
 
             return "creado con éxito";
@@ -31,10 +35,22 @@ export class RespuestasInformeAlumnoService {
         }
     }
 
+    public async asignarRespuestasAsignaturasRespuesta(asignaturas: AsignaturasRespuestaDto){
+        try {
+            const asignar = await this._databaseService.asignaturasEnRespuestasInforme.createMany({
+                data: asignaturas.asignaturas
+            })
+
+            return asignar;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     public async validarRespuestas(respuesta: CreateRespuestaInformAlumnoDto){
         const informe = await this._informeAlumnoService.existeInforme(respuesta.id_informe);
 
-        const pregunta = await this._preguntasAlumnoService.existePregunta(respuesta.id_pregunta);
+        const pregunta = await this._preguntasAlumnoService.obtenerPreguntaImplementada(respuesta.id_pregunta);
 
         if(!(informe || pregunta)){
             return false;

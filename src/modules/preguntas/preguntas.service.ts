@@ -31,6 +31,15 @@ export class PreguntasService {
         }
     }
 
+    public async obtenerPreguntaById(id_pregunta: number){
+        const pregunta = await this._databaseService.preguntas.findUnique({
+            where: {
+                id_pregunta: id_pregunta,
+            }
+        })
+
+        return pregunta;
+    }
     public async crearPreguntas(preguntas: CrearPreguntasDto){
         try {
             console.log(preguntas);

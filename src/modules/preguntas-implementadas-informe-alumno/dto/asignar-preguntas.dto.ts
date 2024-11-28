@@ -11,5 +11,5 @@ export class AsignarPreguntaDto {
     @IsNotEmpty()
     @IsNumber()
     id_pregunta: number;
-
+    
 }
