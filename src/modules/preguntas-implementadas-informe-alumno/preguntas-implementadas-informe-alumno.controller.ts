@@ -1,4 +1,4 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { PreguntasImplementadasInformeAlumnoService } from './preguntas-implementadas-informe-alumno.service';
 import { AsignarPreguntaDto, AsignarPreguntasDto } from './dto/asignar-preguntas.dto';
 
@@ -13,9 +13,9 @@ export class PreguntasImplementadasInformeAlumnoController {
         return await this._preguntaAlumnoService.obtenerPreguntas();
     }
 
-    @Post('asociar')
-    public async implementarPregunta(pregunta: AsignarPreguntaDto){
-        return await this._preguntaAlumnoService.asignarPregunta(pregunta);
+    @Post()
+    public async implementarPregunta(@Body() pregunta: AsignarPreguntaDto){
+        return await this._preguntaAlumnoService.asignarPregunta(pregunta.id_pregunta);
     }
 
     @Post('asociar-varios')

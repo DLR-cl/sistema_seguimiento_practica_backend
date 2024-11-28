@@ -34,21 +34,22 @@ export class PreguntasImplementadasInformeAlumnoService {
         }
     }
 
-    public async asignarPregunta(pregunta: AsignarPreguntaDto){
+    public async asignarPregunta(pregunta_id: number){
         try {
-            const existe = await this._preguntaService.obtenerPreguntaById(pregunta.id_pregunta);
+            const existe = await this._preguntaService.obtenerPreguntaById(pregunta_id);
             if(!existe){
                 throw new BadRequestException('No existe pregunta a relacionar')
             }
             const implementacion = await this._databaseService.preguntasImplementadasInformeAlumno.create({
-                data: pregunta,
+                data: {
+                    id_pregunta: pregunta_id
+                },
             });
             return implementacion;
         } catch (error) {
             if(error instanceof BadRequestException){
                 throw error;
             }
-
             throw new InternalServerErrorException('Error interno al asignar la pregunta al informe');
         }
     }

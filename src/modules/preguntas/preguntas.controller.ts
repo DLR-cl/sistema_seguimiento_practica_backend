@@ -10,7 +10,7 @@ export class PreguntasController {
         private readonly _preguntaService: PreguntasService,
     ){}
 
-    @Post('crear')
+    @Post()
     public async crearPregunta(@Body() pregunta: CrearPreguntaDto){
         return await this._preguntaService.crearPregunta(pregunta);
     }

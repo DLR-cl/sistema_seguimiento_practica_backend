@@ -9,7 +9,7 @@ export class DimensionesEvaluativasController {
     constructor(
         private readonly _dimensionesService: DimensionesEvaluativasService,
     ){}
-    @Post('crear')
+    @Post()
     public async crearDimension(@Body() dimension: CrearDimensionDto){
         return await this._dimensionesService.crearDimension(dimension);
     }
