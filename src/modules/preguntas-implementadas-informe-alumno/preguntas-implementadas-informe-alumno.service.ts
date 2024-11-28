@@ -3,6 +3,7 @@ import { DatabaseService } from 'src/database/database/database.service';
 import { AsignarPreguntaDto, AsignarPreguntasDto } from './dto/asignar-preguntas.dto';
 import { Preguntas } from '@prisma/client';
 import { PreguntasService } from '../preguntas/preguntas.service';
+import { responsePreguntas } from './dto/response-preguntas.dto';
 
 @Injectable()
 export class PreguntasImplementadasInformeAlumnoService {
@@ -46,7 +47,7 @@ export class PreguntasImplementadasInformeAlumnoService {
             if(yaAsignado){
                 throw new BadRequestException('La pregunta ya se encuentra asignada');
             }
-            
+
             if(!existe){
                 throw new BadRequestException('No existe pregunta a relacionar')
             }
@@ -66,13 +67,23 @@ export class PreguntasImplementadasInformeAlumnoService {
 
 
     public async obtenerPreguntas(){
-        return await this._databaseService.preguntasImplementadasInformeAlumno.findMany(
-            {
+        const preguntasWithoutMap = await this._databaseService.preguntasImplementadasInformeAlumno.findMany(
+            {   
                 include: {
-                    preguntas: true,
-                }
+                    preguntas: {
+                        select: {
+                            id_pregunta: true,
+                            enunciado_pregunta: true,
+                            tipo_pregunta: true,
+                        }
+                    },
+                },
             }
         );
+
+        const preguntas: responsePreguntas[] = preguntasWithoutMap.flatMap(implementada => implementada.preguntas);
+
+        return preguntas
     }
 
     public async obtenerPreguntaImplementada(id_pregunta: number){
