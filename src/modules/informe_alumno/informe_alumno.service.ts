@@ -1,16 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException, Param } from '@nestjs/common';
 import { CreateInformeAlumnoDto } from './dto/create-informe-alumno.dto';
 import { DatabaseService } from '../../database/database/database.service';
-import { Estado_informe, Estado_practica, TipoPractica } from '@prisma/client';
+import { Estado_informe, Estado_practica, InformesAlumno, TipoPractica } from '@prisma/client';
 import { AlumnoPracticaService } from '../alumno_practica/alumno_practica.service';
 import { PracticasService } from '../practicas/practicas.service';
 import { CreateAsignacionDto } from './dto/create-asignacion.dto';
 import { CreateEnlaceDto } from './dto/create-enlace.dto';
 import { file } from 'googleapis/build/src/apis/file';
 import * as path from 'path';
-import { NotFoundError } from 'rxjs';
-import { existsSync } from 'fs';
-import { ElPepe } from 'uploads/hola';
+
 @Injectable()
 export class InformeAlumnoService {
     constructor(
@@ -30,7 +28,7 @@ export class InformeAlumnoService {
             if(!await this.existeInformeRegistrado(informe.id_alumno, informe.id_practica)){
                 throw new BadRequestException('Ya existe un informe asociado a esa practica');
             }
-
+            
             const nuevoInforme = await this._databaseService.informesAlumno.create({
                 data: {
                     ...informe,
@@ -61,12 +59,14 @@ export class InformeAlumnoService {
     
     }
     public async asignarInformeAlAcademico(asignacion: CreateAsignacionDto){
-
         try{
             // asignar informe al academico, debe existir academico e informe
-            if(this.existeInforme(asignacion.id_informe)!){
+            if(!await this.existeInforme(asignacion.id_informe)){
                 throw new BadRequestException('No existe informe');
-            }
+            }  
+            const fechaInicio = new Date();
+            const fechaFin = new Date(fechaInicio);
+            fechaFin.setDate(fechaInicio.getDate() + 14 );
 
             const asignarInforme = await this._databaseService.informesAlumno.update({
                 where:{
@@ -74,7 +74,9 @@ export class InformeAlumnoService {
                 },
                 data: {
                     id_academico: asignacion.id_academico,
-                    estado: Estado_informe.REVISION
+                    estado: Estado_informe.REVISION,
+                    fecha_inicio_revision: fechaInicio,
+                    fecha_termino_revision: fechaFin,
                 }
             });
             // antes de cambiar el estado hay que definir cuánto tiempo tiene el academico para revisarlo...
@@ -84,7 +86,36 @@ export class InformeAlumnoService {
                 throw error;
             }
         }
+    }
 
+    private async generarAlertaAcademico(){
+        try {
+            const informesAlumno: InformesAlumno[] = await this._databaseService.informesAlumno.findMany({
+                where: {
+                    estado: Estado_informe.REVISION
+                },
+            });
+            const actualDay = new Date();
+            for(let informe of informesAlumno){
+                let terminoDay = new Date(informe.fecha_termino_revision);
+                
+                const diferenciaDias = Math.ceil((
+                    terminoDay.getDate() - actualDay.getDate()
+                )/ (1000 * 60 * 20 * 24));
+
+                if(diferenciaDias == 7){
+                    // generar alerta
+                }else if(diferenciaDias == 3){
+                    // generar alerta
+                }else if(diferenciaDias == 0){
+                    // generar alerta
+                }else if(diferenciaDias < 0){
+                    // generar de atraso contando los dias que lleva atrasado
+                }
+            }   
+        } catch (error) {
+            
+        }
     }
 
     public async aprobarInforme(id_informe: number ,aprobacion: Estado_informe){
@@ -94,7 +125,7 @@ export class InformeAlumnoService {
                     id_informe: id_informe
                 },
                 data: {
-                    estado: aprobacion
+                    estado: aprobacion,
                 }
             }
         )

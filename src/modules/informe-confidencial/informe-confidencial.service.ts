@@ -66,9 +66,9 @@ export class InformeConfidencialService {
                 }
             });
 
-            return 'cambiazo';
+            return 'Se realizó la asignación correctamente';
         } catch (error) {
-            
+            throw error;
         }
     }
 

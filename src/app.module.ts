@@ -20,6 +20,7 @@ import { MailModule } from './mail/mail.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AsignaturasModule } from './modules/asignaturas/asignaturas.module';
+import { RespuestasInformeAlumnoModule } from './modules/respuestas-informe-alumno/respuestas-informe-alumno.module';
 
 
 @Module({
@@ -44,6 +45,7 @@ import { AsignaturasModule } from './modules/asignaturas/asignaturas.module';
     MailModule,
     SwaggerModule,
     AsignaturasModule,
+    RespuestasInformeAlumnoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

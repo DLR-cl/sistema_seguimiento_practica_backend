@@ -6,9 +6,10 @@ import { ResponseAlumnoDto } from './dto/response-alumno.dto';
 import { AlumnoDataDto } from './dto/alumno-data.dto';
 import { DatabaseService } from '../../database/database/database.service';
 import { AuthService } from '../../auth/auth.service';
-import { Tipo_usuario, TipoPractica, Usuarios } from '@prisma/client';
+import { Estado_informe, Estado_practica, Tipo_usuario, TipoPractica, Usuarios } from '@prisma/client';
 import { AlumnosDataDto } from './dto/alumnos-data.dto';
 import { UsersService } from '../users/users.service';
+import { escape } from 'querystring';
 
 @Injectable()
 export class AlumnoPracticaService {
@@ -59,7 +60,11 @@ export class AlumnoPracticaService {
                 id_user: id,
             },
             include: {
-                practica:  true,
+                practica: {
+                    where: {
+                        estado: Estado_practica.ESPERA_INFORME_ALUMNO,
+                    }
+                },
                 informe: true,
             }
         });
@@ -151,4 +156,5 @@ export class AlumnoPracticaService {
         }
     }
 
+0
 }

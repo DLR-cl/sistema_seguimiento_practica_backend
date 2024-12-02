@@ -178,7 +178,8 @@ export class PracticasService {
                 }
             });
             const fecha_actual = new Date();
-            practicas.forEach((practica) => {
+            const ids_practicas_finalizadas: number[] = [];
+            practicas.forEach((practica) =>  {
                 const fechaTermino = new Date(practica.fecha_termino);
                 const diferenciaDias = Math.ceil(
                     (fechaTermino.getTime() - fecha_actual.getTime()) / (1000 * 60 * 60 * 24),
@@ -191,21 +192,52 @@ export class PracticasService {
                         html: 'Estimado/a actualmente le queda 3 días de práctica, en caso de extender su práctica por favor solicite dicha extension a la brevedad, en caso que no ignore este correo, gracias',
                     }
                     this._emailService.sendEmail(message);
+                }else if(diferenciaDias <= 0){
+                    ids_practicas_finalizadas.push(practica.id_practica);
                 }
             });
+
+            for(let i of ids_practicas_finalizadas){
+                const updatePractica = await this._databaseService.practicas.update({
+                    where: {
+                        id_practica: i,
+                    },
+                    data: {
+                        estado: Estado_practica.ESPERA_INFORME_ALUMNO,
+                    }
+                })
+            }
         } catch (error) {
             throw error;
         }
     }
 
+    private 
+
     public async esPracticaAlumno(id_alumno: number){
         return await this._databaseService.practicas.findFirst({
             where: { 
                 id_alumno: id_alumno,
-                NOT: {
-                    estado: Estado_practica.FINALIZADA
-                }
+                estado: Estado_practica.ESPERA_INFORME_ALUMNO
             }
         })
+    }
+
+    public async alumnoHabilitadoEnviarInforme(id_alumno: number){
+        const actualDate = new Date();
+        // buscar practica de un alumno cuya practica esté finalizada
+        const practica = await this._databaseService.practicas.findFirst({
+            where: {
+                fecha_termino: {
+                    lt: actualDate
+                },
+                id_alumno: id_alumno,
+            }
+        });
+        // 
+        if(!practica){
+            return false;
+        }
+        return true;
     }
 }
