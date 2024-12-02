@@ -57,6 +57,10 @@ export class AlumnoPracticaService {
         const findAlumno = await this._databaseService.alumnosPractica.findUnique({
             where: {
                 id_user: id,
+            },
+            include: {
+                practica:  true,
+                informe: true,
             }
         });
 
