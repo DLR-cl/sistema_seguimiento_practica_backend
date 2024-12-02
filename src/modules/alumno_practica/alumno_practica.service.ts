@@ -48,7 +48,7 @@ export class AlumnoPracticaService {
         });
 
         if(!findUser){
-            throw new BadRequestException('Error al obtener el usuario');
+            throw new BadRequestException('Usuario no existente');
         }
 
         const {password: _, ...userWithoutPassword} = findUser;
