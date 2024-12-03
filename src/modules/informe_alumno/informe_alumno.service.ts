@@ -21,17 +21,19 @@ export class InformeAlumnoService {
 
     public async crearInformeAlumno(informe: CreateInformeAlumnoDto){
         try {
-            if(!await this._alumnoService.existeAlumno(informe.id_alumno) || !((await this._practicaService.esPracticaAlumno(informe.id_alumno)).id_practica == informe.id_practica)){
+            console.log(informe.id_practica);
+            if(!await this._alumnoService.existeAlumno(informe.id_alumno)){
                 throw new BadRequestException('No existe alumno o la practica no le pertenece')
             }
-
+            console.log('hola')
             if(!await this.existeInformeRegistrado(informe.id_alumno, informe.id_practica)){
                 throw new BadRequestException('Ya existe un informe asociado a esa practica');
             }
-            
+            console.log('hola')
             const nuevoInforme = await this._databaseService.informesAlumno.create({
                 data: {
-                    ...informe,
+                    id_practica: informe.id_practica,
+                    id_alumno: informe.id_alumno,
                     estado: Estado_informe.ENVIADA,
                 }
             });
@@ -44,11 +46,11 @@ export class InformeAlumnoService {
         };
     };
 
-    private async existeInformeRegistrado(id_alumno: number, id_practica: number) {
+    private async existeInformeRegistrado(id_alumno: number, id_pract: number) {
         const informe = await this._databaseService.informesAlumno.findFirst({
             where: {
                 id_alumno: id_alumno,
-                id_practica: id_practica
+                id_practica: id_pract
             }
         });
 
@@ -157,9 +159,15 @@ export class InformeAlumnoService {
                 where: {id_informe: id},
                 data: { archivo: fileName},
             });
+            const getInforme = await this._databaseService.informesAlumno.findUnique({
+                where: {
+                    id_informe: id
+                }
+            });
+            console.log(getInforme)
             const updatePractica = await this._databaseService.practicas.update({
                 where:{
-                    id_practica: informe.id_practica,
+                    id_practica: getInforme.id_practica,
                 },
                 data: {
                     estado: Estado_practica.REVISION_INFORME_ALUMNO
@@ -178,7 +186,7 @@ export class InformeAlumnoService {
         if(!informe || !informe.archivo){
             throw new NotFoundException('No se encontro el informe');
         }
-        const uploadPath = path.resolve(__dirname, '..', '..', '..', '..', 'uploads');
+        const uploadPath = path.resolve(__dirname, '..', '..', '..', 'uploads');
         console.log(typeof uploadPath, uploadPath); 
 
         const filePath = path.join(uploadPath, informe.archivo);

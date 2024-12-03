@@ -216,12 +216,10 @@ export class PracticasService {
         }
     }
 
-    private 
-
-    public async esPracticaAlumno(id_alumno: number){
+    public async esPracticaAlumno(id_pract: number){
         return await this._databaseService.practicas.findFirst({
             where: { 
-                id_alumno: id_alumno,
+                id_practica: id_pract,
                 estado: Estado_practica.ESPERA_INFORME_ALUMNO
             }
         })

@@ -23,7 +23,7 @@ export class InformeAlumnoController {
     @Post('upload')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
-            destination: './uploads',
+            destination: 'uploads',
             filename: (req, file, callback) => {
 
                 callback(null, file.originalname);
@@ -46,7 +46,7 @@ export class InformeAlumnoController {
         const originalPath = path.resolve(file.path);
         const extension = extname(file.originalname);
         const nuevoNombre = `informe-${id}${extension}`;
-        const filePath = join(__dirname, '..', '..', '..', 'uploads', nuevoNombre);
+        const filePath = join(__dirname, '..', '..', 'uploads', nuevoNombre);
         fs.renameSync(originalPath, filePath);
 
         return await this._informeAlumnoService.asociarArchivoAlumno(+body.id, nuevoNombre)

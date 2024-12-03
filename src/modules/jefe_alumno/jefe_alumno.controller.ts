@@ -23,7 +23,7 @@ export class JefeAlumnoController {
     }
 
     @Get(':id/lista-informes')
-    public async getListaInformes(@Param('id', ParseIntPipe) id_supervisor){
+    public async getListaInformes(@Param('id', ParseIntPipe) id_supervisor: number){
         return await this._jefeAlumnoService.getEstadoPracticasAsociadas(id_supervisor);
     }
 }
