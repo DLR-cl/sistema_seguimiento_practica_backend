@@ -146,7 +146,10 @@ export class PracticasService {
 
             const practica = await this._databaseService.practicas.findUnique({
                 where: {
-                    id_practica: id_practica
+                    id_practica: id_practica,
+                },
+                include: {
+                    informe_alumno: true,
                 }
             });
 
@@ -174,7 +177,8 @@ export class PracticasService {
                         include: {
                             usuario: true,
                         }
-                    }
+                    },
+                    informe_alumno: true,
                 }
             });
             const fecha_actual = new Date();

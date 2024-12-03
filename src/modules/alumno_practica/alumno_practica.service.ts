@@ -156,5 +156,5 @@ export class AlumnoPracticaService {
         }
     }
 
-0
+
 }

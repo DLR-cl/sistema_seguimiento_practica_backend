@@ -157,6 +157,14 @@ export class InformeAlumnoService {
                 where: {id_informe: id},
                 data: { archivo: fileName},
             });
+            const updatePractica = await this._databaseService.practicas.update({
+                where:{
+                    id_practica: informe.id_practica,
+                },
+                data: {
+                    estado: Estado_practica.REVISION_INFORME_ALUMNO
+                }
+            })
 
             return informe;
         } catch (error) {
@@ -190,5 +198,18 @@ export class InformeAlumnoService {
         });
 
         return informe;
+    }
+
+    public async existeRespuestaInforme(id_practica: number){
+        try {
+            const practica = await this._practicaService.getPractica(id_practica);
+            if(practica.informe_alumno){
+                return practica.informe_alumno;
+            }else {
+                return {};
+            }
+        } catch (error) {
+            throw error;
+        }
     }
 }

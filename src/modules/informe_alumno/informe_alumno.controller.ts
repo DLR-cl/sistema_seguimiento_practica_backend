@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseIntPipe, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { CreateInformeAlumnoDto } from './dto/create-informe-alumno.dto';
 import { InformeAlumnoService } from './informe_alumno.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -66,7 +66,10 @@ export class InformeAlumnoController {
             }
             throw new NotFoundException('Hubo un problema al procesar el archivo');
         }
+    }
 
-
+    @Get('existeRespuesta/:id_practica')
+    public async existeRespuestas(@Param('id_practica') id_practica: string){
+        return await this._informeAlumnoService.existeRespuestaInforme(+id_practica);
     }
 }
