@@ -59,8 +59,12 @@ export class AsignaturasService {
 
     public async getAllAsignaturas(){
         try {
-            const asignaturas: Asignaturas[] = await this._databaseService.asignaturas.findMany();
-            return asignaturas;
+            const asignaturas: Asignaturas[] = await this._databaseService.asignaturas.findMany({
+                orderBy: {
+                    semestre: 'asc'
+                }
+            });
+            return asignaturas;1
         } catch (error) {
             throw error;
         }
