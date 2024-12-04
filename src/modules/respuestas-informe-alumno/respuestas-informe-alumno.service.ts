@@ -23,7 +23,7 @@ export class RespuestasInformeAlumnoService {
                 }
                 // asume que una respuesta contempla asignaturas
                 if(res.asignaturas){
-                    const asign = await this.asignarRespuestasAsignaturasRespuesta(asignaturas, res.id_pregunta, res.id_informe);
+                    const asign = await this.asignarRespuestasAsignaturasRespuesta(res.asignaturas, res.id_pregunta, res.id_informe);
                 }else if(res.puntaje){
                     const nuevaRespuesta = await this._databaseService.respuestasInformeAlumno.create({
                         data: {
