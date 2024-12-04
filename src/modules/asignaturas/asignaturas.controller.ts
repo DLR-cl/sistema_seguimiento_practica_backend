@@ -22,7 +22,7 @@ export class AsignaturasController {
 
     @Post('generar-varios')
     public async generarAsignaturas(@Body() asignaturas: crearAsignaturasDto){
-        return await this.generarAsignaturas(asignaturas);
+        return await this._asignaturasService.createAsignaturas(asignaturas);
     }
     
     @Get()

@@ -232,8 +232,7 @@ model Asignaturas {
   nombre          String          @id @db.VarChar(100)
   tipo_asignatura Tipo_asignatura
   semestre        Int
-  //color String;  
-  codigo          String
+  codigo          String      @db.VarChar(100)
 
   respuestas AsignaturasEnRespuestasInforme[]
 }

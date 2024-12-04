@@ -26,7 +26,7 @@ export class AsignaturasService {
     public async createAsignaturas(asignaturas: crearAsignaturasDto){
         try {
             for(let asig of asignaturas.asignaturas){
-                if(!await this.existeAsignatura(asig.nombre)){
+                if(await this.existeAsignatura(asig.nombre)){
                     throw new BadRequestException('Ya existe la asignatura');
                 }
             };
