@@ -21,8 +21,9 @@ export class RespuestasInformeAlumnoService {
                 if(!validar){
                     throw new BadRequestException('No existe pregunta o informe asociado');
                 }
-                // asume que una respuesta contempla asignaturas
+                // asume que una respuesta contempla asignaturas | fix DEBE CONTENER LA RESPUESTA PARA RELACIONAR CON ASIGNATURAS
                 if(res.asignaturas){
+
                     const asign = await this.asignarRespuestasAsignaturasRespuesta(res.asignaturas, res.id_pregunta, res.id_informe);
                 }else if(res.puntaje){
                     const nuevaRespuesta = await this._databaseService.respuestasInformeAlumno.create({
