@@ -166,7 +166,7 @@ model InformeConfidencial {
   fecha_termino_revision DateTime? @db.Date
   // relacion
   id_supervisor          Int
-  id_alumno_evaluado     Int       @unique
+  id_alumno_evaluado     Int       
   id_practica            Int       @unique
   id_academico           Int?
 

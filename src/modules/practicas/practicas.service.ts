@@ -132,7 +132,14 @@ export class PracticasService {
 
     public async getAllPracticas(){
         try {
-            const practicas = await this._databaseService.practicas.findMany();
+            const practicas = await this._databaseService.practicas.findMany({
+                include: {
+                    alumno: true,
+                    informe_alumno: true,
+                    informe_confidencial: true,
+                },
+
+            });
             return practicas
         }catch(error){
         }
