@@ -7,6 +7,7 @@ import { AuthLoginDto } from 'src/auth/dto/authLoginDto.dto';
 import { JwtService } from '@nestjs/jwt';
 import { isRole } from 'src/utils/user.roles';
 import { Tipo_usuario, TipoPractica } from '@prisma/client';
+import { CreateUsuarioDto } from './dto/create-usuario.dto';
 
 
 @Injectable()
@@ -19,6 +20,7 @@ export class UsersService {
 
   async signUp(authRegister: AuthRegisterDto) {
     try {
+      console.log(authRegister);
       if (await this.findUser(authRegister.correo)) {
         throw new BadRequestException('Ya existe cuenta con ese correo');
       };
@@ -39,16 +41,17 @@ export class UsersService {
         },
       });
 
-      console.log(newUser);
       const { password: _, ...userWithoutPassword } = newUser;
 
       return newUser;
 
 
     } catch (error) {
+      console.log(error);
       if(error instanceof BadRequestException){
         throw error;
       }
+      throw new InternalServerErrorException('Error interno al crear un usuario');
     }
 
 

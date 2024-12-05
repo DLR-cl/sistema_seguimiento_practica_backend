@@ -3,11 +3,7 @@ import { Tipo_usuario } from "@prisma/client";
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateUsuarioDto {
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    password: string;
-    
+
     @ApiProperty()
     @IsEmail()
     @IsNotEmpty()

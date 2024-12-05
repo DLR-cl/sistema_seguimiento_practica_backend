@@ -2,14 +2,15 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UsersService } from './users.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { Tipo_usuario } from '@prisma/client';
+import { AuthRegisterDto } from 'src/auth/dto/authRegisterDto.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   
-  @Post('registrar')
-  public registrarUsuario(usuario: CreateUsuarioDto){
-    return this.usersService.signUp(usuario);
+  @Post()
+  public async registrarUsuario(@Body() usuario: AuthRegisterDto){
+    return await this.usersService.signUp(usuario);
   }
   @Get(':id')
   public async obtenerUsuario(@Param('id') id: string) {
