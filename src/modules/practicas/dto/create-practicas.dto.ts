@@ -10,7 +10,6 @@ export class createPracticaDto {
     @IsNotEmpty()
     horas_semanales: number;
 
-
     @IsDate()
     @IsNotEmpty()
     fecha_inicio: Date;

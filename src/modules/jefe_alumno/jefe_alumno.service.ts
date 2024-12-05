@@ -36,7 +36,7 @@ export class JefeAlumnoService {
                 id_empresa: jefe_alumno.id_empresa,
             }
         });
-
+        
         const response: ResponseJefeAlumnoDto = {
             message: 'Jefe del alumno creado con éxito',
             status_code: HttpStatus.OK,

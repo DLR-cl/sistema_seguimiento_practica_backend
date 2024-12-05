@@ -6,6 +6,7 @@ import { compare } from 'bcrypt';
 import { AuthLoginDto } from 'src/auth/dto/authLoginDto.dto';
 import { JwtService } from '@nestjs/jwt';
 import { isRole } from 'src/utils/user.roles';
+import { Tipo_usuario, TipoPractica } from '@prisma/client';
 
 
 @Injectable()
@@ -88,6 +89,32 @@ export class UsersService {
       if(error instanceof BadRequestException){
         throw error;
       }
+    }
+  }
+
+  public async obtenerUsuario(id: number){
+    try {
+      const user = await this.databaseService.usuarios.findUnique({
+        where:{ 
+          id_usuario: id,
+        }
+      })
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async obtenerUsuariosByRol(rol: Tipo_usuario){
+    try {
+      const usuarios = await this.databaseService.usuarios.findMany({
+        where: {
+          tipo_usuario: rol,
+        }
+      })
+      return usuarios;
+    } catch (error) {
+      throw error;
     }
   }
 }

@@ -12,12 +12,11 @@ export class EmpresasController {
         private readonly _empresasService: EmpresasService,
     ){}
     
-    @Post('registrar-empresa')
+    @Post()
     public registrar(@Body() empresa: createEmpresasDto){
         return this._empresasService.crearEmpresas(empresa);
     }
     
-    @Roles(Tipo_usuario.JEFE_DEPARTAMENTO)
     @Get()
     public getEmpresas(){
         return this._empresasService.getEmpresas();

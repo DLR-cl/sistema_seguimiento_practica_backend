@@ -8,9 +8,8 @@ export class PracticasController {
         private readonly _practicaService: PracticasService,
     ){}
 
-    @Post('generar')
+    @Post()
     public generarPractica(@Body() practica: createPracticaDto){
-        
         return this._practicaService.generarPractica(practica);
     }
 

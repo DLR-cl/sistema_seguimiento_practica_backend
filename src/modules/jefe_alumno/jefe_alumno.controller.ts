@@ -11,7 +11,7 @@ export class JefeAlumnoController {
     ){}
 
 
-    @Post('registrar')
+    @Post()
     async registrar(@Body() jefe_alumno: JefeAlumnoDto){
         return await this._jefeAlumnoService.registrarJefe(jefe_alumno);
     }

@@ -186,7 +186,7 @@ export class InformeAlumnoService {
         if(!informe || !informe.archivo){
             throw new NotFoundException('No se encontro el informe');
         }
-        const uploadPath = path.resolve(__dirname, '..', '..', '..', 'uploads');
+        const uploadPath = path.resolve(__dirname, '..', '..', 'uploads');
         console.log(typeof uploadPath, uploadPath); 
 
         const filePath = path.join(uploadPath, informe.archivo);
