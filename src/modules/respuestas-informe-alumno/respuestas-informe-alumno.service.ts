@@ -16,6 +16,7 @@ export class RespuestasInformeAlumnoService {
     public async crearRespuesta(respuestas: ListaRespuestaDto){
         try {
             let asignaturas: string[];
+            console.log(respuestas.respuestas);
             for(let res of respuestas.respuestas){
                 const validar = await this.validarRespuestas(res);
                 if(!validar){
@@ -23,8 +24,13 @@ export class RespuestasInformeAlumnoService {
                 }
                 // asume que una respuesta contempla asignaturas | fix DEBE CONTENER LA RESPUESTA PARA RELACIONAR CON ASIGNATURAS
                 if(res.asignaturas){
-
-                    const asign = await this.asignarRespuestasAsignaturasRespuesta(res.asignaturas, res.id_pregunta, res.id_informe);
+                    const respuesta = await this._databaseService.respuestasInformeAlumno.create({
+                        data: {
+                            id_informe: res.id_informe,
+                            id_pregunta: res.id_pregunta,
+                            }
+                    })
+                    const asign = await this.asignarRespuestasAsignaturasRespuesta(res.asignaturas, res.id_informe, res.id_pregunta);
                 }else if(res.puntaje){
                     const nuevaRespuesta = await this._databaseService.respuestasInformeAlumno.create({
                         data: {
@@ -46,13 +52,15 @@ export class RespuestasInformeAlumnoService {
 
             return "creado con éxito";
         } catch (error) {
+            console.log(error);
             if(error instanceof BadRequestException){
                 throw error;
             }
+            throw error;
         }
     }
 
-    public async asignarRespuestasAsignaturasRespuesta(asignaturas: string[], id_informe: number, id_pregunta: number){
+    public async asignarRespuestasAsignaturasRespuesta(asignaturas: string[], id_informe: number, id_respuesta: number){
         try {
 
             const array = [];
@@ -60,10 +68,10 @@ export class RespuestasInformeAlumnoService {
             for(let asig of asignaturas){
                 let typeAsig = {
                     id_informe: id_informe,
-                    id_pregunta: id_pregunta,
+                    id_pregunta: id_respuesta,
                     nombre_asignatura: asig,
                 }
-
+                console.log(typeAsig);
                 array.push(typeAsig);
             }
             const asignar = await this._databaseService.asignaturasEnRespuestasInforme.createMany({
