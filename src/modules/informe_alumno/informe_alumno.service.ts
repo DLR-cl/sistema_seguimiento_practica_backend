@@ -8,6 +8,7 @@ import { CreateAsignacionDto } from './dto/create-asignacion.dto';
 import { CreateEnlaceDto } from './dto/create-enlace.dto';
 import { file } from 'googleapis/build/src/apis/file';
 import * as path from 'path';
+import { info } from 'console';
 
 @Injectable()
 export class InformeAlumnoService {
@@ -29,7 +30,11 @@ export class InformeAlumnoService {
             if(!await this.existeInformeRegistrado(informe.id_alumno, informe.id_practica)){
                 throw new BadRequestException('Ya existe un informe asociado a esa practica');
             }
-            console.log('hola')
+
+            if(!await this._practicaService.esPracticaAlumno(informe.id_practica)){
+                throw new BadRequestException('Practica sin finalizar o el periodo de enviar informe venció');
+            }
+            
             const nuevoInforme = await this._databaseService.informesAlumno.create({
                 data: {
                     id_practica: informe.id_practica,

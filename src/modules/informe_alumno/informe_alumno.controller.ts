@@ -7,7 +7,7 @@ import { extname, join } from 'path';
 import { InformeDto } from './dto/informe_pdf.dto';
 import { Response } from 'express';
 
-
+const rootPath = process.cwd();
 @Controller('informe-alumno')
 export class InformeAlumnoController {
 
@@ -15,7 +15,7 @@ export class InformeAlumnoController {
         private readonly _informeAlumnoService: InformeAlumnoService,
     ) { }
 
-    @Post('crear-informe')
+    @Post()
     public async crearInformeAlumno(@Body() informe: CreateInformeAlumnoDto) {
         return await this._informeAlumnoService.crearInformeAlumno(informe);
     }
@@ -23,7 +23,7 @@ export class InformeAlumnoController {
     @Post('upload')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
-            destination: 'uploads',
+            destination: join(rootPath, 'uploads'),
             filename: (req, file, callback) => {
 
                 callback(null, file.originalname);
@@ -44,9 +44,10 @@ export class InformeAlumnoController {
         const fs = require('fs');
 
         const originalPath = path.resolve(file.path);
+        console.log(originalPath);
         const extension = extname(file.originalname);
         const nuevoNombre = `informe-${id}${extension}`;
-        const filePath = join(__dirname, '..', '..', 'uploads', nuevoNombre);
+        const filePath = join(rootPath, 'uploads', nuevoNombre);
         fs.renameSync(originalPath, filePath);
 
         return await this._informeAlumnoService.asociarArchivoAlumno(+body.id, nuevoNombre)
