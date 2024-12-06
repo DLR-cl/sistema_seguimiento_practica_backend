@@ -134,7 +134,24 @@ export class PracticasService {
         try {
             const practicas = await this._databaseService.practicas.findMany({
                 include: {
-                    alumno: true,
+                    alumno: {
+                        select: {
+                            id_user: true,
+                            primer_practica: true,
+                            segunda_practica: true,
+                        }
+                        ,
+                        include: {
+                            usuario: {
+                                select: {
+                                    correo: true,
+                                    nombre: true,
+                                    rut: true,
+                                    tipo_usuario: true,
+                                }
+                            }
+                        }
+                    },
                     informe_alumno: true,
                     informe_confidencial: true,
                 },
