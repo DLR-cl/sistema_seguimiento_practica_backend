@@ -2,12 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database/database.service';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
 import { access } from 'fs';
-
+import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class AcademicosService {
     constructor(
         private readonly _databaseService: DatabaseService,
-    ){}
+    ){
+
+    }
 
     public async crearAcademico(academico: CreateAcademicoDto){
         try {
@@ -44,6 +46,9 @@ export class AcademicosService {
     }
 
     public async cantidadInformesPorAcademico(){
-        
+        try {
+        } catch (error) {
+            throw error;
+        }
     }
 }
