@@ -43,4 +43,7 @@ export class AcademicosService {
         return true;  
     }
 
+    public async cantidadInformesPorAcademico(){
+        
+    }
 }

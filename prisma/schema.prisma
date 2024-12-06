@@ -248,6 +248,7 @@ enum Tipo_usuario {
   JEFE_DEPARTAMENTO
   SECRETARIA
   JEFE_EMPLEADOR
+  ACADEMICO
 }
 
 enum Modalidad_practica {
@@ -261,6 +262,7 @@ enum Tipo_pregunta {
   CERRADA
   EVALUATIVA
   DESARROLLO_PROFESIONAL
+  
 }
 
 enum Estado_informe {

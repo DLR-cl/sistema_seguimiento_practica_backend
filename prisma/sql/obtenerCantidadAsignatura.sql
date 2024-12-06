@@ -1,7 +1,5 @@
--- obtener la cantidad de asignaturas seleccionadas por el semestre
+-- Obtener la cantidad de asignaturas por informes tomados por academico
 -- @param { DateTime } $1: ini_semestre
 -- @param { DateTime } $2: fin_semestre
 -- @param { Date } $3: year
-select a.nombre, count(
-    select * from AsignaturasEnRespuestasInforme where 
-)
+select 
