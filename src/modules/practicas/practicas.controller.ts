@@ -18,4 +18,9 @@ export class PracticasController {
         return await this._practicaService.getPractica(id_practica);
     }
 
+    @Get()
+    public async getAllPracticas(){
+        return await this._practicaService.getAllPracticas();
+    }
+
 }

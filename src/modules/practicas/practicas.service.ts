@@ -159,6 +159,7 @@ export class PracticasService {
             });
             return practicas
         }catch(error){
+            throw error;
         }
     }
 
