@@ -142,7 +142,7 @@ export class PracticasService {
 
     public async getPractica(id_practica: number){
         try {
-            if(!this.existePractica(id_practica)){
+            if(!await this.existePractica(id_practica)){
                 throw new BadRequestException('No existe practica solicitada')
             }
 

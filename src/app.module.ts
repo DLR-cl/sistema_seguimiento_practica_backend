@@ -22,6 +22,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { AsignaturasModule } from './modules/asignaturas/asignaturas.module';
 import { RespuestasInformeAlumnoModule } from './modules/respuestas-informe-alumno/respuestas-informe-alumno.module';
 import { AcademicosModule } from './modules/academicos/academicos.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 
 @Module({
@@ -47,7 +48,8 @@ import { AcademicosModule } from './modules/academicos/academicos.module';
     SwaggerModule,
     AsignaturasModule,
     RespuestasInformeAlumnoModule,
-    AcademicosModule
+    AcademicosModule,
+    DashboardModule
   ],
   controllers: [AppController],
   providers: [AppService],
