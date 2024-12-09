@@ -15,6 +15,15 @@ export class AcademicosService {
 
     }
 
+    public async obtenerAcademico(id_academico: number){
+        try {
+            if(!this.existeAcademico(id_academico)){
+                throw new BadRequestException('Academico no existe')
+            }
+        } catch (error) {
+            
+        }
+    }
     public async crearAcademico(academico: CreateAcademicoDto){
         try {
             const usuario = await this._userService.signUp({...academico})

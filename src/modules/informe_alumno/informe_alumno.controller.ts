@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseIntPipe, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { CreateInformeAlumnoDto } from './dto/create-informe-alumno.dto';
 import { InformeAlumnoService } from './informe_alumno.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -6,6 +6,7 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { InformeDto } from './dto/informe_pdf.dto';
 import { Response } from 'express';
+import { CreateAsignacionDto } from './dto/create-asignacion.dto';
 
 const rootPath = process.cwd();
 @Controller('informe-alumno')
@@ -72,5 +73,10 @@ export class InformeAlumnoController {
     @Get('existeRespuesta/:id_practica')
     public async existeRespuestas(@Param('id_practica') id_practica: string){
         return await this._informeAlumnoService.existeRespuestaInforme(+id_practica);
+    }
+
+    @Patch('asociar-informe')
+    public async asociarInforme(@Body() data: CreateAsignacionDto){
+        return await this._informeAlumnoService.asignarInformeAlAcademico(data);
     }
 }
