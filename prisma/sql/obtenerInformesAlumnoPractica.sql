@@ -14,6 +14,7 @@ SELECT
     u.tipo_usuario AS alumno_tipo_usuario,
     a.primer_practica,
     a.segunda_practica,
+    ia.id_informe,
     ia.estado AS estado_informe_alumno,
     ia.archivo AS informe_alumno_archivo,
     ua.nombre AS academico_nombre,

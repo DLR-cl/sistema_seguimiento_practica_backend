@@ -1,5 +1,4 @@
 -- prisma/sql/obtenerAcademico.sql
--- @Param {Type} $1: id del academico
 SELECT 
     u.id_usuario,
     u.nombre,
@@ -7,6 +6,6 @@ SELECT
     u.tipo_usuario,
     u.correo
 FROM
-    Usuario
+    Usuario u
 WHERE
-    u.tipo_usuario = "ACADEMICO" AND u.id_usuario = $1
+    u.tipo_usuario = "ACADEMICO" AND u.id_usuario = ?

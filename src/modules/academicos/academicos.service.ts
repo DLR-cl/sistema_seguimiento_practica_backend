@@ -1,11 +1,12 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseService } from '../../database/database/database.service';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
 import { access } from 'fs';
 import { PrismaClient } from '@prisma/client';
 import { CantidadInformesPorAcademico } from './dto/cantidad-informes.dto';
-import { obtenerCantidadInformes } from '@prisma/client/sql'
+import { obtenerAcademico, obtenerCantidadInformes } from '@prisma/client/sql'
 import { UsersService } from '../users/users.service';
+import { Academico } from './dto/academico.dto';
 @Injectable()
 export class AcademicosService {
     constructor(
@@ -20,8 +21,13 @@ export class AcademicosService {
             if(!this.existeAcademico(id_academico)){
                 throw new BadRequestException('Academico no existe')
             }
+
+            const academico = await this._databaseService.$queryRawTyped<Academico>(obtenerAcademico(id_academico))
         } catch (error) {
-            
+            if(error instanceof BadRequestException){
+                throw error;
+            }
+            throw new InternalServerErrorException('Error interno al obtener al academico')
         }
     }
     public async crearAcademico(academico: CreateAcademicoDto){
