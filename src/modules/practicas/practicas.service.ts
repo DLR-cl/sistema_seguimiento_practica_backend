@@ -154,6 +154,7 @@ export class PracticasService {
                                         select: {
                                             nombre: true,
                                             rut: true,
+                                            id_usuario: true
                                         }
                                     }
                                 }
