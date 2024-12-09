@@ -146,7 +146,7 @@ export class InformeAlumnoService {
                 }
             });
 
-            if(informe!){
+            if(!informe){
                 return false;
             }
             return true;
