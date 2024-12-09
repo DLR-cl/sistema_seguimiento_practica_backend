@@ -1,4 +1,4 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
 import { AcademicosService } from './academicos.service';
 
@@ -12,5 +12,10 @@ export class AcademicosController {
     @Post('registrar')
     public registrarAcademico(academico: CreateAcademicoDto){
         return this._academicoService.crearAcademico(academico);
+    }
+
+    @Get('cantidad-informes')
+    public async obtenerCantidadInformes(){
+        return await this._academicoService.cantidadInformesPorAcademico()
     }
 }

@@ -3,6 +3,8 @@ import { DatabaseService } from '../../database/database/database.service';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
 import { access } from 'fs';
 import { PrismaClient } from '@prisma/client';
+import { CantidadInformesPorAcademico } from './dto/cantidad-informes.dto';
+import { obtenerCantidadInformes } from '@prisma/client/sql'
 @Injectable()
 export class AcademicosService {
     constructor(
@@ -47,7 +49,14 @@ export class AcademicosService {
 
     public async cantidadInformesPorAcademico(){
         try {
-            
+            const prisma = new PrismaClient()
+            const resultados = await prisma.$queryRawTyped<CantidadInformesPorAcademico>(obtenerCantidadInformes())
+            const datosConvertidos = resultados.map((resultado) => ({
+                ...resultado,
+                cantidad_informes: Number(resultado.cantidad_informes),
+            }));
+
+            return datosConvertidos;
         } catch (error) {
             throw error;
         }

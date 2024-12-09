@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
 import { CreateRespuestaInformAlumnoDto, ListaRespuestaDto } from './dto/create-respuesta-informe-alumno.dto';
 import { InformeAlumnoService } from '../informe_alumno/informe_alumno.service';
@@ -50,7 +50,10 @@ export class RespuestasInformeAlumnoService {
                 }
             }
 
-            return "creado con éxito";
+            return {
+                message: 'Respuestas creadas con éxito',
+                statusCode: HttpStatus.OK,
+            }
         } catch (error) {
             console.log(error);
             if(error instanceof BadRequestException){
