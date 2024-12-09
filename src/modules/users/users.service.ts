@@ -100,6 +100,9 @@ export class UsersService {
       const user = await this.databaseService.usuarios.findUnique({
         where:{ 
           id_usuario: id,
+        },
+        select: {
+          password: false,
         }
       })
       return user;
