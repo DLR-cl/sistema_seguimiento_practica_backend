@@ -23,6 +23,7 @@ export class AcademicosService {
             }
 
             const academico = await this._databaseService.$queryRawTyped<Academico>(obtenerAcademico(id_academico))
+            return academico;
         } catch (error) {
             if(error instanceof BadRequestException){
                 throw error;
