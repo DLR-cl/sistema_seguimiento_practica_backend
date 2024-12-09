@@ -21,12 +21,6 @@ export class AuthService {
     ){}
 
   
-
-
-    async signUp(authRegister: AuthRegisterDto){
-        return await this._usuarioService.signUp(authRegister);
-    }
-
     async signIn(authLoginDto: AuthLoginDto){
 
             try {
@@ -34,7 +28,6 @@ export class AuthService {
                 if(!userExists){
                     throw new BadRequestException('Error, no existe usuario');
                 }
-                console.log(authLoginDto.password);
                 const user = await this._databaseService.usuarios.findUnique({
                     where: { correo: authLoginDto.correo }
                 });
@@ -67,18 +60,12 @@ export class AuthService {
     }
 
     private async findUser(email: string) {
-        try {
           const user = await this._databaseService.usuarios.findUnique({
             where: {
               correo: email,
             }
           });
-          return !!user;
-        } catch (error) {
-          if (error instanceof BadRequestException) {
-            throw error
-          }
-    
+
+          return user;
         }
-      }
 }

@@ -1,12 +1,13 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotAcceptableException } from "@nestjs/common";
 import { createPracticaDto } from "./dto/create-practicas.dto";
 import { DatabaseService } from "../../database/database/database.service";
-import { PracticaResponseDto } from "./dto/practica-response.dto";
+import { PracticaInfo, PracticaResponseDto } from "./dto/practica-response.dto";
 import { AlumnoPracticaService } from "../alumno_practica/alumno_practica.service";
 import { Estado_practica, TipoPractica } from "@prisma/client";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { MailService } from "src/mail/mail.service";
 import { SendEmailDto } from "src/mail/dto/mail.dto";
+import { obtenerInformesAlumnoPractica } from "@prisma/client/sql";
 
 @Injectable()
 export class PracticasService {
@@ -132,38 +133,7 @@ export class PracticasService {
 
     public async getAllPracticas(){
         try {
-            const practicas = await this._databaseService.practicas.findMany({
-                include: {
-                    alumno: {
-                        include: {
-                            usuario: {
-                                select: {
-                                    correo: true,
-                                    nombre: true,
-                                    rut: true,
-                                    tipo_usuario: true,
-                                }
-                            }
-                        }
-                    },
-                    informe_alumno: {
-                        include: {
-                            academico: {
-                                include: {
-                                    usuario: {
-                                        select: {
-                                            nombre: true,
-                                            rut: true,
-                                            id_usuario: true
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    informe_confidencial: true,
-                },
-            });
+            const practicas = await this._databaseService.$queryRawTyped<PracticaInfo>(obtenerInformesAlumnoPractica());
             return practicas
         }catch(error){
             throw error;
