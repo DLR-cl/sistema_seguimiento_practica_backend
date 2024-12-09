@@ -163,7 +163,6 @@ export class PracticasService {
                     },
                     informe_confidencial: true,
                 },
-
             });
             return practicas
         }catch(error){

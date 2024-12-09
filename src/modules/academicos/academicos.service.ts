@@ -1,23 +1,23 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database/database/database.service';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
 import { access } from 'fs';
 import { PrismaClient } from '@prisma/client';
 import { CantidadInformesPorAcademico } from './dto/cantidad-informes.dto';
 import { obtenerCantidadInformes } from '@prisma/client/sql'
+import { UsersService } from '../users/users.service';
 @Injectable()
 export class AcademicosService {
     constructor(
         private readonly _databaseService: DatabaseService,
+        private readonly _userService: UsersService,
     ){
 
     }
 
     public async crearAcademico(academico: CreateAcademicoDto){
         try {
-            const usuario = await this._databaseService.usuarios.create({
-                data: {...academico},
-            });
+            const usuario = await this._userService.signUp({...academico})
 
             const nuevoAcademico = await this._databaseService.academico.create({
                 data: {
@@ -25,12 +25,17 @@ export class AcademicosService {
                 }
             });
 
-            return "gola";
+            return {
+                message: 'Academico creado con éxito',
+                statusCode: HttpStatus.OK,
+                data: usuario
+            }
 
         }catch(error){
             if(error instanceof BadRequestException){
                 throw error;
             }
+            throw error;
         }
     };
 

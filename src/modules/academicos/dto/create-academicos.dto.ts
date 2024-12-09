@@ -5,10 +5,6 @@ export class CreateAcademicoDto{
     
     @IsNotEmpty()
     @IsString()
-    password: string;
-
-    @IsNotEmpty()
-    @IsString()
     correo: string;
 
     @IsNotEmpty()
