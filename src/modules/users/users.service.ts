@@ -113,10 +113,14 @@ export class UsersService {
       const usuarios = await this.databaseService.usuarios.findMany({
         where: {
           tipo_usuario: rol,
+        },
+        select: {
+          password: false,
         }
       })
       return usuarios;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
