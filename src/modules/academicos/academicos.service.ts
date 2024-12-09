@@ -49,8 +49,7 @@ export class AcademicosService {
 
     public async cantidadInformesPorAcademico(){
         try {
-            const prisma = new PrismaClient()
-            const resultados = await prisma.$queryRawTyped<CantidadInformesPorAcademico>(obtenerCantidadInformes())
+            const resultados = await this._databaseService.$queryRawTyped<CantidadInformesPorAcademico>(obtenerCantidadInformes())
             const datosConvertidos = resultados.map((resultado) => ({
                 ...resultado,
                 cantidad_informes: Number(resultado.cantidad_informes),

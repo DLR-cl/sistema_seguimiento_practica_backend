@@ -146,7 +146,20 @@ export class PracticasService {
                             }
                         }
                     },
-                    informe_alumno: true,
+                    informe_alumno: {
+                        include: {
+                            academico: {
+                                include: {
+                                    usuario: {
+                                        select: {
+                                            nombre: true,
+                                            rut: true,
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     informe_confidencial: true,
                 },
 
