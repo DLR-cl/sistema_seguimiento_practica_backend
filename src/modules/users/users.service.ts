@@ -102,7 +102,11 @@ export class UsersService {
           id_usuario: id,
         },
         select: {
-          password: false,
+          nombre: true,
+          rut: true,
+          id_usuario: true,
+          correo: true,
+          tipo_usuario: true,
         }
       })
       return user;
@@ -118,7 +122,11 @@ export class UsersService {
           tipo_usuario: rol,
         },
         select: {
-          password: false,
+          nombre: true,
+          rut: true,
+          id_usuario: true,
+          correo: true,
+          tipo_usuario: true,
         }
       })
       return usuarios;

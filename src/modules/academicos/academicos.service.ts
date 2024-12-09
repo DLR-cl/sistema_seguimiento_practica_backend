@@ -47,6 +47,7 @@ export class AcademicosService {
 
     public async cantidadInformesPorAcademico(){
         try {
+            
         } catch (error) {
             throw error;
         }
