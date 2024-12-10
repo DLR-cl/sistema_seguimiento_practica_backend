@@ -25,16 +25,6 @@ export class PracticasService {
                 throw new BadRequestException('El alumno aún se encuentra en una práctica');
             };
 
-            const activar = await this.activarPractica(practica.id_alumno, practica.tipo_practica);
-            // si el alumno no está activo en ninguna práctica
-            if(!await this._alumnoService.alumnoActivo(practica.id_alumno)){
-                throw new BadRequestException('El alumno no tiene activo la práctica');
-            }
-            
-            // se cambia el tipo de práctica de acuerdo a cual tenga activo
-            practica.tipo_practica = await this._alumnoService.alumnoActivo(practica.id_alumno);
-
-            
             const nuevaPractica = await this._databaseService.practicas.create({
                 data: {
                     ...practica,
@@ -59,18 +49,12 @@ export class PracticasService {
         const existePractica = await this._databaseService.practicas.findFirst({
             where:{
                 id_alumno: practica.id_alumno,
-                id_supervisor: practica.id_supervisor,
-                tipo_practica: practica.tipo_practica,
                 NOT: {
                     estado: Estado_practica.FINALIZADA
                 }
             }
-            
         });
-        if(!existePractica){
-            return false;
-        }
-        return true;
+        return existePractica
     }
 
     public async existePractica(id_practica: number){
@@ -85,6 +69,7 @@ export class PracticasService {
         }
         return true;
     }
+
 
     public async activarPractica(id_alumno: number, tipo_practica: TipoPractica){
 
@@ -116,7 +101,6 @@ export class PracticasService {
                 where: {
                     NOT: {
                         estado: Estado_practica.FINALIZADA,
-
                     }
                 }
             });

@@ -77,27 +77,7 @@ export class AlumnoPracticaService {
         return alumno;
     }
 
-    // se debe diferenciar en qué práctica está activo
-    public async alumnoActivo(id_alumno: number): Promise<TipoPractica | null>{
-        const alumno = await this._databaseService.alumnosPractica.findUnique({
-            where:{
-                id_user: id_alumno,
-            }
-        });
 
-        if(!alumno){
-            throw new BadRequestException('Alumno no existe');
-        }
-
-        if(alumno.primer_practica){
-            return TipoPractica.PRACTICA_UNO;
-        }else if(alumno.segunda_practica){
-            return TipoPractica.PRACTICA_DOS;
-        }else{
-            return null;
-        }
-
-    } 
 
     public async existeAlumno(id_alumno: number){
         const alumno = await this._databaseService.alumnosPractica.findUnique({
