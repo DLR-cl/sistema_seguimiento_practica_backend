@@ -22,7 +22,7 @@ export class PracticasService {
         try {
             // si ya existe una práctica definida
             if(await this.hayPracticaActiva(practica)){
-                throw new BadRequestException('Ya existe una práctica registrada con esos datos');
+                throw new BadRequestException('El alumno aún se encuentra en una práctica');
             };
 
             const activar = await this.activarPractica(practica.id_alumno, practica.tipo_practica);
@@ -61,18 +61,12 @@ export class PracticasService {
                 id_alumno: practica.id_alumno,
                 id_supervisor: practica.id_supervisor,
                 tipo_practica: practica.tipo_practica,
-                fecha_inicio: practica.fecha_inicio,
                 NOT: {
-                    OR: [
-                        {
-                            estado: Estado_practica.FINALIZADA,
-                        },
-                    ]
+                    estado: Estado_practica.FINALIZADA
                 }
             }
             
         });
-
         if(!existePractica){
             return false;
         }

@@ -26,7 +26,8 @@ export class AuthService {
             try {
                 const userExists = await this.findUser(authLoginDto.correo);
                 if(!userExists){
-                    throw new BadRequestException('Error, no existe usuario');
+                  console.log("mal correo")
+                    throw new BadRequestException('Error, contraseña o correo inválido');
                 }
                 const user = await this._databaseService.usuarios.findUnique({
                     where: { correo: authLoginDto.correo }
@@ -48,6 +49,7 @@ export class AuthService {
 
             } catch(error){
                 if(error instanceof BadRequestException){
+                  console.log(error);
                   throw error;
                 }else if(error instanceof UnauthorizedException){
                   throw error;

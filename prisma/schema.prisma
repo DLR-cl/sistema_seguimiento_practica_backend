@@ -22,6 +22,7 @@ model Usuarios {
   rut        String @unique @db.Char(10)
 
   tipo_usuario    Tipo_usuario
+  // solo para academicos
   comentarios     comentariosPractica[]
   alumno_practica AlumnosPractica?
   jefe_alumno     JefesAlumno?
@@ -250,6 +251,7 @@ enum Tipo_usuario {
   SECRETARIA
   JEFE_EMPLEADOR
   ACADEMICO
+  ADMINISTRADOR
 }
 
 enum Modalidad_practica {

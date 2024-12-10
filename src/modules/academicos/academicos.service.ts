@@ -2,7 +2,7 @@ import { BadRequestException, HttpStatus, Injectable, InternalServerErrorExcepti
 import { DatabaseService } from '../../database/database/database.service';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
 import { access } from 'fs';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Tipo_usuario } from '@prisma/client';
 import { CantidadInformesPorAcademico } from './dto/cantidad-informes.dto';
 import { obtenerAcademico, obtenerCantidadInformes } from '@prisma/client/sql'
 import { UsersService } from '../users/users.service';
@@ -16,6 +16,24 @@ export class AcademicosService {
 
     }
 
+    public async obtenerAcademicos(){
+        try {
+            const academicos = await this._databaseService.usuarios.findMany({
+                select: {
+                    nombre: true,
+                    rut: true,
+                    correo: true,
+                },
+                where: {
+                    tipo_usuario: Tipo_usuario.ACADEMICO
+                }
+            });
+
+            return academicos
+        } catch (error) {
+            throw error;
+        }
+    }
     public async obtenerAcademico(id_academico: number){
         try {
             if(!this.existeAcademico(id_academico)){
