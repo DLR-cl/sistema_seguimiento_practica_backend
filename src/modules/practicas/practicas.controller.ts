@@ -23,4 +23,8 @@ export class PracticasController {
         return await this._practicaService.getAllPracticas();
     }
 
+    @Get('alumno/:id')
+    public async getPracticaByAlumno(@Param('id') id_alumno: string){
+        return await this._practicaService.getPracticaAlumno(+id_alumno);
+    }
 }

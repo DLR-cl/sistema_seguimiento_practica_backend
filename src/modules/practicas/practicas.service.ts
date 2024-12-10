@@ -114,7 +114,10 @@ export class PracticasService {
         try {
             const practicas = await this._databaseService.practicas.findMany({
                 where: {
-                    fecha_termino: null,
+                    NOT: {
+                        estado: Estado_practica.FINALIZADA,
+
+                    }
                 }
             });
 
@@ -237,5 +240,18 @@ export class PracticasService {
             return false;
         }
         return true;
+    }
+
+    public async getPracticaAlumno(id_alumno: number){
+        try {
+            const practicas = await this._databaseService.practicas.findMany({
+                where: {
+                    id_alumno: id_alumno,
+                }
+            })
+            return practicas
+        } catch (error) {
+            throw error;
+        }
     }
 }
