@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["typedSql"]
 }
 
@@ -145,7 +145,7 @@ model RespuestasInformeAlumno {
 model AsignaturasEnRespuestasInforme {
   id_informe        Int
   id_pregunta       Int
-  nombre_asignatura String 
+  nombre_asignatura String
 
   respuesta  RespuestasInformeAlumno @relation(fields: [id_informe, id_pregunta], references: [id_informe, id_pregunta])
   asignatura Asignaturas             @relation(fields: [nombre_asignatura], references: [nombre])
@@ -163,13 +163,16 @@ model InformeConfidencial {
   horas_inasistencia              Int
   nota_evaluacion                 Int?
 
+  estado                 Estado_informe
   // tiempos de revision
-  fecha_inicio_revision  DateTime? @db.Date
-  fecha_termino_revision DateTime? @db.Date
+  fecha_inicio_revision  DateTime?      @db.Date
+  fecha_termino_revision DateTime?      @db.Date
+  // añadir fecha final real
+  
   // relacion
   id_supervisor          Int
-  id_alumno_evaluado     Int       
-  id_practica            Int       @unique
+  id_alumno_evaluado     Int
+  id_practica            Int            @unique
   id_academico           Int?
 
   respuestas RespuestasInformeConfidencial[]
@@ -233,8 +236,8 @@ model DimensionesEvaluativas {
 model Asignaturas {
   nombre          String          @id @db.VarChar(100)
   tipo_asignatura Tipo_asignatura
-  semestre        Decimal  @db.Decimal(5,1)
-  codigo          String      @db.VarChar(100)
+  semestre        Decimal         @db.Decimal(5, 1)
+  codigo          String          @db.VarChar(100)
 
   respuestas AsignaturasEnRespuestasInforme[]
 }
@@ -265,7 +268,6 @@ enum Tipo_pregunta {
   CERRADA
   EVALUATIVA
   DESARROLLO_PROFESIONAL
-  
 }
 
 enum Estado_informe {

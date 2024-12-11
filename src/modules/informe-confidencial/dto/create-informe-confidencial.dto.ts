@@ -1,3 +1,4 @@
+import { Estado_informe } from "@prisma/client";
 import { IsNotEmpty, IsNumber } from "class-validator";
 
 export class CreateInformeConfidencialDto {
@@ -28,6 +29,7 @@ export class CreateInformeConfidencialDto {
     
     @IsNumber()
     @IsNotEmpty()
-    id_practica: number;    
+    id_practica: number;   
     
+    estado = Estado_informe.ENVIADA
 }    

@@ -1,16 +1,11 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from '../database/database/database.service';
 import { AuthLoginDto } from './dto/authLoginDto.dto';
-import { AuthRegisterDto } from './dto/authRegisterDto.dto';
-import { encrypt } from './libs/bcryp';
-import { ResponseDto } from './dto/response.dto';
-import { Tipo_usuario } from '@prisma/client';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { resolveObjectURL } from 'buffer';
 import { UsersService } from '../modules/users/users.service';
 import { jwtConstants } from './libs/constants';
-import { decrypt } from 'dotenv';
+
 
 @Injectable()
 export class AuthService {
@@ -26,7 +21,6 @@ export class AuthService {
             try {
                 const userExists = await this.findUser(authLoginDto.correo);
                 if(!userExists){
-                  console.log("mal correo")
                     throw new BadRequestException('Error, contraseña o correo inválido');
                 }
                 const user = await this._databaseService.usuarios.findUnique({
