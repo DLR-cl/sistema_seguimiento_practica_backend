@@ -9,7 +9,7 @@ export class AcademicosController {
         private readonly _academicoService: AcademicosService,
     ){}
 
-    @Post('registrar')
+    @Post()
     public registrarAcademico(@Body() academico: CreateAcademicoDto){
         return this._academicoService.crearAcademico(academico);
     }

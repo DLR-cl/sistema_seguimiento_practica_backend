@@ -62,7 +62,7 @@ export class AlumnoPracticaService {
             include: {
                 practica: {
                     where: {
-                        estado: Estado_practica.ESPERA_INFORME_ALUMNO,
+                        estado: Estado_practica.ESPERA_INFORMES,
                     }
                 },
                 informe: true,

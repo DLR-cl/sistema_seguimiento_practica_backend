@@ -8,11 +8,6 @@ export class InformeConfidencialController {
     constructor(
         private readonly _informeConfidencialService: InformeConfidencialService,
     ){}
-
-    @Post('generar')
-    public generarInformeConfidencial(@Body() informe: CreateInformeConfidencialDto){
-        return this._informeConfidencialService.generarInformeConfidencial(informe);
-    }
     
     @Get('informes/:id_supervisor')
     public async getInformesBySupervisor(@Param('id_supervisor', ParseIntPipe) id_supervisor: number){

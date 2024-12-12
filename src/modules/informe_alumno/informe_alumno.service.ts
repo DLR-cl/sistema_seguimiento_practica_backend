@@ -20,36 +20,6 @@ export class InformeAlumnoService {
     ){
     }
 
-    public async crearInformeAlumno(informe: CreateInformeAlumnoDto){
-        try {
-            console.log(informe.id_practica);
-            if(!await this._alumnoService.existeAlumno(informe.id_alumno)){
-                throw new BadRequestException('No existe alumno o la practica no le pertenece')
-            }
-            console.log('hola')
-            if(!await this.existeInformeRegistrado(informe.id_alumno, informe.id_practica)){
-                throw new BadRequestException('Ya existe un informe asociado a esa practica');
-            }
-
-            if(!await this._practicaService.esPracticaAlumno(informe.id_practica)){
-                throw new BadRequestException('Practica sin finalizar o el periodo de enviar informe venció');
-            }
-            
-            const nuevoInforme = await this._databaseService.informesAlumno.create({
-                data: {
-                    id_practica: informe.id_practica,
-                    id_alumno: informe.id_alumno,
-                    estado: Estado_informe.ENVIADA,
-                }
-            });
-            return nuevoInforme;
-        } catch(error){
-            if(error instanceof BadRequestException){
-                throw error;
-            }
-            throw error;
-        };
-    };
 
     private async existeInformeRegistrado(id_alumno: number, id_pract: number) {
         const informe = await this._databaseService.informesAlumno.findFirst({
@@ -175,7 +145,7 @@ export class InformeAlumnoService {
                     id_practica: getInforme.id_practica,
                 },
                 data: {
-                    estado: Estado_practica.REVISION_INFORME_ALUMNO
+                    estado: Estado_practica.REVISION_GENERAL
                 }
             })
 

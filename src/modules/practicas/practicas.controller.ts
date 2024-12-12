@@ -27,4 +27,5 @@ export class PracticasController {
     public async getPracticaByAlumno(@Param('id') id_alumno: string){
         return await this._practicaService.getPracticaAlumno(+id_alumno);
     }
+
 }

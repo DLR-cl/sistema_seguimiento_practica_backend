@@ -107,6 +107,7 @@ model InformesAlumno {
   archivo      String?        @db.VarChar(300) //documento con los datos requeridos
   estado       Estado_informe
   id_academico Int?
+  fecha_inicio DateTime
 
   fecha_inicio_revision  DateTime? @db.Date
   fecha_termino_revision DateTime? @db.Date
@@ -157,21 +158,23 @@ model InformeConfidencial {
   id_informe_confidencial Int @id @default(autoincrement())
 
   // sobre el alumno y la práctica
-  horas_practicas_regulares       Int
-  horas_practicas_extraordinarias Int
-  total_horas                     Int
-  horas_inasistencia              Int
+  horas_practicas_regulares       Int?
+  horas_practicas_extraordinarias Int?
+  total_horas                     Int?
+  horas_inasistencia              Int?
   nota_evaluacion                 Int?
-
+  fecha_inicio                    DateTime // no se agregó fecha final 
+  // desde la fecha inicio a comparación de la fecha actual se enviará correo
+  fecha_envio                     DateTime?
   estado                 Estado_informe
   // tiempos de revision
   fecha_inicio_revision  DateTime?      @db.Date
   fecha_termino_revision DateTime?      @db.Date
   // añadir fecha final real
-  
+  fecha_real_revision   DateTime?       @db.Date
   // relacion
-  id_supervisor          Int
-  id_alumno_evaluado     Int
+  id_supervisor          Int            @db.Int
+  id_alumno_evaluado     Int            @db.Int
   id_practica            Int            @unique
   id_academico           Int?
 
@@ -276,14 +279,12 @@ enum Estado_informe {
   APROBADA
   CORRECCION
   DESAPROBADA
+  ESPERA
 }
 
 enum Estado_practica {
   CURSANDO
-  ESPERA_INFORME_ALUMNO
-  REVISION_INFORME_ALUMNO
-  CORRECCION_INFORME_ALUMNO
-  ESPERA_INFORME_CONFIDENCIAL
+  ESPERA_INFORMES
   REVISION_GENERAL
   FINALIZADA
 }

@@ -26,4 +26,9 @@ export class DashboardController {
     public async obtenerInformesCriticos(@Param('id') id_academico: string){
         return await this._dashboardService.obtenerEntregaCritica(+id_academico);
     }
+
+    @Get('informes-supervisor/:id')
+    public async obtenerInformesAsociados(@Param('id') id_supervisor: string){
+        return await this._dashboardService.infoTablaSupervisorPractica(+id_supervisor);
+    }
 }

@@ -16,10 +16,6 @@ export class InformeAlumnoController {
         private readonly _informeAlumnoService: InformeAlumnoService,
     ) { }
 
-    @Post()
-    public async crearInformeAlumno(@Body() informe: CreateInformeAlumnoDto) {
-        return await this._informeAlumnoService.crearInformeAlumno(informe);
-    }
 
     @Post('upload')
     @UseInterceptors(FileInterceptor('file', {
