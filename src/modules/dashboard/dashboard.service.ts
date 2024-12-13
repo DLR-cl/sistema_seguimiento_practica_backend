@@ -171,13 +171,21 @@ export class DashboardService {
         where: {
           id_supervisor: id_supervisor,
           OR: [
-            {estado: "CURSANDO"},
-            {estado: "ESPERA_INFORMES"}
-          ],
-          informe_confidencial: {
-            NOT: {
-              estado: "ENVIADA",
+            {informe_confidencial: {
+              NOT: {
+                estado: "ENVIADA",
+              }
+            }},
+            {
+              informe_confidencial: null
             }
+          ],
+          NOT: {
+            OR: [
+              {estado: "FINALIZADA"},
+              {estado: "REVISION_GENERAL"}
+            ]
+ 
           }
         }
       });
