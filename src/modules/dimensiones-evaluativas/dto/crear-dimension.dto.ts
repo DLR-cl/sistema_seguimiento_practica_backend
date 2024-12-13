@@ -9,3 +9,17 @@ export class CrearDimensionDto {
     @IsString()
     descripcion: string;
 }
+
+export class CrearSubDimensionDto {
+    @IsNotEmpty()
+    @IsString()
+    nombre: string;
+
+    @IsNotEmpty()
+    @IsString()
+    descripcion: string;
+    
+    @IsNotEmpty()
+    @IsString()
+    idDimensionPadre: number;
+}

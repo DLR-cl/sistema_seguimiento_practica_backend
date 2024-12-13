@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CrearDimensionDto } from './dto/crear-dimension.dto';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { CrearDimensionDto, CrearSubDimensionDto } from './dto/crear-dimension.dto';
 import { DimensionesEvaluativasService } from './dimensiones-evaluativas.service';
 import { get } from 'http';
 
@@ -17,5 +17,25 @@ export class DimensionesEvaluativasController {
     @Get()
     public async obtenerDimensiones(){
         return await this._dimensionesService.obtenerDimensiones()
+    }
+
+    @Post('subdimensiones')
+    public async crearSubDimension(@Body() subDimension: CrearSubDimensionDto){
+        return await this._dimensionesService.crearSubDimension(subDimension);
+    }
+
+    @Post('subDimensiones/varios')
+    public async crearSubDimensiones(@Body() subDimensiones: CrearSubDimensionDto[]){
+        return await this._dimensionesService.crearVariasSubDimensiones(subDimensiones)
+    }
+
+    @Get('subdimensiones')
+    public async obtenerSubdimensiones() {
+        return await this._dimensionesService.obtenerSubdimensiones();
+    }
+
+    @Get('subdimensiones/:id')
+    public async obtenerSubdimension(@Param('id') id_sub: string){
+        return await this._dimensionesService.obtenerSubdimension(+id_sub);
     }
 }
