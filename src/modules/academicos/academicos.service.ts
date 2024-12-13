@@ -99,4 +99,6 @@ export class AcademicosService {
             throw error;
         }
     }
+
+    
 }

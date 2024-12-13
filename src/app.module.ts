@@ -23,6 +23,7 @@ import { AsignaturasModule } from './modules/asignaturas/asignaturas.module';
 import { RespuestasInformeAlumnoModule } from './modules/respuestas-informe-alumno/respuestas-informe-alumno.module';
 import { AcademicosModule } from './modules/academicos/academicos.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { EmailAvisosModule } from './modules/email-avisos/email-avisos.module';
 
 
 @Module({
@@ -49,7 +50,8 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     AsignaturasModule,
     RespuestasInformeAlumnoModule,
     AcademicosModule,
-    DashboardModule
+    DashboardModule,
+    EmailAvisosModule
   ],
   controllers: [AppController],
   providers: [AppService],

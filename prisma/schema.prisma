@@ -162,7 +162,7 @@ model InformeConfidencial {
   horas_practicas_extraordinarias Int?
   total_horas                     Int?
   horas_inasistencia              Int?
-  nota_evaluacion                 Int?
+  nota_evaluacion                 Decimal?  @db.Decimal(5, 1)
   fecha_inicio                    DateTime // no se agregó fecha final 
   // desde la fecha inicio a comparación de la fecha actual se enviará correo
   fecha_envio                     DateTime?
@@ -206,7 +206,7 @@ model Preguntas {
   preguntas_implementadas_informe      PreguntasImplementadasInformeAlumno?
   preguntas_implementadas_confidencial PreguntasImplementadasInformeConfidencial?
 
-  dimension DimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
+  dimension SubDimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
 }
 
 model PreguntasImplementadasInformeConfidencial {
@@ -229,11 +229,23 @@ model RespuestasInformeConfidencial {
   @@id([pregunta_id, informe_id])
 }
 
-model DimensionesEvaluativas {
+model SubDimensionesEvaluativas {
   id_dimension Int         @id @default(autoincrement())
   nombre       String      @db.VarChar(100)
   descripcion  String      @db.VarChar(200)
+  idDimensionPadre Int
   preguntas    Preguntas[]
+
+
+  dimensionPadre DimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
+}
+
+model DimensionesEvaluativas {
+  id_dimension Int @id @default(autoincrement())
+  nombre String
+  descripcion String
+
+  subDimensiones SubDimensionesEvaluativas[]
 }
 
 model Asignaturas {

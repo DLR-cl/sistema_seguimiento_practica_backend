@@ -1,5 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
 import { Practicas } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export class PracticaResponseDto {
     message: 'Practica Creada con Éxito';
@@ -34,7 +35,7 @@ export class PracticaInfo {
     horas_practicas_extraordinarias?: number;
     total_horas?: number;
     horas_inasistencia?: number;
-    nota_evaluacion?: number;
+    nota_evaluacion?: Decimal;
     supervisor_nombre?: string;
     supervisor_rut?: string;
     supervisor_correo?: string;

@@ -38,9 +38,14 @@ export class InformeAlumnoService {
     public async asignarInformeAlAcademico(asignacion: CreateAsignacionDto){
         try{
             // asignar informe al academico, debe existir academico e informe
-            if(!await this.existeInforme(asignacion.id_informe)){
+            const informeExiste = await this.existeInforme(asignacion.id_informe)
+            if(!informeExiste){
                 throw new BadRequestException('No existe informe');
             }  
+
+            if(!informeExiste.archivo){
+                throw new BadRequestException('El alumno aun no ha subido su informe');
+            }
             const fechaInicio = new Date();
             const fechaFin = new Date(fechaInicio);
             fechaFin.setDate(fechaInicio.getDate() + 14 );
@@ -116,10 +121,7 @@ export class InformeAlumnoService {
                 }
             });
 
-            if(!informe){
-                return false;
-            }
-            return true;
+            return informe;
         }catch(error){
             if(error instanceof BadRequestException){
                 throw error;
