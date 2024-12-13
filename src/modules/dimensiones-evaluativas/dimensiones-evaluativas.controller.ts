@@ -24,7 +24,7 @@ export class DimensionesEvaluativasController {
         return await this._dimensionesService.crearSubDimension(subDimension);
     }
 
-    @Post('subDimensiones/varios')
+    @Post('subdimensiones/varios')
     public async crearSubDimensiones(@Body() subDimensiones: CrearSubDimensionDto[]){
         return await this._dimensionesService.crearVariasSubDimensiones(subDimensiones)
     }
