@@ -8,7 +8,7 @@ export class PreguntasImplementadasConfidencialService {
     constructor(
         private readonly _databaseService: DatabaseService,
     ){}
-
+    
     public async implementarPregunta(pregunta: AsignarPreguntaDto){
         try {
             const implentacion = await this._databaseService.preguntasImplementadasInformeConfidencial.create({

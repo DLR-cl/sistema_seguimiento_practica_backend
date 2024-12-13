@@ -16,9 +16,9 @@ export class JefeAlumnoService {
         private readonly _authService: AuthService,
         private readonly _databaseService: DatabaseService,
         private readonly _userService: UsersService,
-    ){}
+    ) { }
 
-    async registrarJefe(jefe_alumno: JefeAlumnoDto){
+    async registrarJefe(jefe_alumno: JefeAlumnoDto) {
 
         const user: AuthRegisterDto = {
             nombre: jefe_alumno.nombre,
@@ -36,7 +36,7 @@ export class JefeAlumnoService {
                 id_empresa: jefe_alumno.id_empresa,
             }
         });
-        
+
         const response: ResponseJefeAlumnoDto = {
             message: 'Jefe del alumno creado con éxito',
             status_code: HttpStatus.OK,
@@ -49,48 +49,64 @@ export class JefeAlumnoService {
         return response;
     }
 
-    public async getJefeAlumno(id: number): Promise<JefeAlumnoDto> {
-            const  jefe = await this._databaseService.jefesAlumno.findUnique({
-                where:{
+    public async getJefeAlumno(id: number) {
+
+        try {
+
+
+            const jefe = await this._databaseService.jefesAlumno.findUnique({
+                where: {
                     id_user: id,
                 },
             });
-            
+
+            if (!jefe) {
+                throw new BadRequestException('No existe jefe registrado');
+            }
+
             const findUser = await this._databaseService.usuarios.findUnique({
                 where: {
                     id_usuario: id,
                 },
             })
 
-            if(!findUser){
+            if (!findUser) {
                 throw new BadRequestException('Error al encontrar usuario');
             }
 
-            const usuarioJefe: JefeAlumnoDto = {
-                ...findUser,
-                ...jefe
+            const usuarioJefe= {
+                id_jefe: findUser.id_usuario,
+                nombre: findUser.nombre,
+                correo: findUser.correo,
+                id_empresa: jefe.id_empresa,
+                cargo: jefe.cargo,
             }
 
             return usuarioJefe;
-        
+        } catch (error) {
+            if(error instanceof BadRequestException){
+                throw error;
+            }
+            throw new InternalServerErrorException('Error interno al momento obtener un supervisor')
+        }
     }
 
-    public async existeSupervisor(id_supervisor: number){
-        
+    public async existeSupervisor(id_supervisor: number) {
+
         const supervisor = await this._databaseService.jefesAlumno.findUnique({
             where: {
                 id_user: id_supervisor,
             }
         });
 
-        if(!supervisor){
+        if (!supervisor) {
             return false;
         }
 
         return true;
     }
 
-    public async getEstadoPracticasAsociadas(id_supervisor: number){
+    public async getEstadoPracticasAsociadas(id_supervisor: number) {
         try {
             const practicas = await this._databaseService.jefesAlumno.findUnique({
                 where: {
@@ -110,12 +126,12 @@ export class JefeAlumnoService {
                     },
                 }
             });
-            
+
             let informes: InforPractica[] = [];
 
-            for(let informe of practicas.practicas){
+            for (let informe of practicas.practicas) {
                 let estado: boolean = false;
-                if(informe.informe_confidencial !== null){
+                if (informe.informe_confidencial !== null) {
                     estado = true;
                     let disponible = informe.informe_confidencial.id_informe_confidencial;
                 }
@@ -131,7 +147,7 @@ export class JefeAlumnoService {
                 console.log(inforPractica);
                 informes.push(inforPractica);
             }
-            const listaInformes:InformesPractica = {
+            const listaInformes: InformesPractica = {
                 informes_data: informes,
             };
 

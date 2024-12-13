@@ -1,4 +1,5 @@
-import { IsArray, IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { Decimal } from "@prisma/client/runtime/library";
+import { IsArray, IsDataURI, IsDecimal, IsEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateRespuestaInformAlumnoDto {
     @IsNotEmpty()
@@ -16,6 +17,10 @@ export class CreateRespuestaInformAlumnoDto {
     @IsOptional()
     @IsNumber()
     puntaje?: number;
+
+    @IsOptional()
+    @IsDecimal()
+    nota?: Decimal;
 
     @IsOptional()
     @IsArray()

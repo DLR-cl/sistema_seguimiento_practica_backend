@@ -4,6 +4,7 @@ import { CreateRespuestaInformAlumnoDto, ListaRespuestaDto } from './dto/create-
 import { InformeAlumnoService } from '../informe_alumno/informe_alumno.service';
 
 import { PreguntasImplementadasInformeAlumnoService } from '../preguntas-implementadas-informe-alumno/preguntas-implementadas-informe-alumno.service';
+import { Tipo_pregunta } from '@prisma/client';
 
 @Injectable()
 export class RespuestasInformeAlumnoService {
@@ -16,7 +17,6 @@ export class RespuestasInformeAlumnoService {
     public async crearRespuesta(respuestas: ListaRespuestaDto){
         try {
             let asignaturas: string[];
-            console.log(respuestas.respuestas);
             for(let res of respuestas.respuestas){
                 const validar = await this.validarRespuestas(res);
                 if(!validar){
@@ -32,6 +32,24 @@ export class RespuestasInformeAlumnoService {
                     })
                     const asign = await this.asignarRespuestasAsignaturasRespuesta(res.asignaturas, res.id_informe, res.id_pregunta);
                 }else if(res.puntaje){
+                    const findPregunta = await this._databaseService.preguntasImplementadasInformeAlumno.findUnique({
+                        where: {
+                            id_pregunta: res.id_pregunta
+                        },
+                        include: {
+                            preguntas: true,
+                        }
+                    });
+
+                    if(findPregunta.preguntas.tipo_pregunta == Tipo_pregunta.EVALUATIVA){
+                        const nuevaRespuesta = await this._databaseService.respuestasInformeAlumno.create({
+                            data: {
+                                id_informe: res.id_informe,
+                                id_pregunta: res.id_pregunta,
+                                nota: res.nota,
+                            }
+                        });
+                    }
                     const nuevaRespuesta = await this._databaseService.respuestasInformeAlumno.create({
                         data: {
                             id_informe: res.id_informe,
@@ -89,11 +107,12 @@ export class RespuestasInformeAlumnoService {
 
     public async validarRespuestas(respuesta: CreateRespuestaInformAlumnoDto){
         const informe = await this._informeAlumnoService.existeInforme(respuesta.id_informe);
-
+        if(!informe){
+            throw new BadRequestException('El informe no existe para asignar las respuestas');
+        }
         const pregunta = await this._preguntasAlumnoService.obtenerPreguntaImplementada(respuesta.id_pregunta);
-
-        if(!(informe || pregunta)){
-            return false;
+        if(!pregunta){
+            throw new BadRequestException('Error, la pregunta a responder no está registrada en la base de datos');
         }
 
         return true

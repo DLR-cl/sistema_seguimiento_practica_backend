@@ -242,7 +242,7 @@ export class PracticasService {
 
 
 
-    @Cron('46 15 * * *')
+    @Cron('0 8 * * *')
     private async generarInformeConfidencial() {
         try {
             const findPracticas: any = await this._databaseService.practicas.findMany({
@@ -251,7 +251,7 @@ export class PracticasService {
                     informe_confidencial: null,
                 },
             });
-
+            console.log(findPracticas)
             if (findPracticas.length != 0) {
                 const informesConfidencial = await Promise.all(findPracticas.map(async (practica) => {
 
@@ -271,15 +271,12 @@ export class PracticasService {
                         });
                     }
                 }));
-
-                return this._databaseService.informeConfidencial.findMany();
             }
-            return {}
         } catch (error) {
             throw error;
         }
     }
-    @Cron('46 15 * * *')
+    @Cron('0 8 * * *')
     private async createInformeAlumno() {
         try {
             const findPracticas: any = await this._databaseService.practicas.findMany({
@@ -313,7 +310,7 @@ export class PracticasService {
             return {}
 
         } catch (error) {
-
+            throw error;
         }
     }
 }
