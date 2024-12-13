@@ -5,6 +5,7 @@ import { DatabaseModule } from 'src/database/database/database.module';
 
 @Module({
   providers: [EmailAvisosService],
-  imports: [MailModule, DatabaseModule]
+  imports: [MailModule, DatabaseModule],
+  exports: [EmailAvisosService]
 })
 export class EmailAvisosModule {}

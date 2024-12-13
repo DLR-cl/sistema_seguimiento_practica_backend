@@ -142,6 +142,105 @@ export class EmailAvisosService {
         `;
     }
     
+    // enviar a alumno y academico 
+    public async notificacionAsignacion(id_academico: number, id_informe: number) {
+        try {
+            // Obtener datos del académico
+            const academico = await this._databaseService.usuarios.findUnique({
+                where: { id_usuario: id_academico },
+            });
+    
+            if (!academico) {
+                throw new Error(`No se encontró un académico con el ID ${id_academico}`);
+            }
+    
+            // Obtener datos del informe
+            const informe = await this._databaseService.informesAlumno.findUnique({
+                where: { id_informe: id_informe },
+                include: { practica: true }, // Incluye información de la práctica
+            });
+    
+            if (!informe) {
+                throw new Error(`No se encontró un informe con el ID ${id_informe}`);
+            }
+    
+            // Obtener datos del alumno
+            const estudiante = await this._databaseService.usuarios.findUnique({
+                where: { id_usuario: informe.id_alumno },
+            });
+    
+            if (!estudiante) {
+                throw new Error(`No se encontró un estudiante con el ID ${informe.id_alumno}`);
+            }
+            const fechaInicioRevision = new Date(informe.fecha_inicio_revision).toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            });
+    
+            const fechaFinTentativa = new Date(informe.fecha_termino_revision).toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            });
+                  // Generar correos
+        const emailAcademico: SendEmailDto = {
+            recipients: [academico.correo],
+            subject: `Asignación de informe confidencial - ${estudiante.nombre}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
+                        <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">Hola ${academico.nombre},</h2>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Se le ha asignado el informe confidencial del estudiante <strong>${estudiante.nombre}</strong>, quien está realizando la práctica de tipo <em>"${informe.practica.tipo_practica}"</em>.
+                        </p>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            La revisión del informe deberá comenzar el <strong>${fechaInicioRevision}</strong> y tiene como fecha tentativa de término el <strong>${fechaFinTentativa}</strong>.
+                        </p>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Por favor, revise y gestione el informe correspondiente dentro del plazo establecido.
+                        </p>
+                        <p style="color: #1f2937; font-size: 16px; margin-top: 30px;">Saludos cordiales,</p>
+                        <p style="color: #1f2937; font-size: 16px; font-weight: 600;">El equipo de Gestión de Prácticas</p>
+                    </div>
+                </div>
+            `,
+        };
+
+        const emailEstudiante: SendEmailDto = {
+            recipients: [estudiante.correo],
+            subject: `Asignación de académico para su informe`,
+            html: `
+                <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
+                        <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">Hola ${estudiante.nombre},</h2>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Le informamos que su informe ha sido asignado al académico <strong>${academico.nombre}</strong>.
+                        </p>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            La revisión de su informe comenzará el <strong>${fechaInicioRevision}</strong> y tiene como fecha tentativa de término el <strong>${fechaFinTentativa}</strong>.
+                        </p>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Puede contactar al académico en el correo: <a href="mailto:${academico.correo}">${academico.correo}</a>.
+                        </p>
+                        <p style="color: #1f2937; font-size: 16px; margin-top: 30px;">Saludos cordiales,</p>
+                        <p style="color: #1f2937; font-size: 16px; font-weight: 600;">El equipo de Gestión de Prácticas</p>
+                    </div>
+                </div>
+            `,
+        };
+
+            // Llamar al servicio de envío de correos
+            await this._mailService.sendEmail(emailAcademico);
+            await this._mailService.sendEmail(emailEstudiante);
+    
+            console.log('Correos enviados exitosamente.');
+        } catch (error) {
+            console.error('Error al enviar las notificaciones:', error.message);
+        }
+    }
     
     
 

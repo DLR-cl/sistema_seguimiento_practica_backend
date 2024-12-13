@@ -9,13 +9,14 @@ import { CreateEnlaceDto } from './dto/create-enlace.dto';
 import { file } from 'googleapis/build/src/apis/file';
 import * as path from 'path';
 import { info } from 'console';
+import { EmailAvisosService } from '../email-avisos/email-avisos.service';
 
 @Injectable()
 export class InformeAlumnoService {
     constructor(
         private readonly _databaseService: DatabaseService,
-        private readonly _alumnoService: AlumnoPracticaService,
         private readonly _practicaService: PracticasService,
+        private readonly _emailService: EmailAvisosService,
         
     ){
     }
@@ -38,14 +39,7 @@ export class InformeAlumnoService {
     public async asignarInformeAlAcademico(asignacion: CreateAsignacionDto){
         try{
             // asignar informe al academico, debe existir academico e informe
-            const informeExiste = await this.existeInforme(asignacion.id_informe)
-            if(!informeExiste){
-                throw new BadRequestException('No existe informe');
-            }  
 
-            if(!informeExiste.archivo){
-                throw new BadRequestException('El alumno aun no ha subido su informe');
-            }
             const fechaInicio = new Date();
             const fechaFin = new Date(fechaInicio);
             fechaFin.setDate(fechaInicio.getDate() + 14 );
@@ -61,42 +55,14 @@ export class InformeAlumnoService {
                     fecha_termino_revision: fechaFin,
                 }
             });
-            // antes de cambiar el estado hay que definir cuánto tiempo tiene el academico para revisarlo...
+
+            // notificar alumno
+            // this._emailService.notificacionAsignacion(asignarInforme.id_academico, asignarInforme.id_informe);
             return asignarInforme;
         }catch(error){
             if(error instanceof BadRequestException){
                 throw error;
             }
-        }
-    }
-
-    private async generarAlertaAcademico(){
-        try {
-            const informesAlumno: InformesAlumno[] = await this._databaseService.informesAlumno.findMany({
-                where: {
-                    estado: Estado_informe.REVISION
-                },
-            });
-            const actualDay = new Date();
-            for(let informe of informesAlumno){
-                let terminoDay = new Date(informe.fecha_termino_revision);
-                
-                const diferenciaDias = Math.ceil((
-                    terminoDay.getDate() - actualDay.getDate()
-                )/ (1000 * 60 * 20 * 24));
-
-                if(diferenciaDias == 7){
-                    // generar alerta
-                }else if(diferenciaDias == 3){
-                    // generar alerta
-                }else if(diferenciaDias == 0){
-                    // generar alerta
-                }else if(diferenciaDias < 0){
-                    // generar de atraso contando los dias que lleva atrasado
-                }
-            }   
-        } catch (error) {
-            
         }
     }
 
@@ -118,6 +84,7 @@ export class InformeAlumnoService {
             const informe = await this._databaseService.informesAlumno.findUnique({
                 where:{
                     id_informe: id_informe,
+                    estado: Estado_informe.ENVIADA
                 }
             });
 

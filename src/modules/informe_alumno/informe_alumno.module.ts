@@ -6,11 +6,13 @@ import { AlumnoPracticaModule } from '../alumno_practica/alumno_practica.module'
 import { PracticasModule } from '../practicas/practicas.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from '../users/users.module';
+import { EmailAvisosService } from '../email-avisos/email-avisos.service';
+import { EmailAvisosModule } from '../email-avisos/email-avisos.module';
 
 @Module({
   providers: [InformeAlumnoService,Object],
   controllers: [InformeAlumnoController],
   exports: [InformeAlumnoService],
-  imports: [DatabaseModule, AlumnoPracticaModule, PracticasModule, AuthModule, UsersModule]
+  imports: [DatabaseModule, AlumnoPracticaModule, PracticasModule, AuthModule, UsersModule, EmailAvisosModule]
 })
 export class InformeAlumnoModule {}
