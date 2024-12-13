@@ -1,10 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
 import { ModificarPreguntaDto } from './dto/modificar-pregunta.dto';
 import { CrearPreguntaDto } from './dto/crear-pregunta.dto';
 import { CrearPreguntasDto } from './dto/crear-preguntas.dto';
 import { DimensionesEvaluativasService } from '../dimensiones-evaluativas/dimensiones-evaluativas.service';
-import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class PreguntasService {
@@ -16,7 +15,14 @@ export class PreguntasService {
 
     public async crearPregunta(pregunta: CrearPreguntaDto){
         try {
-            if(! await this.existePregunta(pregunta.enunciado_pregunta)){
+            if(!await this._databaseService.subDimensionesEvaluativas.findUnique({
+                where: {
+                    id_dimension: pregunta.id_dimension,
+                }
+            })){
+                throw new BadRequestException('No existe la subdimension seleccionada para crear la pregunta');
+            }
+            if(!await this.existePregunta(pregunta.enunciado_pregunta)){
                 throw new BadRequestException('Ya existe ese enunciado para la pregunta');
             }
             const nuevaPregunta = await this._databaseService.preguntas.create({
@@ -28,6 +34,7 @@ export class PreguntasService {
             if(error instanceof BadRequestException){
                 throw error;
             }
+            throw new InternalServerErrorException('Error Interno al momento de crear una pregunta');
         }
     }
 
@@ -42,11 +49,9 @@ export class PreguntasService {
     }
     public async crearPreguntas(preguntas: CrearPreguntasDto){
         try {
-            console.log(preguntas);
             const nuevasPreguntas = await this._databaseService.preguntas.createMany({
                 data: preguntas.preguntas,
             })
-            console.log(preguntas.preguntas);
             return nuevasPreguntas;
         } catch (error) {
             throw error;
@@ -74,11 +79,17 @@ export class PreguntasService {
                 }
             });
 
+            if(!nuevaPregunta){
+                throw new BadRequestException('Error al modificar la pregunta, posiblemente no exista o el enunciado ya existe');
+            }
+
             return nuevaPregunta;
         } catch (error) {
             if(error instanceof BadRequestException){
                 throw error;
             }
+
+            throw new InternalServerErrorException('Error interno al momento de modificar la pregunta')
         }
     }
 
@@ -98,9 +109,9 @@ export class PreguntasService {
 
     public async obtenerPreguntasPorDimension(id_dimension: number){
         try {
-            const dimension = await this._dimensionesService.getDimension(id_dimension);
+            const dimension = await this._dimensionesService.obtenerSubdimension(id_dimension);
             if(!dimension){
-                throw new BadRequestException('La dimension que busca no existe en el sistema')
+                throw new BadRequestException('La subdimension que busca no existe en el sistema')
             };
 
             const preguntas = await this._databaseService.preguntas.findMany({
@@ -111,7 +122,11 @@ export class PreguntasService {
 
             return preguntas;
         } catch (error) {
-            
+            if(error instanceof BadRequestException){
+                throw error;
+            }
+
+            throw new InternalServerErrorException('Error interno al momento de obtener las preguntas por subdimension')
         }
     }
 }

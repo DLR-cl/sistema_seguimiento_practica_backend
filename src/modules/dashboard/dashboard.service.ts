@@ -156,4 +156,41 @@ export class DashboardService {
       throw error;
     }
   }
+
+  public async obtenerCantidadAlumnosAsignadosSupervisor(id_supervisor: number){
+    try {
+      if(! await this._databaseService.jefesAlumno.findUnique({
+        where: {
+          id_user: id_supervisor,
+        }
+      })){
+        throw new BadRequestException('Error, el supervisor no existe')
+      }
+
+      const cantAlumnosAsignados = await this._databaseService.practicas.count({
+        where: {
+          id_supervisor: id_supervisor,
+          OR: [
+            {estado: "CURSANDO"},
+            {estado: "ESPERA_INFORMES"}
+          ],
+          informe_confidencial: {
+            NOT: {
+              estado: "ENVIADA",
+            }
+          }
+        }
+      });
+
+      return {
+        cant_alumnos: cantAlumnosAsignados
+      }
+    } catch (error) {
+      if(error instanceof BadRequestException){
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Error interno al momento de obtener la cantidad de alumnos asignados a un supervisor');
+    }
+  }
 }

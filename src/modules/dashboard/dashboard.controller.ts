@@ -31,4 +31,9 @@ export class DashboardController {
     public async obtenerInformesAsociados(@Param('id') id_supervisor: string){
         return await this._dashboardService.infoTablaSupervisorPractica(+id_supervisor);
     }
+
+    @Get('cantidad-alumnos-asignados/:id')
+    public async obtenerCantidadAlumnosAsignadosSupervisor(@Param('id') id_supervisor: string){
+        return await this._dashboardService.obtenerCantidadAlumnosAsignadosSupervisor(+id_supervisor)
+    }
 }

@@ -54,5 +54,12 @@ export class EmailAvisosService {
         }
     }
 
+    private async avisoPracticaAlumnos(){
+        try {
+            const findAlumnos = await this._databaseService.alumnosPractica.findMany();
+        } catch (error) {
+            
+        }
+    }
 
 }

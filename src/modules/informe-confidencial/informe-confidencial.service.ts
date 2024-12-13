@@ -52,6 +52,7 @@ export class InformeConfidencialService {
         }
     }
 
+
     public async getInformesConfidenciales(id_supervisor: number){
         try {
             const informes = await this._databaseService.informeConfidencial.findMany({
@@ -65,6 +66,7 @@ export class InformeConfidencialService {
             
         }
     }
+
 
     
 }
