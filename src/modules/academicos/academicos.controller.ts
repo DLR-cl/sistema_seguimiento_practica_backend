@@ -1,10 +1,11 @@
-import { BadRequestException, Body, Controller, Get, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, Patch, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
 import { AcademicosService } from './academicos.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { CrearInformeCorreccion } from './dto/create-correccion-informe.dto';
+import { Response } from 'express';
 const rootPath = process.cwd();
 
 @Controller('academicos')
@@ -72,6 +73,44 @@ export class AcademicosController {
         @Body() data: CrearInformeCorreccion){
             return await this._academicoService.subirCorreccion(file, data, rootPath)
     }
+
+        @Get('ver-informe/:id_informe')
+        async verInforme(@Param('id_informe') id_informe: number, @Res() res: Response) {
+            try {
+                const fileStream = await this._academicoService.getArchivo(id_informe);
+    
+                // Determinar el tipo de contenido según el archivo (por ejemplo, PDF o imagen)
+                res.setHeader('Content-Type', 'application/pdf');  // Puedes ajustarlo según el tipo de archivo
+                res.setHeader('Content-Disposition', 'inline; filename="informe.pdf"');
+                
+                // Enviar el archivo como stream, permitiendo que se muestre en el navegador
+                fileStream.pipe(res);
+            } catch (error) {
+                if (error instanceof NotFoundException) {
+                    throw error; // Manejo de error si el archivo no existe
+                }
+                throw new Error('Error al intentar mostrar el archivo');
+            }
+        }
+    
+        @Get('descargar-informe/:id_informe')
+        async descargarInforme(@Param('id_informe') id_informe: number, @Res() res: Response) {
+            try {
+                const fileStream = await this._academicoService.getArchivo(id_informe);
+    
+                // Configurar las cabeceras para forzar la descarga
+                res.setHeader('Content-Disposition', 'attachment; filename="informe.pdf"');
+                res.setHeader('Content-Type', 'application/pdf');  // Ajusta según el tipo de archivo
+                
+                // Enviar el archivo como stream para la descarga
+                fileStream.pipe(res);
+            } catch (error) {
+                if (error instanceof NotFoundException) {
+                    throw error; // Manejo de error si el archivo no existe
+                }
+                throw new Error('Error al intentar descargar el archivo');
+            }
+        }
 }
 
 

@@ -1,13 +1,14 @@
-import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from '../../database/database/database.service';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
-import { access } from 'fs';
 import { Estado_informe, PrismaClient, Tipo_usuario, TipoPractica } from '@prisma/client';
 import { CantidadInformesPorAcademico } from './dto/cantidad-informes.dto';
 import { obtenerAcademico, obtenerCantidadInformes } from '@prisma/client/sql'
 import { UsersService } from '../users/users.service';
 import { Academico } from './dto/academico.dto';
-import { extname, join } from 'path';
+import { extname, join, resolve } from 'path';
+import * as fs from 'fs';
+
 import { CrearInformeCorreccion } from './dto/create-correccion-informe.dto';
 @Injectable()
 export class AcademicosService {
@@ -143,5 +144,29 @@ export class AcademicosService {
             throw new InternalServerErrorException('Error interno al subir un archivo');
         }
     }
+
+    async getArchivo(id_informe: number) {
+            // Obtener el informe por ID
+            const informe = await this.getInformePorId(id_informe);
+    
+            if (!informe || !informe.archivo_correccion) {
+                throw new NotFoundException('No se encontró el informe del alumno');
+            }
+    
+            // La ruta completa ya está almacenada en informe.archivo_informe
+            const filePath = resolve(informe.archivo_correccion);
+    
+            if (!fs.existsSync(filePath)) {
+                throw new NotFoundException('El archivo no existe en el sistema de archivos');
+            }
+    
+            return fs.createReadStream(filePath); // Retornar un stream para el controlador
+        }
+    
+        private async getInformePorId(id_informe: number) {
+            return await this._databaseService.informesAlumno.findUnique({
+                where: { id_informe },
+            });
+        }
     
 }
