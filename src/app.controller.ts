@@ -14,11 +14,5 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Post()
-  async hola(@Body() data: {
-    id_informe: number,
-    estado: Estado_informe
-  }){
-    return this.mailService.notificacionCambioEstado(data.id_informe, data.estado);
-  }
+
 }

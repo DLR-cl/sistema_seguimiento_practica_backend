@@ -1,7 +1,8 @@
-import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AlumnosNominaService } from './alumnos-nomina.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as XLSX from 'xlsx'
+import { BuscarAlumnoDto } from './dto/alumnos-nomina.dto';
 @Controller('alumnos-nomina')
 export class AlumnosNominaController {
 
@@ -30,8 +31,11 @@ export class AlumnosNominaController {
       }).filter((row) => row.rut && row.nombre && row.email); // Asegurarse de que los datos no estén vacíos
   
       // Guardar en la base de datos
-      await this._alumnoNominaService.guardarUsuarios(usuarios);
-  
-      return 'Archivo procesado y datos guardados correctamente';
+     return await this._alumnoNominaService.guardarUsuarios(usuarios);
+    }
+
+    @Get('alumno')
+    async buscarAlumnoNomina(@Body() alumno: BuscarAlumnoDto){
+        return await this._alumnoNominaService.obtenerAlumnoNomina(alumno.rut);
     }
 }

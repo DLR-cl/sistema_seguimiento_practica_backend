@@ -16,7 +16,7 @@ datasource db {
 
 model AlumnasNomina {
   id_alumno Int @id @default(autoincrement())
-  rut String  @db.VarChar(10)
+  rut String  @db.VarChar(10) @unique
   nombre String @db.VarChar(200)
   email String @db.VarChar(100)
 }

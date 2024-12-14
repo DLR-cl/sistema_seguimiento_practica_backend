@@ -26,6 +26,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { EmailAvisosModule } from './modules/email-avisos/email-avisos.module';
 import { RespuestaInformeConfidencialController } from './modules/respuesta-informe-confidencial/respuesta-informe-confidencial.controller';
 import { RespuestaInformeConfidencialModule } from './modules/respuesta-informe-confidencial/respuesta-informe-confidencial.module';
+import { AlumnosNominaModule } from './modules/alumnos-nomina/alumnos-nomina.module';
 
 
 @Module({
@@ -54,7 +55,8 @@ import { RespuestaInformeConfidencialModule } from './modules/respuesta-informe-
     AcademicosModule,
     DashboardModule,
     EmailAvisosModule,
-    RespuestaInformeConfidencialModule
+    RespuestaInformeConfidencialModule,
+    AlumnosNominaModule
   ],
   controllers: [AppController],
   providers: [AppService],
