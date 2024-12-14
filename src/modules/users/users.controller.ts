@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { Tipo_usuario } from '@prisma/client';
 import { AuthRegisterDto } from 'src/auth/dto/authRegisterDto.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { ChangePasswordDto } from './dto/changePassword.dto';
 
 @Controller('users')
 export class UsersController {
@@ -24,5 +26,15 @@ export class UsersController {
       throw new Error('Rol inválido');
     }
     return await this.usersService.obtenerUsuariosByRol(rolUsuario);
+  }
+
+  @UseGuards(AuthGuard) // Asegura que el usuario esté autenticado
+  @Patch('change-password')
+  async changePassword(
+    @Req() req: any, // Obtener datos del usuario autenticado
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    const userId = req.user.id; // Extrae el ID del usuario del token JWT
+    return this.usersService.changePassword(userId, changePasswordDto);
   }
 }

@@ -30,12 +30,11 @@ export class AlumnoPracticaService {
             }
         });
 
-        const {password: _, ...userWithoutPassword } = usuario;
 
         const response: ResponseAlumnoDto = {
             message: 'Alumno Creado con éxito',
             status_code: HttpStatus.OK,
-            data: userWithoutPassword,
+            data: usuario,
         };
         return response;
     }
