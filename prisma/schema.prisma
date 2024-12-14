@@ -14,6 +14,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model AlumnasNomina {
+  id_alumno Int @id @default(autoincrement())
+  rut String  @db.VarChar(10)
+  nombre String @db.VarChar(200)
+  email String @db.VarChar(100)
+}
+
 model Usuarios {
   id_usuario Int    @id @default(autoincrement())
   password   String @db.VarChar(250)

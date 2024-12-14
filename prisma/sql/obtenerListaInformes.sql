@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     a.nombre AS nombre_alumno,
     p.tipo_practica,
     infA.estado AS estado_informe,
