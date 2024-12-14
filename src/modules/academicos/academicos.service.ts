@@ -10,11 +10,13 @@ import { extname, join, resolve } from 'path';
 import * as fs from 'fs';
 
 import { CrearInformeCorreccion } from './dto/create-correccion-informe.dto';
+import { EmailAvisosService } from '../email-avisos/email-avisos.service';
 @Injectable()
 export class AcademicosService {
     constructor(
         private readonly _databaseService: DatabaseService,
         private readonly _userService: UsersService,
+        private readonly _emailAvisosService: EmailAvisosService
     ) {
 
     }
@@ -109,7 +111,7 @@ export class AcademicosService {
             const existeInforme = await this._databaseService.informesAlumno.findUnique({
                 where: {
                     id_informe: data.id_informe,
-                    estado: Estado_informe.ENVIADA
+                    estado: Estado_informe.REVISION
                 }
             });
     
@@ -131,10 +133,11 @@ export class AcademicosService {
                     estado: Estado_informe.REVISION
                 },
                 data: {
-                    archivo_correccion: filePath
+                    archivo_correccion: filePath,
+                    estado: Estado_informe.CORRECCION
                 }
             });
-    
+            
             return informe;
         } catch (error) {
             if (error instanceof BadRequestException || error instanceof UnauthorizedException) {

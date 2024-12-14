@@ -109,6 +109,8 @@ export class InformeAlumnoService {
                 }
             });
 
+            await this._emailService.notificacionCambioEstado(informeCambio.id_informe, informeCambio.estado);
+
 
             return {
                 message: 'El informe ha sido actualizado con éxito',

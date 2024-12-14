@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { Estado_informe } from '@prisma/client';
 import { obtenerInformeConfidencialSupersivor, obtenerInformesAcademicos, obtenerPracticaAlumnoVencimiento, obtenerPracticasAsociadasSupervisor } from '@prisma/client/sql';
 import { DatabaseService } from 'src/database/database/database.service';
 import { SendEmailDto } from 'src/mail/dto/mail.dto';
@@ -91,7 +92,7 @@ export class EmailAvisosService {
             const informesConfidenciales = await this._databaseService.$queryRawTyped<any>(
                 obtenerInformeConfidencialSupersivor()
             );
-    
+
             // Itera sobre los informes y envía correos
             await Promise.all(
                 informesConfidenciales.map(async (informe) => {
@@ -100,7 +101,7 @@ export class EmailAvisosService {
                         subject: `Aviso: Quedan ${informe.dias_restantes} días para enviar el informe confidencial`,
                         html: this.generarCuerpoCorreoHTML(informe),
                     };
-    
+
                     // Llama al servicio de envío de correos
                     await this._mailService.sendEmail(email);
                 })
@@ -109,7 +110,7 @@ export class EmailAvisosService {
             throw error;
         }
     }
-    
+
     // Método para generar el cuerpo del correo en HTML con estilo TailwindCSS
     private generarCuerpoCorreoHTML(informe: any): string {
         return `
@@ -123,11 +124,11 @@ export class EmailAvisosService {
     
                     <p style="color: #374151; font-size: 16px; margin-top: 20px;">
                         La fecha límite para la entrega del informe es el <strong style="color: #3b82f6;">${new Date(informe.fecha_limite_entrega).toLocaleDateString('es-ES', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                        })}</strong>.
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        })}</strong>.
                     </p>
     
                     <p style="color: #374151; font-size: 16px; margin-top: 20px;">
@@ -140,7 +141,7 @@ export class EmailAvisosService {
             </div>
         `;
     }
-    
+
     // enviar a alumno y academico 
     public async notificacionAsignacion(id_academico: number, id_informe: number) {
         try {
@@ -148,26 +149,26 @@ export class EmailAvisosService {
             const academico = await this._databaseService.usuarios.findUnique({
                 where: { id_usuario: id_academico },
             });
-    
+
             if (!academico) {
                 throw new Error(`No se encontró un académico con el ID ${id_academico}`);
             }
-    
+
             // Obtener datos del informe
             const informe = await this._databaseService.informesAlumno.findUnique({
                 where: { id_informe: id_informe },
                 include: { practica: true }, // Incluye información de la práctica
             });
-    
+
             if (!informe) {
                 throw new Error(`No se encontró un informe con el ID ${id_informe}`);
             }
-    
+
             // Obtener datos del alumno
             const estudiante = await this._databaseService.usuarios.findUnique({
                 where: { id_usuario: informe.id_alumno },
             });
-    
+
             if (!estudiante) {
                 throw new Error(`No se encontró un estudiante con el ID ${informe.id_alumno}`);
             }
@@ -177,18 +178,18 @@ export class EmailAvisosService {
                 month: 'long',
                 day: 'numeric',
             });
-    
+
             const fechaFinTentativa = new Date(informe.fecha_termino_revision).toLocaleDateString('es-ES', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
             });
-                  // Generar correos
-        const emailAcademico: SendEmailDto = {
-            recipients: [academico.correo],
-            subject: `Asignación de informe confidencial - ${estudiante.nombre}`,
-            html: `
+            // Generar correos
+            const emailAcademico: SendEmailDto = {
+                recipients: [academico.correo],
+                subject: `Asignación de informe confidencial - ${estudiante.nombre}`,
+                html: `
                 <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
                     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
                         <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">Hola ${academico.nombre},</h2>
@@ -206,12 +207,12 @@ export class EmailAvisosService {
                     </div>
                 </div>
             `,
-        };
+            };
 
-        const emailEstudiante: SendEmailDto = {
-            recipients: [estudiante.correo],
-            subject: `Asignación de académico para su informe`,
-            html: `
+            const emailEstudiante: SendEmailDto = {
+                recipients: [estudiante.correo],
+                subject: `Asignación de académico para su informe`,
+                html: `
                 <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
                     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
                         <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">Hola ${estudiante.nombre},</h2>
@@ -229,18 +230,135 @@ export class EmailAvisosService {
                     </div>
                 </div>
             `,
-        };
+            };
 
             // Llamar al servicio de envío de correos
             await this._mailService.sendEmail(emailAcademico);
             await this._mailService.sendEmail(emailEstudiante);
-    
+
             console.log('Correos enviados exitosamente.');
         } catch (error) {
             console.error('Error al enviar las notificaciones:', error.message);
         }
     }
-    
-    
+
+
+    public async notificacionCambioEstado(id_informe: number, estado: Estado_informe) {
+        try {
+            // Obtener datos del informe
+            const informe = await this._databaseService.informesAlumno.findUnique({
+                where: { id_informe },
+                include: { alumno: { include: { usuario: true } } }, // Incluye datos del alumno relacionado
+            });
+
+            if (!informe) {
+                throw new Error(`No se encontró un informe con el ID ${id_informe}`);
+            }
+
+            const alumno = informe.alumno;
+
+            if (!alumno) {
+                throw new Error(`No se encontró un alumno relacionado con el informe ID ${id_informe}`);
+            }
+
+            const emailAlumno: SendEmailDto = {
+                recipients: [alumno.usuario.correo],
+                subject: this.getEmailSubject(estado),
+                html: this.getEmailHtml(estado, alumno.usuario.nombre, id_informe),
+            };
+
+            // Enviar el correo al alumno
+            await this._mailService.sendEmail(emailAlumno);
+
+            console.log(`Correo enviado al alumno ${alumno.usuario.correo} para el estado ${estado}`);
+        } catch (error) {
+            console.error('Error al enviar la notificación:', error.message);
+        }
+    }
+
+    private getEmailSubject(estado: Estado_informe): string {
+        switch (estado) {
+            case Estado_informe.APROBADA:
+                return 'Informe aprobado';
+            case Estado_informe.DESAPROBADA:
+                return 'Informe desaprobado';
+            case Estado_informe.CORRECCION:
+                return 'Corrección requerida en su informe';
+            default:
+                return 'Actualización sobre su informe';
+        }
+    }
+
+    private getEmailHtml(estado: Estado_informe, nombreAlumno: string, idInforme: number): string {
+
+        switch (estado) {
+            case Estado_informe.APROBADA:
+                return `
+                <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
+                        <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">¡Hola ${nombreAlumno}!</h2>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            ¡Nos alegra mucho informarte que tu informe ha sido <strong>APROBADO</strong>! 
+                        </p>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Este es un gran paso en tu práctica profesional. Felicitaciones por el esfuerzo y dedicación que has demostrado.
+                        </p>
+                        <p style="color: #1f2937; font-size: 16px; margin-top: 30px;">Un fuerte abrazo,</p>
+                        <p style="color: #1f2937; font-size: 16px; font-weight: 600;">El equipo de Gestión de Prácticas</p>
+                    </div>
+                </div>
+            `;
+            case Estado_informe.DESAPROBADA:
+                return `
+                <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
+                        <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">Hola ${nombreAlumno},</h2>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Queremos informarte que tu informe ha sido <strong>DESAPROBADO</strong>. 
+                        </p>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Sabemos que no es la noticia que esperabas, pero queremos animarte a seguir adelante y trabajar en los aspectos pendientes. Puedes contactar con tu academico para resolver dudas.
+                        </p>
+                        <p style="color: #1f2937; font-size: 16px; font-weight: 600;">El equipo de Gestión de Prácticas</p>
+                    </div>
+                </div>
+            `;
+            case Estado_informe.CORRECCION:
+                return `
+                <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
+                        <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">Hola ${nombreAlumno},</h2>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Tu informe ha sido revisado y está en estado de <strong>CORRECCIÓN</strong>.
+                        </p>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Te invitamos a ingresar al sistema para revisar la corrección y los comentarios que te dejó tu académico. 
+
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            ¡Estamos seguros de que con algunos ajustes tu informe quedará perfecto!
+                        </p>
+                        <p style="color: #1f2937; font-size: 16px; margin-top: 30px;">Mucho ánimo,</p>
+                        <p style="color: #1f2937; font-size: 16px; font-weight: 600;">El equipo de Gestión de Prácticas</p>
+                    </div>
+                </div>
+            `;
+            default:
+                return `
+                <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
+                        <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">Hola ${nombreAlumno},</h2>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Hay una actualización sobre tu informe. Por favor, revisa el sistema para más detalles.
+                        </p>
+                        <p style="color: #1f2937; font-size: 16px; margin-top: 30px;">Saludos cordiales,</p>
+                        <p style="color: #1f2937; font-size: 16px; font-weight: 600;">El equipo de Gestión de Prácticas</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+
+
 
 }

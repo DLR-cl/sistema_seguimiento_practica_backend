@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotAcceptableException } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, NotAcceptableException, Logger } from "@nestjs/common";
 import { createPracticaDto } from "./dto/create-practicas.dto";
 import { DatabaseService } from "../../database/database/database.service";
 import { PracticaInfo, PracticaResponseDto } from "./dto/practica-response.dto";
@@ -12,7 +12,7 @@ import { CreateInformeConfidencialDto } from "../informe-confidencial/dto/create
 
 @Injectable()
 export class PracticasService {
-
+    private readonly logger = new Logger(PracticasService.name);
     constructor(
         private readonly _databaseService: DatabaseService,
         private readonly _alumnoService: AlumnoPracticaService,
@@ -260,4 +260,40 @@ export class PracticasService {
             throw error;
         }
     }
+
+    // finalizar practica automaticamente
+    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    async actualizarEstadoPracticas(): Promise<void> {
+      try {
+        // Obtener las prácticas que aún no están finalizadas y cuya fecha de término ya pasó
+        const practicasPorFinalizar = await this._databaseService.practicas.findMany({
+          where: {
+            estado: { not: Estado_practica.FINALIZADA },
+            fecha_termino: { lt: new Date() },
+          },
+        });
+  
+        if (practicasPorFinalizar.length === 0) {
+          this.logger.log('No hay prácticas que necesiten ser finalizadas.');
+          return;
+        }
+  
+        // Actualizar el estado de las prácticas
+        const updates = practicasPorFinalizar.map((practica) => 
+          this._databaseService.practicas.update({
+            where: { id_practica: practica.id_practica },
+            data: { estado: Estado_practica.FINALIZADA },
+          })
+        );
+  
+        await Promise.all(updates);
+  
+        this.logger.log(
+          `Se actualizaron ${practicasPorFinalizar.length} prácticas a estado FINALIZADA.`
+        );
+      } catch (error) {
+        this.logger.error('Error al actualizar el estado de las prácticas.', error);
+      }
+    }
+  
 }
