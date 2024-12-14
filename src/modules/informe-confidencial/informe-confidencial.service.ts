@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
 import { CreateInformeConfidencialDto } from './dto/create-informe-confidencial.dto';
 import { AlumnoPracticaService } from '../alumno_practica/alumno_practica.service';
@@ -37,6 +37,18 @@ export class InformeConfidencialService {
     
     public async asignarInformeConfidencial(id_informe:number, id_academico: number){
         try {
+
+            const informeConfidencial = await this._databaseService.informeConfidencial.findUnique({
+                where: {
+                    id_informe_confidencial: id_informe,
+                    estado: Estado_informe.ENVIADA
+                }
+            });
+
+            if(!informeConfidencial){
+                throw new BadRequestException('El informe confidencial no existe o aun no ha sido enviado');
+            }
+            
             const asignacion = await this._databaseService.informeConfidencial.update({
                 where: {
                     id_informe_confidencial: id_informe,
@@ -46,15 +58,23 @@ export class InformeConfidencialService {
                 }
             });
 
-            return 'Se realizó la asignación correctamente';
+            return {
+                message: 'Informe Confidencial Asignado con éxito',
+                status: HttpStatus.OK,
+                data: asignacion
+            }
         } catch (error) {
-            throw error;
+            if(error instanceof BadRequestException){
+                throw error;
+            }
+            throw new InternalServerErrorException('Error interno al asignar informe confidencial');
         }
     }
 
 
     public async getInformesConfidenciales(id_supervisor: number){
         try {
+        
             const informes = await this._databaseService.informeConfidencial.findMany({
                 where: {
                     id_supervisor: id_supervisor,
@@ -63,7 +83,7 @@ export class InformeConfidencialService {
 
             return informes;
         } catch (error) {
-            
+            throw error;
         }
     }
 

@@ -53,7 +53,7 @@ export class EmailAvisosService {
             throw error;
         }
     }
-    @Cron('0 8 * * *')
+
     private async avisoPracticaAlumnos() {
         try {
             const findAlumnos = await this._databaseService.$queryRawTyped<any>(obtenerPracticaAlumnoVencimiento());
@@ -85,7 +85,6 @@ export class EmailAvisosService {
         }
     }
 
-    @Cron('39 16 * * *')
     private async avisoDiasRestanteEnvioConfidencial() {
         try {
             // Obtiene los datos desde la base de datos

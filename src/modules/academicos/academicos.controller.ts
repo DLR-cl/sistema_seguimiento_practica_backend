@@ -1,6 +1,11 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, MaxFileSizeValidator, Param, ParseFilePipe, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
 import { AcademicosService } from './academicos.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
+import { CrearInformeCorreccion } from './dto/create-correccion-informe.dto';
+const rootPath = process.cwd();
 
 @Controller('academicos')
 export class AcademicosController {
@@ -28,4 +33,45 @@ export class AcademicosController {
     public async obtenerAcademicos(){
         return await this._academicoService.obtenerAcademicos();
     }
+
+    @Patch('subir-correccion')
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: (req, file, callback) => {
+                const { tipo_practica } = req.body; // Obtener el tipo de práctica
+                let subFolder = '';
+                
+                if (tipo_practica === 'PRACTICA_UNO') {
+                    subFolder = 'informes-practica-uno/academicos-correccion';
+                } else if (tipo_practica === 'PRACTICA_DOS') {
+                    subFolder = 'informes-practica-dos/academicos-correccion';
+                } else {
+                    return callback(new BadRequestException('Tipo de práctica no válido'), null);
+                }
+    
+                const folderPath = join(rootPath, 'uploads', subFolder);
+                callback(null, folderPath); // Establece la carpeta de destino
+            },
+            filename: (req, file, callback) => {
+                const { nombre_alumno } = req.body; // Obtener el nombre del alumno
+                const extension = extname(file.originalname);
+                const nuevoNombre = `correccion-informe-${nombre_alumno}${extension}`;
+                callback(null, nuevoNombre); // Renombra el archivo
+            }
+        }),
+    }))
+    public async subirCorreccion(
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024})
+                ],
+                exceptionFactory: (errors) => new BadRequestException('Archivo Inválido') 
+            })
+        ) file: Express.Multer.File,
+        @Body() data: CrearInformeCorreccion){
+            return await this._academicoService.subirCorreccion(file, data, rootPath)
+    }
 }
+
+

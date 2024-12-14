@@ -101,13 +101,14 @@ model Practicas {
 }
 
 model InformesAlumno {
-  id_informe   Int            @id @default(autoincrement())
-  id_practica  Int            @unique
-  id_alumno    Int
-  archivo      String?        @db.VarChar(300) //documento con los datos requeridos
-  estado       Estado_informe
-  id_academico Int?
-  fecha_inicio DateTime
+  id_informe         Int            @id @default(autoincrement())
+  id_practica        Int            @unique
+  id_alumno          Int
+  archivo            String?        @db.VarChar(300) //documento con los datos requeridos
+  archivo_correccion String?        @db.VarChar(300) //documento correccion
+  estado             Estado_informe
+  id_academico       Int?
+  fecha_inicio       DateTime
 
   fecha_inicio_revision  DateTime? @db.Date
   fecha_termino_revision DateTime? @db.Date
