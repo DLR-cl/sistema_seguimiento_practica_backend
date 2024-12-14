@@ -39,40 +39,73 @@ export class AcademicosController {
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: (req, file, callback) => {
-                const { tipo_practica } = req.body; // Obtener el tipo de práctica
-                let subFolder = '';
-                
-                if (tipo_practica === 'PRACTICA_UNO') {
-                    subFolder = 'informes-practica-uno/academicos-correccion';
-                } else if (tipo_practica === 'PRACTICA_DOS') {
-                    subFolder = 'informes-practica-dos/academicos-correccion';
-                } else {
-                    return callback(new BadRequestException('Tipo de práctica no válido'), null);
-                }
-    
-                const folderPath = join(rootPath, 'uploads', subFolder);
-                callback(null, folderPath); // Establece la carpeta de destino
+                // Carpeta temporal para evitar depender de datos del body
+                const folderPath = join(rootPath, 'uploads', 'temp-correcciones');
+                callback(null, folderPath);
             },
             filename: (req, file, callback) => {
-                const { nombre_alumno } = req.body; // Obtener el nombre del alumno
-                const extension = extname(file.originalname);
-                const nuevoNombre = `correccion-informe-${nombre_alumno}${extension}`;
-                callback(null, nuevoNombre); // Renombra el archivo
-            }
+                const tempFileName = `${Date.now()}-${file.originalname}`; // Nombre temporal
+                callback(null, tempFileName);
+            },
         }),
     }))
     public async subirCorreccion(
         @UploadedFile(
             new ParseFilePipe({
                 validators: [
-                    new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024})
+                    new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }), // Máximo 20MB
                 ],
-                exceptionFactory: (errors) => new BadRequestException('Archivo Inválido') 
-            })
+                exceptionFactory: () => new BadRequestException('Archivo Inválido'),
+            }),
         ) file: Express.Multer.File,
-        @Body() data: CrearInformeCorreccion){
-            return await this._academicoService.subirCorreccion(file, data, rootPath)
+        @Body() data: CrearInformeCorreccion,
+    ) {
+        const fs = require('fs');
+        try {
+            console.log('Datos recibidos:', data); // Inspección del body
+            console.log('Archivo recibido:', file); // Inspección del archivo
+    
+            if (!data.tipo_practica || !data.nombre_alumno || !data.id_informe || !data.id_academico) {
+                throw new BadRequestException('Faltan datos obligatorios en la solicitud');
+            }
+    
+            // Determinar la carpeta final según `tipo_practica`
+            let subFolder = '';
+            if (data.tipo_practica === 'PRACTICA_UNO') {
+                subFolder = 'informes-practica-uno/academicos-correccion';
+            } else if (data.tipo_practica === 'PRACTICA_DOS') {
+                subFolder = 'informes-practica-dos/academicos-correccion';
+            } else {
+                throw new BadRequestException('Tipo de práctica no válido');
+            }
+    
+            const folderPath = join(rootPath, 'uploads', subFolder);
+            if (!fs.existsSync(folderPath)) {
+                fs.mkdirSync(folderPath, { recursive: true }); // Crear la carpeta si no existe
+            }
+    
+            // Renombrar y mover el archivo a la carpeta final
+            const extension = extname(file.originalname);
+            const nuevoNombre = `correccion-informe-${data.nombre_alumno}${extension}`;
+            const nuevoPath = join(folderPath, nuevoNombre);
+    
+            await fs.promises.rename(file.path, nuevoPath);
+    
+            // Llamar al servicio para almacenar la información en la base de datos
+            return await this._academicoService.subirCorreccion(
+                { ...file, path: nuevoPath },
+                data,
+                rootPath,
+            );
+        } catch (error) {
+            // Eliminar el archivo si ocurre algún error
+            if (fs.existsSync(file.path)) {
+                await fs.promises.unlink(file.path);
+            }
+            throw error;
+        }
     }
+    
 
         @Get('ver-informe/:id_informe')
         async verInforme(@Param('id_informe') id_informe: number, @Res() res: Response) {

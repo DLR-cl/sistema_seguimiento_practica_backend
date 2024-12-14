@@ -285,38 +285,56 @@ export class InformeAlumnoService {
     }
 
     async subirInforme(file: Express.Multer.File, data: InformeDto, rootPath: string) {
+        const fs = require('fs');
+        const filePath = file.path;
+    
         try {
+            
+
+    
             const existeAlumno = await this._databaseService.alumnosPractica.findUnique({
-                where: { id_user: data.id_alumno },
+                where: {
+                    id_user: data.id_alumno,
+                },
                 include: {
                     usuario: true,
-                }
-            });
-
-            if (!existeAlumno) {
-                throw new BadRequestException('El alumno no existe');
-            }
-
-            const filePath = join(rootPath, file.path);
-
-            // Actualizar en la base de datos
-            const informeActualizado = await this._databaseService.informesAlumno.update({
-                where: { id_informe: data.id_informe },
-                data: {
-                    archivo: filePath,
                 },
             });
-
+    
+            if (!existeAlumno) {
+                throw new NotFoundException(`No se encontró un alumno con el ID ${data.id_alumno}`);
+            }
+    
+            // Almacena la ruta del archivo en la base de datos
+            const rutaArchivo = filePath; // Puedes ajustar la ruta si necesitas eliminar parte del path
+            await this._databaseService.informesAlumno.update({
+                where: {
+                    id_informe: data.id_informe,
+                    estado: Estado_informe.ESPERA,
+                }
+                ,data: {
+                    id_alumno: data.id_alumno,
+                    archivo: rutaArchivo,
+                    estado: Estado_informe.ENVIADA
+                },
+            });
+    
             return {
                 message: 'Informe subido exitosamente',
-                data: informeActualizado,
+                filePath: rutaArchivo,
             };
         } catch (error) {
-            if(error instanceof BadRequestException){
-                throw error;
+            // Elimina el archivo si hay un error
+            try {
+                if (fs.existsSync(filePath)) {
+                    await fs.promises.unlink(filePath);
+                    console.log(`Archivo eliminado: ${filePath}`);
+                }
+            } catch (unlinkError) {
+                console.error(`Error al intentar eliminar el archivo: ${unlinkError.message}`);
             }
-            console.error(error);
-            throw new InternalServerErrorException('Error interno al subir el archivo');
+            throw error; // Relanza el error para que sea manejado
         }
     }
+    
 }
