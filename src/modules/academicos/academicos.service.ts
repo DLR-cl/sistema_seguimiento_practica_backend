@@ -25,12 +25,17 @@ export class AcademicosService {
         try {
             const academicos = await this._databaseService.usuarios.findMany({
                 select: {
+                    id_usuario: true,
                     nombre: true,
                     rut: true,
                     correo: true,
                 },
                 where: {
-                    tipo_usuario: Tipo_usuario.ACADEMICO
+                    OR: [
+                        {tipo_usuario: Tipo_usuario.ACADEMICO},
+                        {tipo_usuario: Tipo_usuario.JEFE_CARRERA},
+                        {tipo_usuario: Tipo_usuario.JEFE_DEPARTAMENTO}
+                    ]
                 }
             });
 

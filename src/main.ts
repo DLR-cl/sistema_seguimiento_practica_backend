@@ -18,10 +18,9 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
   app.enableCors({
     origin: 'http://localhost:4200', // El dominio desde el que se permiten las solicitudes (tu frontend)
-    credentials: true, // Permitir el envío de cookies (credenciales)
+
   })
 
-  app.use(cookieParser())
   await app.listen(3000);
 }
 bootstrap();

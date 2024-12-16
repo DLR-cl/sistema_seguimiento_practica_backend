@@ -9,6 +9,6 @@ FROM
 LEFT JOIN 
     InformesAlumno ia ON ia.id_academico = u.id_usuario
 WHERE
-    u.tipo_usuario = "ACADEMICO"
+    u.tipo_usuario IN ("ACADEMICO", "JEFE_CARRERA", "JEFE_DEPARTAMENTO")
 GROUP BY 
     u.id_usuario;

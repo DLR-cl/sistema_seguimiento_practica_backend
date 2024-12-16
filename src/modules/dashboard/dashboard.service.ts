@@ -202,5 +202,7 @@ export class DashboardService {
     }
   }
 
-  
+  // ESTADISTICAS PRACTICA
+
+  async estadisticaPractica(){}
 }

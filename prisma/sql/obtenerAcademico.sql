@@ -8,4 +8,4 @@ SELECT
 FROM
     Usuario u
 WHERE
-    u.tipo_usuario = "ACADEMICO" AND u.id_usuario = ?
+    u.tipo_usuario IN ("ACADEMICO", "JEFE_CARRERA", "JEFE_DEPARTAMENTO") AND u.id_usuario = ?
