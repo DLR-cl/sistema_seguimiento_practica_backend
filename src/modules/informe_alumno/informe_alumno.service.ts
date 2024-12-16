@@ -206,8 +206,8 @@ export class InformeAlumnoService {
         try {
             const informe = await this._databaseService.informesAlumno.findUnique({
                 where: {
-                    id_informe: id_informe
-                }
+                    id_informe: Number(id_informe)
+                },
             });
 
             let existe: boolean = false;
