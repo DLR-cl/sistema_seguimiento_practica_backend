@@ -191,16 +191,37 @@ export class InformeAlumnoService {
         });
     }
 
-    public async existeRespuestaInforme(id_practica: number){
+    public async existeRespuestaInforme(id_informe: number){
         try {
-            const practica = await this._practicaService.getPractica(id_practica);
-            if(practica.informe_alumno){
-                return practica.informe_alumno;
-            }else {
-                return {};
+            const informe = await this._databaseService.informesAlumno.findUnique({
+                where: {
+                    id_informe: id_informe
+                }
+            });
+
+            let existe: boolean = false;
+            let correcionInforme: boolean = false;
+
+            if(!informe){
+                throw new BadRequestException('Error, el informe no existe o no está enviado.')
+            }
+
+            if(informe.estado in [Estado_informe.ENVIADA, Estado_informe.REVISION, Estado_informe.APROBADA, Estado_informe.DESAPROBADA]){
+                existe = true;
+            }
+
+            if(informe.estado == Estado_informe.CORRECCION){
+                correcionInforme = true;
+            }
+            return {
+                existeRespuesta:  existe,
+                correcion: correcionInforme
             }
         } catch (error) {
+           if(error instanceof BadRequestException){
             throw error;
+           }
+           throw new InternalServerErrorException('Error interno al ver si se encuentra respondido un informe');
         }
     }
 
@@ -291,8 +312,6 @@ export class InformeAlumnoService {
         const filePath = file.path;
     
         try {
-            
-
     
             const existeAlumno = await this._databaseService.alumnosPractica.findUnique({
                 where: {
@@ -307,26 +326,73 @@ export class InformeAlumnoService {
                 throw new NotFoundException(`No se encontró un alumno con el ID ${data.id_alumno}`);
             }
     
-            // Almacena la ruta del archivo en la base de datos
-            const rutaArchivo = filePath; // Puedes ajustar la ruta si necesitas eliminar parte del path
-            await this._databaseService.informesAlumno.update({
+            // Buscamos un informe del alumno en estado CORRECCION
+            const informeEnCorreccion = await this._databaseService.informesAlumno.findFirst({
                 where: {
-                    id_informe: data.id_informe,
-                    estado: Estado_informe.ESPERA,
-                }
-                ,data: {
                     id_alumno: data.id_alumno,
-                    archivo: rutaArchivo,
-                    estado: Estado_informe.ENVIADA
-                },
+                    estado: Estado_informe.CORRECCION
+                }
             });
     
-            return {
-                message: 'Informe subido exitosamente',
-                filePath: rutaArchivo,
-            };
+            const rutaArchivo = filePath;
+    
+            if (informeEnCorreccion) {
+                // Si hay un informe en CORRECCION, reemplazamos el archivo
+                if (informeEnCorreccion.archivo && fs.existsSync(informeEnCorreccion.archivo)) {
+                    await fs.promises.unlink(informeEnCorreccion.archivo);
+                    console.log(`Archivo anterior eliminado: ${informeEnCorreccion.archivo}`);
+                }
+    
+                await this._databaseService.informesAlumno.update({
+                    where: {
+                        id_informe: informeEnCorreccion.id_informe,
+                        estado: Estado_informe.CORRECCION,
+                    },
+                    data: {
+                        id_alumno: data.id_alumno,
+                        archivo: rutaArchivo,
+                        // Mantener estado en CORRECCION
+                    },
+                });
+    
+                return {
+                    message: 'Informe reemplazado exitosamente en estado CORRECCION',
+                    filePath: rutaArchivo,
+                };
+            }
+    
+            // Si no se encontró informe en CORRECCION, buscamos el que esté en ESPERA para hacer el primer envío
+            const informeEnEspera = await this._databaseService.informesAlumno.findUnique({
+                where: {
+                    id_informe: data.id_informe
+                }
+            });
+    
+            if (informeEnEspera && informeEnEspera.estado === Estado_informe.ESPERA) {
+                // Actualizar el informe a ENVIADA en el primer envío
+                await this._databaseService.informesAlumno.update({
+                    where: {
+                        id_informe: data.id_informe,
+                        estado: Estado_informe.ESPERA,
+                    },
+                    data: {
+                        id_alumno: data.id_alumno,
+                        archivo: rutaArchivo,
+                        estado: Estado_informe.ENVIADA
+                    },
+                });
+    
+                return {
+                    message: 'Informe enviado exitosamente (de ESPERA a ENVIADA)',
+                    filePath: rutaArchivo,
+                };
+            }
+    
+            // Si no hay informe en CORRECCION ni uno en ESPERA (para este id_informe), significa que no se puede subir
+            throw new BadRequestException('No se puede subir el informe en el estado actual.');
+            
         } catch (error) {
-            // Elimina el archivo si hay un error
+            // En caso de error, elimina el archivo recién subido
             try {
                 if (fs.existsSync(filePath)) {
                     await fs.promises.unlink(filePath);
@@ -335,7 +401,7 @@ export class InformeAlumnoService {
             } catch (unlinkError) {
                 console.error(`Error al intentar eliminar el archivo: ${unlinkError.message}`);
             }
-            throw error; // Relanza el error para que sea manejado
+            throw error; 
         }
     }
     

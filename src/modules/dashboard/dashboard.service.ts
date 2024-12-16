@@ -201,4 +201,6 @@ export class DashboardService {
       throw new InternalServerErrorException('Error interno al momento de obtener la cantidad de alumnos asignados a un supervisor');
     }
   }
+
+  
 }
