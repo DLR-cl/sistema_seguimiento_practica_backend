@@ -41,45 +41,56 @@ export class InformeAlumnoService {
         return false;
     
     }
-    public async asignarInformeAlAcademico(asignacion: CreateAsignacionDto){
-        try{
-            // asignar informe al academico, debe existir academico e informe
-            const informe = await this._databaseService.informesAlumno.findUnique({
+    public async asignarInformeAlAcademico(asignacion: CreateAsignacionDto) {
+        try {
+            // Buscar el informe por su ID y validar el estado permitido para asignación
+            const informe = await this._databaseService.informesAlumno.findFirst({
                 where: {
                     id_informe: asignacion.id_informe,
-                    estado: Estado_informe.ENVIADA
-                    }
+                    estado: {
+                        in: [Estado_informe.ENVIADA, Estado_informe.REVISION], // Estados permitidos
+                    },
+                },
             });
-
-            if(!informe){
-                throw new BadRequestException('El informe del alumno no existe o no ha sido enviado');
+    
+            if (!informe) {
+                throw new BadRequestException(
+                    'El informe del alumno no existe, no ha sido enviado, o no está en revisión'
+                );
             }
+    
+            // Definir fechas de inicio y fin de la revisión
             const fechaInicio = new Date();
             const fechaFin = new Date(fechaInicio);
-            fechaFin.setDate(fechaInicio.getDate() + 14 );
-
+            fechaFin.setDate(fechaInicio.getDate() + 14);
+    
+            // Actualizar el informe con la asignación del académico
             const asignarInforme = await this._databaseService.informesAlumno.update({
-                where:{
-                    id_informe: asignacion.id_informe
+                where: {
+                    id_informe: asignacion.id_informe,
                 },
                 data: {
                     id_academico: asignacion.id_academico,
                     estado: Estado_informe.REVISION,
                     fecha_inicio_revision: fechaInicio,
                     fecha_termino_revision: fechaFin,
-                }
+                },
             });
-
-            // notificar alumno
+    
+            // Notificar al alumno (opcional)
             // this._emailService.notificacionAsignacion(asignarInforme.id_academico, asignarInforme.id_informe);
+    
             return asignarInforme;
-        }catch(error){
-            if(error instanceof BadRequestException){
+        } catch (error) {
+            if (error instanceof BadRequestException) {
                 throw error;
             }
-            throw new InternalServerErrorException('Error interno al asociar el informe del alumno al academico')
+            throw new InternalServerErrorException(
+                'Error interno al asociar el informe del alumno al académico'
+            );
         }
     }
+    
 
     public async aprobarInforme(aprobacion: AprobacionInformeDto){
         try {
