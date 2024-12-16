@@ -1,39 +1,43 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
+import { UserFromToken } from 'src/auth/decorators/userToken.decorator';
 
 @Controller('dashboard')
 export class DashboardController {
+  constructor(private readonly _dashboardService: DashboardService) {}
 
-    constructor( 
-        private readonly _dashboardService: DashboardService,
-    ){}
+  @Get()
+  public async obtenerCantidadEstudiantesEnPractica() {
+    return await this._dashboardService.obtenerCantidadEstudiantesEnPractica();
+  }
 
-    @Get()
-    public async obtenerCantidadEstudiantesEnPractica(){
-        return await this._dashboardService.obtenerCantidadEstudiantesEnPractica();
-    }
+  @Get('info-informes')
+  public async obtenerInfoInformesAcademicos(@UserFromToken() user: any) {
+    const id_academico = user.id_usuario;
+    return await this._dashboardService.obtenerInformacionInformes(id_academico);
+  }
 
-    @Get('info-informes/:id')
-    public async obtenerInfoInformesAcademicos(@Param('id') id_academico: string){
-        return await this._dashboardService.obtenerInformacionInformes(+id_academico);
-    }
+  @Get('pendientes-informes')
+  public async obtenerInformesPendientesAcademico(@UserFromToken() user: any) {
+    const id_academico = user.id_usuario;
+    return await this._dashboardService.cantidadInformesPendientes(id_academico);
+  }
 
-    @Get('pendientes-informes/:id')
-    public async obtenerInformesPendientesAcademico(@Param('id') id_academico: string){
-        return await this._dashboardService.cantidadInformesPendientes(+id_academico);
-    }
-    @Get('informes-criticos/:id')
-    public async obtenerInformesCriticos(@Param('id') id_academico: string){
-        return await this._dashboardService.obtenerEntregaCritica(+id_academico);
-    }
+  @Get('informes-criticos')
+  public async obtenerInformesCriticos(@UserFromToken() user: any) {
+    const id_academico = user.id_usuario;
+    return await this._dashboardService.obtenerEntregaCritica(id_academico);
+  }
 
-    @Get('informes-supervisor/:id')
-    public async obtenerInformesAsociados(@Param('id') id_supervisor: string){
-        return await this._dashboardService.infoTablaSupervisorPractica(+id_supervisor);
-    }
+  @Get('informes-supervisor')
+  public async obtenerInformesAsociados(@UserFromToken() user: any) {
+    const id_supervisor = user.id_usuario;
+    return await this._dashboardService.infoTablaSupervisorPractica(id_supervisor);
+  }
 
-    @Get('cantidad-alumnos-asignados/:id')
-    public async obtenerCantidadAlumnosAsignadosSupervisor(@Param('id') id_supervisor: string){
-        return await this._dashboardService.obtenerCantidadAlumnosAsignadosSupervisor(+id_supervisor)
-    }
+  @Get('cantidad-alumnos-asignados')
+  public async obtenerCantidadAlumnosAsignadosSupervisor(@UserFromToken() user: any) {
+    const id_supervisor = user.id_usuario;
+    return await this._dashboardService.obtenerCantidadAlumnosAsignadosSupervisor(id_supervisor);
+  }
 }

@@ -30,7 +30,7 @@ export class AuthService {
       }
 
       // Generar el token JWT
-      const payload = { id: user.id_usuario, correo: user.correo, rol: user.tipo_usuario };
+      const payload = { id_usuario: user.id_usuario, correo: user.correo, rol: user.tipo_usuario, nombre: user.nombre };
       const access_token = await this._jwtService.signAsync(payload, { secret: jwtConstants.secret });
 
       if (user.primerSesion) {
