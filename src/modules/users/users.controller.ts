@@ -28,12 +28,9 @@ export class UsersController {
     return await this.usersService.obtenerUsuariosByRol(rolUsuario);
   }
 
-  @UseGuards(AuthGuard) // Asegura que el usuario esté autenticado
+  @UseGuards(AuthGuard) // Protege la ruta con el AuthGuard
   @Patch('change-password')
-  async changePassword(
-    @Req() req: any, // Obtener datos del usuario autenticado
-    @Body() changePasswordDto: ChangePasswordDto,
-  ) {
+  async changePassword(@Req() req: any, @Body() changePasswordDto: ChangePasswordDto) {
     const userId = req.user.id; // Extrae el ID del usuario del token JWT
     return this.usersService.changePassword(userId, changePasswordDto);
   }

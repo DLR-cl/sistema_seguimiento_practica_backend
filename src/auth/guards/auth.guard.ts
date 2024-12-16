@@ -1,68 +1,53 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, ForbiddenException } from "@nestjs/common";
-import { Request } from "express";
-import { JwtService } from "@nestjs/jwt";
-import { UsersService } from "src/modules/users/users.service";
-import { Reflector } from "@nestjs/core";
-import { PUBLIC_KEY } from "src/constants/key-decorators";
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
-    private userService: UsersService,
     private reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // Verificar si la ruta es pública
-    const isPublic = this.reflector.get<boolean>(
-      PUBLIC_KEY,
-      context.getHandler(),
-    );
+    const req = context.switchToHttp().getRequest();
 
+    // Verificar si la ruta es pública
+    const isPublic = this.reflector.get<boolean>('isPublic', context.getHandler());
     if (isPublic) {
       return true;
     }
 
-    const req = context.switchToHttp().getRequest<Request>();
-
-    // Obtener el token desde las cookies
-    const token = req.cookies['access_token']; // Requiere cookie-parser
-
-    if (!token) {
-      throw new UnauthorizedException('Token no encontrado en las cookies.');
+    // Obtener el token del encabezado Authorization
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+      throw new UnauthorizedException('Encabezado de autorización no encontrado.');
     }
 
-    // Validar el token
-    try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
+    const token = authHeader.split(' ')[1]; // Formato esperado: "Bearer <token>"
+    if (!token) {
+      throw new UnauthorizedException('Token no encontrado en el encabezado.');
+    }
 
-      req['user'] = payload; // Agregar el payload decodificado al objeto request
+    try {
+      // Validar el token y extraer el payload
+      const payload = await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
+      req['user'] = payload; // Agregar el payload al objeto request
+
+      // Verificar si es el primer inicio de sesión
+      if (payload.primerSesion) {
+        const handler = context.getHandler();
+        const routeName = handler.name; // Nombre de la función del controlador
+
+        // Permitir solo la ruta específica para cambiar contraseña
+        if (routeName !== 'changePassword') {
+          throw new ForbiddenException('Debe cambiar su contraseña antes de continuar.');
+        }
+      }
+
+      return true;
     } catch (error) {
       throw new UnauthorizedException('Token inválido o expirado.');
     }
-
-    // Obtener el usuario del payload
-    const { id } = req['user'];
-
-    const user = await this.userService.findUsuario(id);
-    if (!user) {
-      throw new UnauthorizedException('Usuario no existente.');
-    }
-
-    // Verificar si es el primer inicio de sesión
-    if (user.primerSesion) {
-      const handler = context.getHandler();
-      const routeName = handler.name; // Nombre de la función del controlador
-
-      // Permitir solo rutas específicas para cambio de contraseña
-      if (routeName !== 'changePassword') {
-        throw new ForbiddenException('Debe cambiar su contraseña antes de continuar.');
-      }
-    }
-
-    return true;
   }
 }

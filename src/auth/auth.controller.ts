@@ -9,7 +9,12 @@ export class AuthController {
 
     constructor(private readonly authService: AuthService){}
     @Post('login')
-    async signIn(@Body() authLoginDto: AuthLoginDto, @Res() res: Response) {
-      return this.authService.signIn(authLoginDto, res);
+    async login(@Body() loginDto: AuthLoginDto) {
+      console.log(loginDto);
+      const response = await this.authService.signIn(loginDto);
+      return response;
     }
+    
+    
+    
 }
