@@ -1,6 +1,7 @@
 SELECT
     a.nombre AS nombre_alumno,
     p.tipo_practica,
+    p.id_practica,
     infA.estado AS estado_informe,
     DATEDIFF(DATE(infA.fecha_termino_revision), DATE(CURDATE())) AS dias_para_revision,
     DATE(infA.fecha_inicio_revision) AS inicio_revision,

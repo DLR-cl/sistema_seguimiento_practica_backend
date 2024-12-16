@@ -25,6 +25,20 @@ export class DimensionesEvaluativasService {
         }
     }
 
+    public async crearDimensiones(dimensiones: CrearDimensionDto[]){
+        try {
+            const creados = await this._databaseService.dimensionesEvaluativas.createMany({
+                data: dimensiones
+            })
+            return {
+                message: 'Dimensiones creadas con éxito',
+                total: creados,
+            }
+        } catch(error) {
+            console.log(error)
+            throw new InternalServerErrorException('Error al crear dimensiones')
+        }
+    }
     public async crearSubDimension(subDimension: CrearSubDimensionDto){
         try {
             const existDimension = await this._databaseService.dimensionesEvaluativas.findUnique({

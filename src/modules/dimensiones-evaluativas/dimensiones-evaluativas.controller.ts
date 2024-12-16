@@ -14,6 +14,10 @@ export class DimensionesEvaluativasController {
         return await this._dimensionesService.crearDimension(dimension);
     }
 
+    @Post('crear-varios')
+    public async crearDimensiones(@Body() dimensiones: CrearDimensionDto[]){
+        return await this._dimensionesService.crearDimensiones(dimensiones);
+    }
     @Get()
     public async obtenerDimensiones(){
         return await this._dimensionesService.obtenerDimensiones()
