@@ -244,7 +244,7 @@ model SubDimensionesEvaluativas {
   idDimensionPadre Int
   preguntas        Preguntas[]
 
-  dimensionPadre DimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
+  dimensionPadre DimensionesEvaluativas @relation(fields: [idDimensionPadre], references: [id_dimension])
 }
 
 model DimensionesEvaluativas {

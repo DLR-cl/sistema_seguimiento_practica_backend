@@ -69,21 +69,55 @@ export class DimensionesEvaluativasService {
         }
     }
 
-    public async crearVariasSubDimensiones(subDimensiones: CrearSubDimensionDto[]){
-        try {
-            const crear = await this._databaseService.subDimensionesEvaluativas.createMany({
-                data: subDimensiones
-            });
-
-            return {
-                message: 'Subdimensiones creadas con éxito',
-                statud: HttpStatus.OK,
-                data: crear
+    public async validarIdsDimension(subDimensiones: CrearSubDimensionDto[]): Promise<void> {
+        const ids = subDimensiones.map(sub => sub.idDimensionPadre);
+        const dimensionesExistentes = await this._databaseService.dimensionesEvaluativas.findMany({
+            where: { id_dimension: { in: ids } },
+            select: { id_dimension: true }
+        });
+    
+        const idsExistentes = dimensionesExistentes.map(dim => dim.id_dimension);
+        for (const sub of subDimensiones) {
+            if (!idsExistentes.includes(sub.idDimensionPadre)) {
+                throw new Error(`El idDimensionPadre ${sub.idDimensionPadre} no existe en DimensionesEvaluativas.`);
             }
-        } catch (error) {
-            throw new InternalServerErrorException('Error interno al crear varias subdimensiones');
         }
     }
+    public async crearVariasSubDimensiones(subDimensiones: CrearSubDimensionDto[]) {
+        try {
+            // Validar que los idDimensionPadre existan
+            await this.validarIdsDimension(subDimensiones);
+    
+            // Obtener los nombres y idDimensionPadre ya existentes
+            const nombresExistentes = await this._databaseService.subDimensionesEvaluativas.findMany({
+                select: { nombre: true, idDimensionPadre: true }
+            });
+    
+            // Filtrar las subdimensiones que aún no existen
+            const subDimensionesFiltradas = subDimensiones.filter(sub => {
+                return !nombresExistentes.some(existente => 
+                    existente.nombre === sub.nombre && existente.idDimensionPadre === sub.idDimensionPadre
+                );
+            });
+    
+            // Verificar si hay subdimensiones nuevas para insertar
+            if (subDimensionesFiltradas.length === 0) {
+                console.log("No hay subdimensiones nuevas para insertar.");
+                return { count: 0 };
+            }
+    
+            // Insertar las subdimensiones filtradas
+            const crear = await this._databaseService.subDimensionesEvaluativas.createMany({
+                data: subDimensionesFiltradas
+            });
+    
+            return crear;
+        } catch (error) {
+            console.error("Error al crear subdimensiones:", error.message);
+            throw new Error(error.message);
+        }
+    }
+    
 
     public async obtenerSubdimensiones(){
         return await this._databaseService.subDimensionesEvaluativas.findMany();
