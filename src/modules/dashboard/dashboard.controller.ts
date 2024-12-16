@@ -40,4 +40,19 @@ export class DashboardController {
     const id_supervisor = user.id_usuario;
     return await this._dashboardService.obtenerCantidadAlumnosAsignadosSupervisor(id_supervisor);
   }
+
+  @Get('estadistica-practicas-dashboard-jefe-carrera')
+  public async obtenerEstadisticas(){
+    return await this._dashboardService.estadisticaPractica();
+  }
+
+  @Get('aprobacion-practicas')
+  public async obtenerAprobacionPracticas(){
+    return await this._dashboardService.obtenerAprobacionPracticas();
+  }
+
+  @Get('alumnos-activos-practica')
+  public async obtenerCantidadAlumnosPorPracticaCursando(){
+    return await this._dashboardService.obtenerTotalPracticaAlumnos ();
+  }
 }
