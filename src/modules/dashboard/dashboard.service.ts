@@ -333,6 +333,7 @@ export class DashboardService {
       const practicas = await this._databaseService.$queryRawTyped<CantidadPractica>(
         obtenerCantidadPracticasPorTipoPoranno(year)
       );
+      console.log(practicas)
   
       // Si practicas es null o undefined, devolver un arreglo vacío
       if (!practicas || practicas.length === 0) {
@@ -340,10 +341,11 @@ export class DashboardService {
       }
   
       // Parsear BigInt a Number con manejo seguro
-      const practicasParsed = practicas.map((p) => ({
+      const practicasParsed = practicas.map((p:any) => (
+        {
         ...p,
-        total_practica: typeof p.total_practica === 'bigint'
-          ? Number(p.total_practica)
+        total_practicas: typeof p.total_practicas === 'bigint'
+          ? Number(p.total_practicas)
           : p.total_practica,
       }));
   
