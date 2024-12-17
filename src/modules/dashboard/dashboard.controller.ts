@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { UserFromToken } from 'src/auth/decorators/userToken.decorator';
+import { CantidadPracticaPorMesesDto } from './dto/cantidad-practica-meses.dto';
 
 @Controller('dashboard')
 export class DashboardController {
@@ -59,5 +60,11 @@ export class DashboardController {
   @Get('obtener-detalles-practica')
   public async obtenerDetallesPracticaTodo(){
     return await this._dashboardService.obtenerDetallesPracticaTodos();
+  }
+
+
+  @Get('obtener-practicas-meses')
+  public async obtenerPracticasPorMes(@Body()data: CantidadPracticaPorMesesDto){
+    return await this._dashboardService.obtenerCantidadPracticasPorTipoPorMesSegunAnno(data.year);
   }
 }
