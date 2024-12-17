@@ -7,11 +7,12 @@ import { DatabaseService } from 'src/database/database/database.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { DatabaseModule } from 'src/database/database/database.module';
 import { UsersModule } from '../users/users.module';
+import { EmailAvisosModule } from '../email-avisos/email-avisos.module';
 
 @Module({
   controllers: [AlumnoPracticaController],
   providers: [AlumnoPracticaService],
   exports: [AlumnoPracticaService],
-  imports: [AuthModule, DatabaseModule, UsersModule]
+  imports: [AuthModule, DatabaseModule, UsersModule, EmailAvisosModule]
 })
 export class AlumnoPracticaModule {}
