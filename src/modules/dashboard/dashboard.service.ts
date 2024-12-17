@@ -333,17 +333,30 @@ export class DashboardService {
       const practicas = await this._databaseService.$queryRawTyped<CantidadPractica>(
         obtenerCantidadPracticasPorTipoPoranno(year)
       );
+      console.log(practicas)
   
-      // Parsear bigint a number
-      const practicasParsed = practicas.map((p) => ({
+      // Si practicas es null o undefined, devolver un arreglo vacío
+      if (!practicas || practicas.length === 0) {
+        return [];
+      }
+  
+      // Parsear BigInt a Number con manejo seguro
+      const practicasParsed = practicas.map((p:any) => (
+        {
         ...p,
-        total_practica: Number(p.total_practica), // Conversión explícita
+        total_practicas: typeof p.total_practicas === 'bigint'
+          ? Number(p.total_practicas)
+          : p.total_practica,
       }));
   
       return practicasParsed;
     } catch (error) {
-      throw new InternalServerErrorException('Error interno al obtener las practicas por mes y tipo por un año específico');
+      throw new InternalServerErrorException(
+        'Error interno al obtener las prácticas por mes y tipo por un año específico'
+      );
     }
   }
+  
+  
   
 }
