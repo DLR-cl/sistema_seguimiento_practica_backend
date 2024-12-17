@@ -328,12 +328,22 @@ export class DashboardService {
     }
   }
   
-  async obtenerCantidadPracticasPorTipoPorMesSegunAnno(year: number){
+  async obtenerCantidadPracticasPorTipoPorMesSegunAnno(year: number) {
     try {
-      const practicas = await this._databaseService.$queryRawTyped<CantidadPractica>(obtenerCantidadPracticasPorTipoPoranno(year));
-      return practicas;
+      const practicas = await this._databaseService.$queryRawTyped<CantidadPractica>(
+        obtenerCantidadPracticasPorTipoPoranno(year)
+      );
+  
+      // Parsear bigint a number
+      const practicasParsed = practicas.map((p) => ({
+        ...p,
+        total_practica: Number(p.total_practica), // Conversión explícita
+      }));
+  
+      return practicasParsed;
     } catch (error) {
-      throw new InternalServerErrorException('Error interno al obtener las practicas por mes y tipo por un año especifico')
+      throw new InternalServerErrorException('Error interno al obtener las practicas por mes y tipo por un año específico');
     }
   }
+  
 }
