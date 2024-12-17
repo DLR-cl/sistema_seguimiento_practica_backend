@@ -11,5 +11,5 @@ export class CantidadPracticaPorMesesDto {
 export interface CantidadPractica {
     mes_inicio?: string;
     tipo_practica?: string;
-    total_practica?: number;
+    total_practica?: BigInt | number;
 }

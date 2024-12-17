@@ -44,6 +44,7 @@ export class UsersService {
   
       return userWithoutPassword;
     } catch (error) {
+      console.log(error)
       throw error instanceof HttpException ? error : new InternalServerErrorException('Error interno al crear un usuario');
     }
   }
