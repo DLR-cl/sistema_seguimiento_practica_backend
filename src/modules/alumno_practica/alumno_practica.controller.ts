@@ -9,6 +9,7 @@ export class AlumnoPracticaController {
     
     @Post('registro')
     public registrar(@Body() alumno_practica: AlumnoPracticaDto){
+        console.log(alumno_practica)
         return this._alumnoService.createAlumnoPractica(alumno_practica);
     }
 

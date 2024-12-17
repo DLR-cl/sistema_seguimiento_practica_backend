@@ -29,7 +29,14 @@ export class AlumnoPracticaService {
             alumno_practica.nombre = invertirYCapitalizarNombre(alumno_practica.nombre);
         }
 
-        const usuario = await this._userService.signUp(alumno_practica);
+        const crearUser = {
+            nombre: alumno_practica.nombre,
+            rut: alumno_practica.rut,
+            correo: alumno_practica.correo,
+            tipo_usuario: alumno_practica.tipo_usuario
+        }
+        
+        const usuario = await this._userService.signUp(crearUser);
         console.log(usuario);
         const alumno = await this._databaseService.alumnosPractica.create({
             data: {
