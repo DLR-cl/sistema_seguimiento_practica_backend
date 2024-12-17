@@ -334,16 +334,27 @@ export class DashboardService {
         obtenerCantidadPracticasPorTipoPoranno(year)
       );
   
-      // Parsear bigint a number
+      // Si practicas es null o undefined, devolver un arreglo vacío
+      if (!practicas || practicas.length === 0) {
+        return [];
+      }
+  
+      // Parsear BigInt a Number con manejo seguro
       const practicasParsed = practicas.map((p) => ({
         ...p,
-        total_practica: Number(p.total_practica), // Conversión explícita
+        total_practica: typeof p.total_practica === 'bigint'
+          ? Number(p.total_practica)
+          : p.total_practica,
       }));
   
       return practicasParsed;
     } catch (error) {
-      throw new InternalServerErrorException('Error interno al obtener las practicas por mes y tipo por un año específico');
+      throw new InternalServerErrorException(
+        'Error interno al obtener las prácticas por mes y tipo por un año específico'
+      );
     }
   }
+  
+  
   
 }
