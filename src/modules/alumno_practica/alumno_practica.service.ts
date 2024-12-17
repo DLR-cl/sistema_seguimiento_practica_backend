@@ -44,7 +44,7 @@ export class AlumnoPracticaService {
             data: usuario,
         };
 
-        this._emailService.notificacionCreacionCuenta(usuario.id_usuario);
+        // this._emailService.notificacionCreacionCuenta(usuario.id_usuario);
         return response;
     }
 

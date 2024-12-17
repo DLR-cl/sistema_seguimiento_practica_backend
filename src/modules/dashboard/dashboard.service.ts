@@ -340,11 +340,11 @@ export class DashboardService {
       }
   
       // Parsear BigInt a Number con manejo seguro
-      const practicasParsed = practicas.map((p) => ({
+      const practicasParsed = practicas.map((p:any) => ({
         ...p,
-        total_practica: typeof p.total_practica === 'bigint'
-          ? Number(p.total_practica)
-          : p.total_practica,
+        total_practicas: typeof p.total_practicas === 'bigint'
+          ? Number(p.total_practicas)
+          : p.total_practicas,
       }));
   
       return practicasParsed;

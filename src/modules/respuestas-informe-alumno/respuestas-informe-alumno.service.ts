@@ -4,7 +4,7 @@ import { CreateRespuestaInformAlumnoDto, ListaRespuestaDto } from './dto/create-
 import { InformeAlumnoService } from '../informe_alumno/informe_alumno.service';
 
 import { PreguntasImplementadasInformeAlumnoService } from '../preguntas-implementadas-informe-alumno/preguntas-implementadas-informe-alumno.service';
-import { Tipo_pregunta } from '@prisma/client';
+import { Estado_informe, Tipo_pregunta } from '@prisma/client';
 
 @Injectable()
 export class RespuestasInformeAlumnoService {
@@ -18,10 +18,7 @@ export class RespuestasInformeAlumnoService {
         try {
             let asignaturas: string[];
             for(let res of respuestas.respuestas){
-                const validar = await this.validarRespuestas(res);
-                if(!validar){
-                    throw new BadRequestException('No existe pregunta o informe asociado');
-                }
+
                 // asume que una respuesta contempla asignaturas | fix DEBE CONTENER LA RESPUESTA PARA RELACIONAR CON ASIGNATURAS
                 if(res.asignaturas){
                     const respuesta = await this._databaseService.respuestasInformeAlumno.create({
@@ -68,6 +65,14 @@ export class RespuestasInformeAlumnoService {
                 }
             }
 
+            const changeStateInforme = await this._databaseService.informesAlumno.update({
+                where:{
+                    id_informe: respuestas.respuestas[0].id_informe,
+                },
+                data: {
+                    estado: Estado_informe.ENVIADA
+                }
+            })
             return {
                 message: 'Respuestas creadas con éxito',
                 statusCode: HttpStatus.OK,

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AlumnosNominaService } from './alumnos-nomina.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as XLSX from 'xlsx'
@@ -33,8 +33,8 @@ export class AlumnosNominaController {
      return await this._alumnoNominaService.guardarUsuarios(usuarios);
     }
 
-    @Get('alumno')
-    async buscarAlumnoNomina(@Body() alumno: BuscarAlumnoDto){
-        return await this._alumnoNominaService.obtenerAlumnoNomina(alumno.rut);
+    @Get('alumno/:rut')
+    async buscarAlumnoNomina(@Param('rut') rut: string){
+        return await this._alumnoNominaService.obtenerAlumnoNomina(rut);
     }
 }
