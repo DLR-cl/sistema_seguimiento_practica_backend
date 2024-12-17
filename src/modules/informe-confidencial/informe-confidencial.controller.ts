@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
-import { CreateInformeConfidencialDto } from './dto/create-informe-confidencial.dto';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { ActualizarInformeConfidencialDto, CreateInformeConfidencialDto } from './dto/create-informe-confidencial.dto';
 import { InformeConfidencialService } from './informe-confidencial.service';
 
 @Controller('informe-confidencial')
@@ -17,5 +17,11 @@ export class InformeConfidencialController {
     @Get(':id_informe')
     public async getInforme(@Param('id_informe', ParseIntPipe) id_informe: number){
         return await this._informeConfidencialService.getInformeConfidencial(id_informe);
+    }
+
+    @Patch('actualizar-informe/:id')
+    public async actualizarInforme(@Param('id', ParseIntPipe) id_informe: number, @Body() update: ActualizarInformeConfidencialDto){
+        console.log(update);
+        return await this._informeConfidencialService.actualizarInforme(+id_informe, update);
     }
 }

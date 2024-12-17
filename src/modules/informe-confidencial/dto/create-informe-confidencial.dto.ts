@@ -38,3 +38,36 @@ export class EncuestaRellnoInformeConfidencialDTO {
     @IsNumber()
     horas_inasistencia: number;
 }
+
+export class ActualizarInformeConfidencialDto {
+    
+    @IsDate()
+    @IsNotEmpty()
+    fecha_inicio_practica: Date;
+   
+    @IsDate()
+    @IsNotEmpty()
+    fecha_fin_practica: Date;
+
+    @IsNotEmpty()
+    @IsNumber()
+    horas_practicas_regulares: number;
+    
+    @IsNotEmpty()
+    @IsNumber()
+    horas_practicas_extraordinarias: number;
+    
+    @IsNotEmpty()
+    @IsNumber()
+    total_horas: number;
+    
+    @IsNotEmpty()
+    @IsNumber()
+    horas_inasistencia: number;
+    @IsNotEmpty()
+    @IsNumber()
+    horas_semanales: number;
+
+    
+    
+}

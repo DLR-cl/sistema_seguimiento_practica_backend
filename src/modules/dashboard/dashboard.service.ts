@@ -307,11 +307,12 @@ export class DashboardService {
       const cursando = await this._databaseService.$queryRawTyped<any>(obtenerCantidadTotalAlumnosPorPractica());
   
       // Convertir BigInt a number
-      const cursandoFormatted = cursando.map((entry) => ({
+      const cursandoFormatted = cursando.map((entry:any) => ({
         ...entry,
         cantidad_estudiantes: Number(entry.cantidad_estudiantes), // Convertir BigInt a number
       }));
-  
+      
+      console.log(cursandoFormatted, 'hola como estas');
       return cursandoFormatted;
     } catch (error) {
       throw new InternalServerErrorException('Error interno al obtener el total de alumnos por práctica');
@@ -361,5 +362,18 @@ export class DashboardService {
   }
   
   
-  
+  async obtenerNotaPromedioDeInformesEmpresas(){
+    try {
+      const promedioNota = await this._databaseService.informeConfidencial.aggregate({
+        _avg: {
+          nota_evaluacion: true,
+        }
+      });
+      return {
+        promedio_nota: promedioNota._avg.nota_evaluacion || 0,
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 }

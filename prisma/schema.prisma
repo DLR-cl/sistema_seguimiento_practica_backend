@@ -170,6 +170,7 @@ model InformeConfidencial {
   horas_practicas_regulares       Int?
   horas_practicas_extraordinarias Int?
   total_horas                     Int?
+  horas_semanales                 Int?
   horas_inasistencia              Int?
   nota_evaluacion                 Decimal?       @db.Decimal(5, 1)
   fecha_inicio                    DateTime // no se agregó fecha final 
@@ -180,6 +181,9 @@ model InformeConfidencial {
   fecha_inicio_revision           DateTime?      @db.Date
   fecha_termino_revision          DateTime?      @db.Date
   // añadir fecha final real
+  fecha_inicio_practica           DateTime?     @db.Date
+  fecha_fin_practica              DateTime?     @db.Date
+
   fecha_real_revision             DateTime?      @db.Date
   // relacion
   id_supervisor                   Int            @db.Int

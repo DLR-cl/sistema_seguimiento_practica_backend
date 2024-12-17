@@ -1,10 +1,10 @@
 import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
-import { CreateInformeConfidencialDto } from './dto/create-informe-confidencial.dto';
+import { ActualizarInformeConfidencialDto, CreateInformeConfidencialDto } from './dto/create-informe-confidencial.dto';
 import { AlumnoPracticaService } from '../alumno_practica/alumno_practica.service';
 import { JefeAlumnoService } from '../jefe_alumno/jefe_alumno.service';
 import { PracticasService } from '../practicas/practicas.service';
-import { Estado_informe, Estado_practica } from '@prisma/client';
+import { Estado_informe, Estado_practica, InformeConfidencial } from '@prisma/client';
 
 @Injectable()
 export class InformeConfidencialService {
@@ -14,7 +14,35 @@ export class InformeConfidencialService {
     ){}
 
 
-
+    public async actualizarInforme(id_informe: number, update: ActualizarInformeConfidencialDto){
+        try {
+            console.log(update.fecha_fin_practica)
+            const total = update.horas_practicas_extraordinarias + update.horas_practicas_regulares - update.horas_inasistencia
+            const informes = await this._databaseService.informeConfidencial.update({
+                where: {
+                    id_informe_confidencial:id_informe
+                },
+                data: {
+                    horas_practicas_regulares: update.horas_practicas_regulares,
+                    horas_practicas_extraordinarias: update.horas_practicas_extraordinarias,
+                    horas_inasistencia: update.horas_inasistencia,
+                    horas_semanales: update.horas_semanales,
+                    total_horas: total,
+                    fecha_inicio_practica: new Date(update.fecha_inicio_practica),
+                    fecha_fin_practica: new Date(update.fecha_fin_practica),
+                    estado: Estado_informe.ENVIADA
+                }
+            })
+            return {
+                message: 'Actualización del informe realizada',
+                status: HttpStatus.OK
+            }
+            console.log(informes)
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
     public async getInformeConfidencial(id_informe: number){
         try {
             const informe = await this._databaseService.informeConfidencial.findUnique({

@@ -67,4 +67,9 @@ export class DashboardController {
   public async obtenerPracticasPorMes(@Param('year', ParseIntPipe) year: number){
     return await this._dashboardService.obtenerCantidadPracticasPorTipoPorMesSegunAnno(year);
   }
+
+  @Get('obtener-promedio-nota-empresa')
+  public async obtenerPromedioNotas(){
+    return await this._dashboardService.obtenerNotaPromedioDeInformesEmpresas();
+  }
 }
