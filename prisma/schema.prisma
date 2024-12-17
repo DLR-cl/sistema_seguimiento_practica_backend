@@ -310,6 +310,7 @@ enum Estado_practica {
   ESPERA_INFORMES
   REVISION_GENERAL
   FINALIZADA
+  INFORMES_RECIBIDOS
 }
 
 enum Tipo_asignatura {

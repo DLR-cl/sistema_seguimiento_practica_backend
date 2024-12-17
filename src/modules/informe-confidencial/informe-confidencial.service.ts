@@ -33,6 +33,25 @@ export class InformeConfidencialService {
                     estado: Estado_informe.ENVIADA
                 }
             })
+
+            const informeAlumno = await this._databaseService.informeConfidencial.findFirst({
+                where: {
+                    id_practica: informes.id_practica,
+                    estado: Estado_informe.ENVIADA
+                }
+
+            });
+
+            if(informeAlumno){
+                const actualizarPractica = await this._databaseService.practicas.update({
+                    where: {
+                        id_practica: informeAlumno.id_practica,
+                    },
+                    data: {
+                        estado: Estado_practica.INFORMES_RECIBIDOS,
+                    }
+                })
+            }
             return {
                 message: 'Actualización del informe realizada',
                 status: HttpStatus.OK

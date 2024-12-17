@@ -36,21 +36,12 @@ export class AsignaturasService {
             );
     
             // Filtrar asignaturas que no estén en la base de datos
-            const asignaturasFiltradas = asignaturas.filter(asig => 
-                !asignaturasExistentesSet.has(asig.nombre)
-            );
-    
             // Verificar si hay asignaturas nuevas para insertar
-            if (asignaturasFiltradas.length === 0) {
-                return {
-                    message: 'No hay asignaturas nuevas para insertar',
-                    total: 0
-                };
-            }
+
     
             // Insertar solo las asignaturas filtradas
             const listaAsignaturas = await this._databaseService.asignaturas.createMany({
-                data: asignaturasFiltradas,
+                data: asignaturas,
             });
     
             return {

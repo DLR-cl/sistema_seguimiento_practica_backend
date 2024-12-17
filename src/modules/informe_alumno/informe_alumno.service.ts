@@ -326,7 +326,7 @@ export class InformeAlumnoService {
     
             const existeAlumno = await this._databaseService.alumnosPractica.findUnique({
                 where: {
-                    id_user: data.id_alumno,
+                    id_user: +data.id_alumno,
                 },
                 include: {
                     usuario: true,
@@ -340,7 +340,7 @@ export class InformeAlumnoService {
             // Buscamos un informe del alumno en estado CORRECCION
             const informeEnCorreccion = await this._databaseService.informesAlumno.findFirst({
                 where: {
-                    id_alumno: data.id_alumno,
+                    id_alumno: +data.id_alumno,
                     estado: Estado_informe.CORRECCION
                 }
             });
@@ -375,7 +375,7 @@ export class InformeAlumnoService {
             // Si no se encontró informe en CORRECCION, buscamos el que esté en ESPERA para hacer el primer envío
             const informeEnEspera = await this._databaseService.informesAlumno.findUnique({
                 where: {
-                    id_informe: data.id_informe
+                    id_informe: +data.id_informe
                 }
             });
     
@@ -383,21 +383,41 @@ export class InformeAlumnoService {
                 // Actualizar el informe a ENVIADA en el primer envío
                 await this._databaseService.informesAlumno.update({
                     where: {
-                        id_informe: data.id_informe,
+                        id_informe: +data.id_informe,
                         estado: Estado_informe.ESPERA,
                     },
                     data: {
-                        id_alumno: data.id_alumno,
+                        id_alumno: +data.id_alumno,
                         archivo: rutaArchivo,
                         estado: Estado_informe.ENVIADA
                     },
                 });
+                const informeConfidencial = await this._databaseService.informeConfidencial.findFirst({
+                    where: {
+                        id_practica: informeEnEspera.id_practica,
+                        estado: Estado_informe.ENVIADA
+                    }
     
+                });
+    
+                if(informeConfidencial){
+                    const actualizarPractica = await this._databaseService.practicas.update({
+                        where: {
+                            id_practica: informeConfidencial.id_practica,
+                        },
+                        data: {
+                            estado: Estado_practica.INFORMES_RECIBIDOS,
+                        }
+                    })
+                }
                 return {
                     message: 'Informe enviado exitosamente (de ESPERA a ENVIADA)',
                     filePath: rutaArchivo,
                 };
             }
+
+            // verificar que se haya subido el otro informe 
+
     
             // Si no hay informe en CORRECCION ni uno en ESPERA (para este id_informe), significa que no se puede subir
             throw new BadRequestException('No se puede subir el informe en el estado actual.');

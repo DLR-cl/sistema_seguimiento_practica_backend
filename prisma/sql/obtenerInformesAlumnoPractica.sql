@@ -24,6 +24,7 @@ SELECT
     ic.total_horas,
     ic.horas_inasistencia,
     ic.nota_evaluacion,
+    ic.estado AS estado_informe_confidencial,
     us.nombre AS supervisor_nombre,
     us.rut AS supervisor_rut,
     us.correo AS supervisor_correo
