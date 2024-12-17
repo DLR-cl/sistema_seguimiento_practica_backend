@@ -12,3 +12,4 @@ export interface CantidadPractica {
     mes_inicio?: string;
     tipo_practica?: string;
     total_practica?: BigInt}
+
