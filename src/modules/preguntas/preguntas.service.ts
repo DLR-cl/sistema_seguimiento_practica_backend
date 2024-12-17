@@ -47,16 +47,48 @@ export class PreguntasService {
 
         return pregunta;
     }
-    public async crearPreguntas(preguntas: CrearPreguntaDto[]){
+    public async crearPreguntas(preguntas: CrearPreguntaDto[]) {
         try {
+            // Obtener las preguntas existentes con enunciado y id_dimension
+            const preguntasExistentes = await this._databaseService.preguntas.findMany({
+                select: { enunciado_pregunta: true, id_dimension: true }
+            });
+    
+            // Crear un set para verificar duplicados rápidamente
+            const preguntasExistentesSet = new Set(
+                preguntasExistentes.map(
+                    pregunta => `${pregunta.enunciado_pregunta}_${pregunta.id_dimension}`
+                )
+            );
+    
+            // Filtrar las preguntas que aún no existen
+            const preguntasFiltradas = preguntas.filter(pregunta => 
+                !preguntasExistentesSet.has(`${pregunta.enunciado_pregunta}_${pregunta.id_dimension}`)
+            );
+    
+            // Si no hay preguntas nuevas, retornar un mensaje
+            if (preguntasFiltradas.length === 0) {
+                return {
+                    message: 'No hay preguntas nuevas para insertar',
+                    total: 0
+                };
+            }
+    
+            // Insertar solo las preguntas filtradas
             const nuevasPreguntas = await this._databaseService.preguntas.createMany({
-                data: preguntas,
-            })
-            return nuevasPreguntas;
+                data: preguntasFiltradas,
+            });
+    
+            return {
+                message: 'Preguntas creadas con éxito',
+                total: nuevasPreguntas.count,
+            };
         } catch (error) {
-            throw error;
+            console.error('Error al crear preguntas:', error.message);
+            throw new InternalServerErrorException('Error al crear preguntas');
         }
     }
+    
     public async getAllPreguntas(){
         try {
             const preguntas = await this._databaseService.preguntas.findMany();

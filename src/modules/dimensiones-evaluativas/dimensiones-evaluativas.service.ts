@@ -24,21 +24,44 @@ export class DimensionesEvaluativasService {
             throw error;
         }
     }
-
-    public async crearDimensiones(dimensiones: CrearDimensionDto[]){
+    public async crearDimensiones(dimensiones: CrearDimensionDto[]) {
         try {
+            // Obtener las dimensiones existentes por nombre
+            const nombresExistentes = await this._databaseService.dimensionesEvaluativas.findMany({
+                select: { nombre: true }
+            });
+    
+            // Crear un array con los nombres existentes
+            const nombresExistentesSet = new Set(nombresExistentes.map(dim => dim.nombre));
+    
+            // Filtrar las dimensiones que aún no existen
+            const dimensionesFiltradas = dimensiones.filter(dimension => 
+                !nombresExistentesSet.has(dimension.nombre)
+            );
+    
+            // Verificar si hay dimensiones nuevas para insertar
+            if (dimensionesFiltradas.length === 0) {
+                return {
+                    message: 'No hay dimensiones nuevas para insertar',
+                    total: 0
+                };
+            }
+    
+            // Insertar las dimensiones filtradas
             const creados = await this._databaseService.dimensionesEvaluativas.createMany({
-                data: dimensiones
-            })
+                data: dimensionesFiltradas
+            });
+    
             return {
                 message: 'Dimensiones creadas con éxito',
-                total: creados,
-            }
-        } catch(error) {
-            console.log(error)
-            throw new InternalServerErrorException('Error al crear dimensiones')
+                total: creados.count,
+            };
+        } catch (error) {
+            console.error(error);
+            throw new InternalServerErrorException('Error al crear dimensiones');
         }
     }
+    
     public async crearSubDimension(subDimension: CrearSubDimensionDto){
         try {
             const existDimension = await this._databaseService.dimensionesEvaluativas.findUnique({

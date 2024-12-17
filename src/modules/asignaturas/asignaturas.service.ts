@@ -23,26 +23,46 @@ export class AsignaturasService {
         }
     }
 
-    public async createAsignaturas(asignaturas: crearAsignaturasDto){
+    public async createAsignaturas(asignaturas: crearAsignaturaDto[]) {
         try {
-            for(let asig of asignaturas.asignaturas){
-                if(await this.existeAsignatura(asig.nombre)){
-                    throw new BadRequestException('Ya existe la asignatura');
-                }
-            };
-
-            const listaAsignaturas = await this._databaseService.asignaturas.createMany({
-                data: asignaturas.asignaturas,
+            // Obtener todas las asignaturas existentes
+            const asignaturasExistentes = await this._databaseService.asignaturas.findMany({
+                select: { nombre: true }
             });
-
-            return listaAsignaturas;
-        } catch (error) {
-            if(error instanceof BadRequestException){
-                throw error;
+    
+            // Crear un Set con los nombres de las asignaturas existentes
+            const asignaturasExistentesSet = new Set(
+                asignaturasExistentes.map(asig => asig.nombre)
+            );
+    
+            // Filtrar asignaturas que no estén en la base de datos
+            const asignaturasFiltradas = asignaturas.filter(asig => 
+                !asignaturasExistentesSet.has(asig.nombre)
+            );
+    
+            // Verificar si hay asignaturas nuevas para insertar
+            if (asignaturasFiltradas.length === 0) {
+                return {
+                    message: 'No hay asignaturas nuevas para insertar',
+                    total: 0
+                };
             }
+    
+            // Insertar solo las asignaturas filtradas
+            const listaAsignaturas = await this._databaseService.asignaturas.createMany({
+                data: asignaturasFiltradas,
+            });
+    
+            return {
+                message: 'Asignaturas creadas con éxito',
+                total: listaAsignaturas.count
+            };
+        } catch (error) {
+            console.error('Error al crear asignaturas:', error.message);
             throw new InternalServerErrorException('Error interno del servidor al crear las asignaturas');
         }
     }
+    
 
     public async existeAsignatura(nombre: string){
         const asignatura = await this._databaseService.asignaturas.findUnique({

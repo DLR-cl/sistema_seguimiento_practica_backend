@@ -16,7 +16,7 @@ export class crearAsignaturaDto {
 
     @IsNotEmpty()
     @IsEnum(Tipo_asignatura)
-    tipo_asignatura: Tipo_asignatura;xx
+    tipo_asignatura: Tipo_asignatura;
 }
 export class crearAsignaturasDto {
     @IsNotEmpty()

@@ -29,7 +29,6 @@ export class AlumnosNominaController {
           email: row['E-mail'] || '',
         };
       }).filter((row) => row.rut && row.nombre && row.email); // Asegurarse de que los datos no estén vacíos
-  
       // Guardar en la base de datos
      return await this._alumnoNominaService.guardarUsuarios(usuarios);
     }

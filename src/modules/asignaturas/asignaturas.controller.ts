@@ -21,7 +21,7 @@ export class AsignaturasController {
     }
 
     @Post('generar-varios')
-    public async generarAsignaturas(@Body() asignaturas: crearAsignaturasDto){
+    public async generarAsignaturas(@Body() asignaturas: crearAsignaturaDto[]){
         return await this._asignaturasService.createAsignaturas(asignaturas);
     }
     
