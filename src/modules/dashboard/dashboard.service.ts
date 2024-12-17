@@ -333,6 +333,8 @@ export class DashboardService {
       const practicas = await this._databaseService.$queryRawTyped<CantidadPractica>(
         obtenerCantidadPracticasPorTipoPoranno(year)
       );
+
+      console.log(year)
       console.log(practicas)
   
       // Si practicas es null o undefined, devolver un arreglo vacío

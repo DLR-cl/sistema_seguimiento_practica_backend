@@ -18,10 +18,7 @@ export class RespuestasInformeAlumnoService {
         try {
             let asignaturas: string[];
             for(let res of respuestas.respuestas){
-                const validar = await this.validarRespuestas(res);
-                if(!validar){
-                    throw new BadRequestException('No existe pregunta o informe asociado');
-                }
+
                 // asume que una respuesta contempla asignaturas | fix DEBE CONTENER LA RESPUESTA PARA RELACIONAR CON ASIGNATURAS
                 if(res.asignaturas){
                     const respuesta = await this._databaseService.respuestasInformeAlumno.create({
