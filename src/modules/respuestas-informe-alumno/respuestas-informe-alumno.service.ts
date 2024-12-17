@@ -18,6 +18,10 @@ export class RespuestasInformeAlumnoService {
         try {
             let asignaturas: string[];
             for(let res of respuestas.respuestas){
+                const validar = await this.validarRespuestas(res);
+                if(!validar){
+                    throw new BadRequestException('No existe pregunta o informe asociado');
+                }
                 // asume que una respuesta contempla asignaturas | fix DEBE CONTENER LA RESPUESTA PARA RELACIONAR CON ASIGNATURAS
                 if(res.asignaturas){
                     const respuesta = await this._databaseService.respuestasInformeAlumno.create({
@@ -101,7 +105,18 @@ export class RespuestasInformeAlumnoService {
         }
     }
 
+    public async validarRespuestas(respuesta: CreateRespuestaInformAlumnoDto){
+        const informe = await this._informeAlumnoService.existeInforme(respuesta.id_informe);
+        if(!informe){
+            throw new BadRequestException('El informe no existe para asignar las respuestas');
+        }
+        const pregunta = await this._preguntasAlumnoService.obtenerPreguntaImplementada(respuesta.id_pregunta);
+        if(!pregunta){
+            throw new BadRequestException('Error, la pregunta a responder no está registrada en la base de datos');
+        }
 
+        return true
+    }
 
     public async getAllRespuestas(){
         return await this._databaseService.respuestasInformeAlumno.findMany();
