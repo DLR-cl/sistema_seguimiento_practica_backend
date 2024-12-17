@@ -28,4 +28,5 @@ export class PracticasController {
         return await this._practicaService.getPracticaAlumno(+id_alumno);
     }
 
+    
 }

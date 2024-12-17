@@ -78,7 +78,7 @@ export class InformeAlumnoService {
             });
     
             // Notificar al alumno (opcional)
-            // this._emailService.notificacionAsignacion(asignarInforme.id_academico, asignarInforme.id_informe);
+            this._emailService.notificacionAsignacion(asignarInforme.id_academico, asignarInforme.id_informe);
     
             return asignarInforme;
         } catch (error) {

@@ -11,6 +11,7 @@ import { AlumnosDataDto } from './dto/alumnos-data.dto';
 import { UsersService } from '../users/users.service';
 import { escape } from 'querystring';
 import { invertirYCapitalizarNombre } from '../../utils/invertir-nombre.function';
+import { EmailAvisosService } from '../email-avisos/email-avisos.service';
 
 @Injectable()
 export class AlumnoPracticaService {
@@ -18,7 +19,8 @@ export class AlumnoPracticaService {
     constructor(
         private readonly _databaseService: DatabaseService,
         private readonly _authService: AuthService,
-        private readonly _userService: UsersService
+        private readonly _userService: UsersService,
+        private readonly _emailService: EmailAvisosService
     ){}
 
     async createAlumnoPractica(alumno_practica: AlumnoPracticaDto){
@@ -41,6 +43,8 @@ export class AlumnoPracticaService {
             status_code: HttpStatus.OK,
             data: usuario,
         };
+
+        this._emailService.notificacionCreacionCuenta(usuario.id_usuario);
         return response;
     }
 

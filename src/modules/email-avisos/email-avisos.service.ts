@@ -359,6 +359,111 @@ export class EmailAvisosService {
     }
 
 
+    public async notificacionCreacionCuenta(id_alumno: number) {
+        try {
+            // Obtener datos del alumno
+            const alumno = await this._databaseService.usuarios.findUnique({
+                where: { id_usuario: id_alumno },
+            });
+    
+            if (!alumno) {
+                throw new Error(`No se encontró un alumno con el ID ${id_alumno}`);
+            }
+    
+            // Extraer los primeros 8 dígitos del RUT
+            const contrasenaTemporal = alumno.rut.substring(0, 8);
+            const correoInstitucional = alumno.correo;
+    
+            // Generar el correo
+            const emailAlumno: SendEmailDto = {
+                recipients: [correoInstitucional],
+                subject: `Creación de su cuenta en el Sistema de Gestión de Prácticas`,
+                html: `
+                <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
+                        <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">Hola ${alumno.nombre},</h2>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Nos complace informarle que su cuenta ha sido creada exitosamente en el <strong>Sistema de Gestión de Prácticas</strong>.
+                        </p>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            A continuación, le proporcionamos los detalles para acceder al sistema:
+                        </p>
+                        <ul style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            <li><strong>Correo institucional:</strong> ${correoInstitucional}</li>
+                            <li><strong>Contraseña temporal:</strong> ${contrasenaTemporal}</li>
+                        </ul>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Por motivos de seguridad, le solicitamos que inicie sesión y cambie su contraseña a la brevedad.
+                        </p>
+                        <p style="color: #1f2937; font-size: 16px; margin-top: 30px;">Saludos cordiales,</p>
+                        <p style="color: #1f2937; font-size: 16px; font-weight: 600;">El equipo de Gestión de Prácticas</p>
+                    </div>
+                </div>
+            `,
+            };
+    
+            // Llamar al servicio de envío de correos
+            await this._mailService.sendEmail(emailAlumno);
+    
+            console.log('Correo de creación de cuenta enviado exitosamente.');
+        } catch (error) {
+            console.error('Error al enviar la notificación de creación de cuenta:', error.message);
+        }
+    }
+    
 
-
+    public async notificacionCorreccionInforme(id_alumno: number, id_informe: number) {
+        try {
+            // Obtener datos del alumno
+            const alumno = await this._databaseService.usuarios.findUnique({
+                where: { id_usuario: id_alumno },
+            });
+    
+            if (!alumno) {
+                throw new Error(`No se encontró un alumno con el ID ${id_alumno}`);
+            }
+    
+            // Obtener datos del informe
+            const informe = await this._databaseService.informesAlumno.findUnique({
+                where: { id_informe: id_informe },
+                include: { academico: {include: { usuario: true}} },
+            });
+    
+            if (!informe || !informe.academico) {
+                throw new Error(`No se encontró un informe con el ID ${id_informe} o no tiene asignado un académico.`);
+            }
+    
+            const correoInstitucional = alumno.correo;
+            const academicoNombre = informe.academico.usuario.nombre;
+    
+            // Generar el correo
+            const emailAlumno: SendEmailDto = {
+                recipients: [correoInstitucional],
+                subject: `Su informe ha sido corregido`,
+                html: `
+                <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
+                        <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">Hola ${alumno.nombre},</h2>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Le informamos que el académico <strong>${academicoNombre}</strong> ha subido la corrección de su informe.
+                        </p>
+                        <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                            Por favor, revise la retroalimentación y realice las modificaciones necesarias en el sistema.
+                        </p>
+                        <p style="color: #1f2937; font-size: 16px; margin-top: 30px;">Saludos cordiales,</p>
+                        <p style="color: #1f2937; font-size: 16px; font-weight: 600;">El equipo de Gestión de Prácticas</p>
+                    </div>
+                </div>
+            `,
+            };
+    
+            // Llamar al servicio de envío de correos
+            await this._mailService.sendEmail(emailAlumno);
+    
+            console.log('Correo de corrección de informe enviado exitosamente.');
+        } catch (error) {
+            console.error('Error al enviar la notificación de corrección de informe:', error.message);
+        }
+    }
+    
 }

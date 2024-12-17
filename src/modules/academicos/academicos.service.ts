@@ -142,7 +142,7 @@ export class AcademicosService {
                     estado: Estado_informe.CORRECCION
                 }
             });
-            
+            this._emailAvisosService.notificacionCorreccionInforme(informe.id_alumno, informe.id_informe)
             return informe;
         } catch (error) {
             if (error instanceof BadRequestException || error instanceof UnauthorizedException) {

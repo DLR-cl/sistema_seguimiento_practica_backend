@@ -223,7 +223,7 @@ export class PracticasService {
             throw error;
         }
     }
-    @Cron('20 12 * * *')
+    @Cron('0 8 * * *')
     private async createInformeAlumno() {
         try {
             const findPracticas: any = await this._databaseService.practicas.findMany({
@@ -263,7 +263,7 @@ export class PracticasService {
 
     // finalizar practica automaticamente
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-    async actualizarEstadoPracticas(): Promise<void> {
+    private async actualizarEstadoPracticas(): Promise<void> {
       try {
         // Obtener las prácticas que aún no están finalizadas y cuya fecha de término ya pasó
         const practicasPorFinalizar = await this._databaseService.practicas.findMany({
@@ -282,14 +282,14 @@ export class PracticasService {
         const updates = practicasPorFinalizar.map((practica) => 
           this._databaseService.practicas.update({
             where: { id_practica: practica.id_practica },
-            data: { estado: Estado_practica.FINALIZADA },
+            data: { estado: Estado_practica.ESPERA_INFORMES },
           })
         );
   
         await Promise.all(updates);
   
         this.logger.log(
-          `Se actualizaron ${practicasPorFinalizar.length} prácticas a estado FINALIZADA.`
+          `Se actualizaron ${practicasPorFinalizar.length} prácticas a estado ESPERA_INFORMES.`
         );
       } catch (error) {
         this.logger.error('Error al actualizar el estado de las prácticas.', error);
