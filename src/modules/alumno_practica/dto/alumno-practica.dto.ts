@@ -20,4 +20,8 @@ export class AlumnoPracticaDto {
     @IsNotEmpty()
     tipo_usuario: Tipo_usuario;
 
+    @IsNotEmpty()
+    @IsBoolean()
+    nomina: boolean;
+
 }

@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
+import { invertirYCapitalizarNombre } from '../../utils/invertir-nombre.function';
 
 @Injectable()
 export class AlumnosNominaService {
@@ -23,6 +24,7 @@ export class AlumnosNominaService {
         const nuevosAlumnos = datos.filter((alumno) => !rutsExistentes.has(alumno.rut));
         const actualizables = datos.filter((alumno) => {
             const existente = alumnosExistentes.find((dbAlumno) => dbAlumno.rut === alumno.rut);
+            console.log(invertirYCapitalizarNombre(alumno.nombre));
             return existente && (existente.nombre !== alumno.nombre || existente.correo !== alumno.email);
         });
         const duplicados = datos.filter((alumno) => {

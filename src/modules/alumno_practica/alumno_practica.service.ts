@@ -10,6 +10,7 @@ import { Estado_informe, Estado_practica, Tipo_usuario, TipoPractica, Usuarios }
 import { AlumnosDataDto } from './dto/alumnos-data.dto';
 import { UsersService } from '../users/users.service';
 import { escape } from 'querystring';
+import { invertirYCapitalizarNombre } from '../../utils/invertir-nombre.function';
 
 @Injectable()
 export class AlumnoPracticaService {
@@ -21,6 +22,10 @@ export class AlumnoPracticaService {
     ){}
 
     async createAlumnoPractica(alumno_practica: AlumnoPracticaDto){
+
+        if(alumno_practica.nomina){
+            alumno_practica.nombre = invertirYCapitalizarNombre(alumno_practica.nombre);
+        }
 
         const usuario = await this._userService.signUp(alumno_practica);
         console.log(usuario);

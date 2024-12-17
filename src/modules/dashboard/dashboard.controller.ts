@@ -55,4 +55,9 @@ export class DashboardController {
   public async obtenerCantidadAlumnosPorPracticaCursando(){
     return await this._dashboardService.obtenerTotalPracticaAlumnos ();
   }
+
+  @Get('obtener-detalles-practica')
+  public async obtenerDetallesPracticaTodo(){
+    return await this._dashboardService.obtenerDetallesPracticaTodos();
+  }
 }

@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Estado_informe, Estado_practica, Tipo_usuario } from '@prisma/client';
-import { obtenerAcademico, obtenerAprobacionPrimerPractica, obtenerAprobacionSegundaPractica, obtenerCantidadAlumnosPractica, obtenerCantidadInformes, obtenerCantidadTotalAlumnosPorPractica, obtenerCargaDocente, obtenerEntregaCriticaInforme, obtenerListaInformes, obtenerPracticasAsociadasSupervisor } from '@prisma/client/sql';
+import { obtenerAcademico, obtenerAprobacionPrimerPractica, obtenerAprobacionSegundaPractica, obtenerCantidadAlumnosPractica, obtenerCantidadInformes, obtenerCantidadTotalAlumnosPorPractica, obtenerCargaDocente, obtenerDetallesPractica, obtenerEntregaCriticaInforme, obtenerListaInformes, obtenerPracticasAsociadasSupervisor } from '@prisma/client/sql';
 import { DatabaseService } from 'src/database/database/database.service';
 import { CantidadInformesInterface } from './dto/cantidad-informe.interface';
 
@@ -316,7 +316,16 @@ export class DashboardService {
       throw new InternalServerErrorException('Error interno al obtener el total de alumnos por práctica');
     }
   }
-  
+
+
+  async obtenerDetallesPracticaTodos(){
+    try {
+      const detalles = await this._databaseService.$queryRawTyped<any>(obtenerDetallesPractica());
+      return detalles;
+    } catch (error) {
+      throw new InternalServerErrorException('Error interno al obtener los detalles');
+    }
+  }
   
 
 }
