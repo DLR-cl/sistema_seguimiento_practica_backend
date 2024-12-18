@@ -46,11 +46,11 @@ export class InformeAlumnoController {
         // Verificar si los datos llegaron correctamente
         console.log('Body:', data);
         console.log('File:', file);
-    
+
         if (!data.nombre_alumno || !data.tipo_practica) {
             throw new BadRequestException('Datos incompletos en el formulario');
         }
-    
+
         // Construir la nueva ruta y el nuevo nombre del archivo
         const practicaFolder =
             data.tipo_practica === 'PRACTICA_UNO'
@@ -59,12 +59,12 @@ export class InformeAlumnoController {
         const extension = file.originalname.split('.').pop();
         const newFileName = `informe-${data.nombre_alumno.replace(/\s+/g, '-')}.${extension}`;
         const newPath = join(rootPath, practicaFolder, newFileName);
-    
+
         // Mover el archivo desde la carpeta temporal a la carpeta final
         const fs = require('fs');
         const oldPath = file.path;
         fs.renameSync(oldPath, newPath);
-    
+
         // Retornar respuesta
         return this._informeAlumnoService.subirInforme(
             { ...file, path: newPath },
@@ -72,29 +72,30 @@ export class InformeAlumnoController {
             rootPath
         );
     }
-    
+
     // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio
     // del servicio que se cambiará parte del informe añadiendole la ruta en la cual se encuentra.
 
     @Get('ver-informe/:id_informe')
-    async verInforme(@Param('id_informe') id_informe: number, @Res() res: Response) {
+    async verInforme(@Param('id_informe', ParseIntPipe) id_informe: number, @Res() res: Response) {
         try {
             const fileStream = await this._informeAlumnoService.getArchivo(+id_informe);
 
-            // Determinar el tipo de contenido según el archivo (por ejemplo, PDF o imagen)
-            res.setHeader('Content-Type', 'application/pdf');  // Puedes ajustarlo según el tipo de archivo
+            if (!fileStream) {
+                throw new NotFoundException('Archivo no encontrado');
+            }
+
+            console.log('Archivo encontrado, enviando al cliente');
+            res.setHeader('Content-Type', 'application/pdf');
             res.setHeader('Content-Disposition', 'inline; filename="informe.pdf"');
 
-            // Enviar el archivo como stream, permitiendo que se muestre en el navegador
             fileStream.pipe(res);
         } catch (error) {
-            if (error instanceof NotFoundException) {
-                throw error; // Manejo de error si el archivo no existe
-            }
-            console.log(error)
+            console.error('Error al intentar mostrar el archivo:', error);
             throw new Error('Error al intentar mostrar el archivo');
         }
     }
+
 
     @Get('descargar-informe/:id_informe')
     async descargarInforme(@Param('id_informe') id_informe: number, @Res() res: Response) {
@@ -141,7 +142,8 @@ export class InformeAlumnoController {
     }
 
     @Get('obtener-respuestas/:id')
-    public async obtenerRespuestaInforme(@Param('id', ParseIntPipe) informe_id: number){
+    public async obtenerRespuestaInforme(@Param('id', ParseIntPipe) informe_id: number) {
+        console.log(informe_id)
         return await this._informeAlumnoService.obtenerRespuestasInforme(informe_id);
     }
 }

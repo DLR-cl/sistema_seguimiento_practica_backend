@@ -117,6 +117,7 @@ model InformesAlumno {
   estado             Estado_informe
   id_academico       Int?
   fecha_inicio       DateTime
+  intentos           Int            @default(3)
 
   fecha_inicio_revision  DateTime? @db.Date
   fecha_termino_revision DateTime? @db.Date

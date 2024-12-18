@@ -133,7 +133,36 @@ export class PracticasService {
                     id_practica: id_practica,
                 },
                 include: {
-                    informe_alumno: true,
+                    informe_alumno: {
+                        include: {
+                            alumno: {
+                                include: {
+                                    usuario: {
+                                        select: {
+                                            nombre: true,
+                                            correo: true,
+                                        }
+                                    },
+                                }
+                            }
+                        }
+                    },
+                    informe_confidencial: {
+                        include: {
+                            supervisor: {
+                                include: {
+                                    usuario: {
+                                        select: {
+                                            nombre: true,
+                                            correo: true,
+                                            rut: true,
+                                        }
+                                    },
+                                    empresa: true
+                                }
+                            }
+                        }
+                    },
                 }
             });
 
