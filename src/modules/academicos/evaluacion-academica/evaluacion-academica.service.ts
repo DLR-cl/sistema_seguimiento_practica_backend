@@ -43,6 +43,11 @@ export class EvaluacionAcademicaService {
                         where: { id_informe: informe.id_informe_alumno },
                         data: { estado: Estado_informe.CORRECCION, intentos: intentosRestantes },
                     });
+
+                    await prisma.practicas.update({
+                        where: { id_practica: informe_alumno.id_practica },
+                        data: { estado: Estado_practica.REVISION_GENERAL },
+                    })
                 } else {
                     await prisma.informesAlumno.update({
                         where: { id_informe: informe.id_informe_alumno },

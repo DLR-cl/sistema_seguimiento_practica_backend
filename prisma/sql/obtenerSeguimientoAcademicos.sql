@@ -1,6 +1,8 @@
 SELECT
     a.nombre AS nombre_alumno,
+    a.rut AS rut_alumno,
     p.tipo_practica,
+    p.estado AS estado_practica,
     infA.estado AS estado_informe,
     ac.nombre AS nombre_academico,
     ac.correo AS correo_academico,
