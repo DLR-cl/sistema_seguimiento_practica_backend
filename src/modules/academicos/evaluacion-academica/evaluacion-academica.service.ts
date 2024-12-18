@@ -110,7 +110,7 @@ export class EvaluacionAcademicaService {
     }
 
     public async obtenerPreguntasImplementadas() {
-        const preguntasImplementadas = await this._databaseService.preguntasImplementadasInformeConfidencial.findMany({
+        const preguntasImplementadas = await this._databaseService.preguntasImplementadasInformeEvaluacion.findMany({
             include: {
                 pregunta: {
                     include: {

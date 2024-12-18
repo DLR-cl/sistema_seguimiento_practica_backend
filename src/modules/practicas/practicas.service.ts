@@ -22,10 +22,20 @@ export class PracticasService {
     public async generarPractica(practica: createPracticaDto) {
         try {
             // si ya existe una práctica definida
+
+
             if (await this.hayPracticaActiva(practica)) {
                 throw new BadRequestException('El alumno aún se encuentra en una práctica');
             };
 
+            if (practica.fecha_termino <= practica.fecha_inicio) {
+                throw new BadRequestException('La fecha de término debe ser posterior a la fecha de inicio.');
+            }
+            
+            if (practica.cantidad_horas < practica.horas_semanales) {
+                throw new BadRequestException('La cantidad de horas totales no puede ser menor a las horas semanales.');
+            }
+            
             const nuevaPractica = await this._databaseService.practicas.create({
                 data: {
                     ...practica,
@@ -46,17 +56,18 @@ export class PracticasService {
         }
     }
 
-    public async hayPracticaActiva(practica: createPracticaDto) {
+    public async hayPracticaActiva(practica: createPracticaDto): Promise<boolean> {
         const existePractica = await this._databaseService.practicas.findFirst({
             where: {
                 id_alumno: practica.id_alumno,
                 NOT: {
-                    estado: Estado_practica.FINALIZADA
-                }
-            }
+                    estado: Estado_practica.FINALIZADA,
+                },
+            },
         });
-        return existePractica
+        return !!existePractica;
     }
+    
 
     public async existePractica(id_practica: number) {
         const existePractica = await this._databaseService.practicas.findUnique({
