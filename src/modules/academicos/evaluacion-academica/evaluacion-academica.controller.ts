@@ -37,7 +37,7 @@ export class EvaluacionAcademicaController {
 
     @Get('obtener-preguntas-implementadas')
     async obtenerPreguntasImplementadas(){
-        return await this.obtenerPreguntasImplementadas();
+        return await this._evaluacionAcademicaService.obtenerPreguntasImplementadas();
     }
 
     @Post('implementar-preguntas')
