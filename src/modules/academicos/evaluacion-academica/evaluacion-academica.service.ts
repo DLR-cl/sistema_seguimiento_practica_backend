@@ -1,7 +1,7 @@
 import { BadRequestException, Body, HttpStatus, Injectable, Post } from '@nestjs/common';
 import { InformeEvaluativoDto, RespuestasInformeEvaluativo } from '../dto/informe-evaluativo.dto';
 import { DatabaseService } from 'src/database/database/database.service';
-import { Estado_informe, Estado_practica, Prisma } from '@prisma/client';
+import { Estado_informe, Estado_practica, Prisma, TipoPractica } from '@prisma/client';
 import { AsignarPreguntaDto } from 'src/modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 
 @Injectable()
@@ -49,10 +49,22 @@ export class EvaluacionAcademicaService {
                         data: { estado: Estado_informe.DESAPROBADA },
                     });
     
-                    await prisma.practicas.update({
+                    const practica = await prisma.practicas.update({
                         where: { id_practica: informe_alumno.id_practica },
                         data: { estado: Estado_practica.FINALIZADA },
                     });
+                    // se desactiva la practica del alumno (el )
+                    if(practica.tipo_practica == TipoPractica.PRACTICA_UNO){
+                        await prisma.alumnosPractica.update({
+                            where: { id_user: informe_alumno.id_alumno },
+                            data: { primer_practica: false }
+                        });
+                    }else {
+                        await prisma.alumnosPractica.update({
+                            where: { id_user: informe_alumno.id_alumno },
+                            data: { segunda_practica: false }
+                        })
+                    }
                 }
     
                 return {
@@ -146,22 +158,22 @@ export class EvaluacionAcademicaService {
     }
 
     async asociarPreguntasInforme(preguntas: AsignarPreguntaDto[]) {
-        if (!preguntas || preguntas.length === 0) {
+        if (!Array.isArray(preguntas) || preguntas.length === 0) {
             throw new BadRequestException('Debe proporcionar al menos una pregunta para asociar.');
         }
-
+    
         try {
             // Preparar datos para insertar
             const datosParaInsertar = preguntas.map((pregunta) => ({
                 id_pregunta: pregunta.id_pregunta,
             }));
-
+    
             // Insertar las preguntas en la tabla de preguntas implementadas
             const resultado = await this._databaseService.preguntasImplementadasInformeEvaluacion.createMany({
                 data: datosParaInsertar,
                 skipDuplicates: true, // Evita errores si ya existe una asignación duplicada
             });
-
+    
             return {
                 message: `${resultado.count} pregunta(s) asociada(s) exitosamente al informe evaluativo.`,
                 status: 200,
@@ -171,4 +183,5 @@ export class EvaluacionAcademicaService {
             throw new BadRequestException('Hubo un error al asociar las preguntas al informe.');
         }
     }
+    
 }

@@ -22,11 +22,18 @@ export class PracticasService {
     public async generarPractica(practica: createPracticaDto) {
         try {
             // si ya existe una práctica definida
+            const alumno = await this._databaseService.alumnosPractica.findUnique({
+                where: { id_user: practica.id_alumno },
+                select: { primer_practica: true, segunda_practica: true }
+            });
 
+            if(alumno.primer_practica && practica.tipo_practica == TipoPractica.PRACTICA_UNO){
+                throw new BadRequestException('El alumno ya se encuentra cursando la practica uno.')
+            }
 
-            if (await this.hayPracticaActiva(practica)) {
-                throw new BadRequestException('El alumno aún se encuentra en una práctica');
-            };
+            if(alumno.segunda_practica && practica.tipo_practica == TipoPractica.PRACTICA_DOS){
+                throw new BadRequestException('El alumno ya se encuentra cursando la segunda practica.')
+            }
 
             if (practica.fecha_termino <= practica.fecha_inicio) {
                 throw new BadRequestException('La fecha de término debe ser posterior a la fecha de inicio.');
@@ -39,35 +46,38 @@ export class PracticasService {
             const nuevaPractica = await this._databaseService.practicas.create({
                 data: {
                     ...practica,
-                    estado: Estado_practica.CURSANDO
+                    estado: Estado_practica.CURSANDO,
+                },
+                include: {
+                    alumno: true, // Relación con el modelo de alumnos
+                    jefe_supervisor: true, // Relación con el modelo de supervisores
                 },
             });
+            if(nuevaPractica.tipo_practica == TipoPractica.PRACTICA_UNO){
+                await this._databaseService.alumnosPractica.update({
+                    where: { id_user: nuevaPractica.id_alumno },
+                    data: { primer_practica: true }
+                })
+            }else {
+                await this._databaseService.alumnosPractica.update({
+                    where: { id_user: nuevaPractica.id_alumno },
+                    data: { segunda_practica: true }
+                })
+            }
+            return new PracticaResponseDto(nuevaPractica);
+            
 
-            const response: PracticaResponseDto = new PracticaResponseDto(nuevaPractica);
-
-            return response;
 
         } catch (error) {
+            console.error('Error al generar la práctica:', error.message);
             if (error instanceof BadRequestException) {
-                throw error
-            } else {
-                throw new InternalServerErrorException('Error interno');
+                throw error;
             }
+            throw new InternalServerErrorException('Error interno al generar la práctica.');
         }
     }
 
-    public async hayPracticaActiva(practica: createPracticaDto): Promise<boolean> {
-        const existePractica = await this._databaseService.practicas.findFirst({
-            where: {
-                id_alumno: practica.id_alumno,
-                NOT: {
-                    estado: Estado_practica.FINALIZADA,
-                },
-            },
-        });
-        return !!existePractica;
-    }
-    
+
 
     public async existePractica(id_practica: number) {
         const existePractica = await this._databaseService.practicas.findUnique({
