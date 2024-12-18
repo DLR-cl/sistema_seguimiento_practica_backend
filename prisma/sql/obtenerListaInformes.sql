@@ -3,6 +3,7 @@ SELECT DISTINCT
     p.tipo_practica,
     p.id_practica AS id_practica,
     infA.estado AS estado_informe,
+    infA.intentos AS intentos,
     DATEDIFF(DATE(infA.fecha_termino_revision), DATE(CURDATE())) AS dias_para_revision,
     DATE(infA.fecha_inicio_revision) AS inicio_revision,
     DATE(infA.fecha_termino_revision) AS fin_revision
