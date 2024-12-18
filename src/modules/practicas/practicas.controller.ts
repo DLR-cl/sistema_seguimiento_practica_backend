@@ -28,7 +28,7 @@ export class PracticasController {
         return await this._practicaService.getPracticaAlumno(+id_alumno);
     }
 
-    @Get('ruta-creacion-informes')
+    @Get('informes/generar')
     public async creacionPracticas(){
         await this._practicaService.actualizarEstadoPracticas();
         await this._practicaService.generarInformeConfidencial();
