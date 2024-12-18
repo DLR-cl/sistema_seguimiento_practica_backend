@@ -19,35 +19,35 @@ export class InformeAlumnoController {
 
 
     @Post('subir-informe')
-@UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-        destination: (req, file, callback) => {
-            const practicaFolder = 'uploads/temp'; // Carpeta temporal
-            callback(null, practicaFolder);
-        },
-        filename: (req, file, callback) => {
-            const tempFileName = `${Date.now()}-${file.originalname}`;
-            callback(null, tempFileName);
-        }
-    })
-}))
-async subirInforme(
-    @UploadedFile(
-        new ParseFilePipe({
-            validators: [
-                new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }),
-                new FileTypeValidator({ fileType: 'application/pdf' }),
-            ],
-            exceptionFactory: (errors) => new BadRequestException('Archivo inválido'),
-        }),
-    ) file: Express.Multer.File,
-    @Body() data: InformeDto
-) {
-    console.log('Body:', data);
-    console.log('File:', file);
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: (req, file, callback) => {
+                const practicaFolder = 'uploads/temp'; // Carpeta temporal
+                callback(null, practicaFolder);
+            },
+            filename: (req, file, callback) => {
+                const tempFileName = `${Date.now()}-${file.originalname}`;
+                callback(null, tempFileName);
+            }
+        })
+    }))
+    async subirInforme(
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }),
+                    new FileTypeValidator({ fileType: 'application/pdf' }),
+                ],
+                exceptionFactory: (errors) => new BadRequestException('Archivo inválido'),
+            }),
+        ) file: Express.Multer.File,
+        @Body() data: InformeDto
+    ) {
+        console.log('Body:', data);
+        console.log('File:', file);
 
-    return this._informeAlumnoService.subirInforme(file, data, 'uploads');
-}
+        return this._informeAlumnoService.subirInforme(file, data, 'uploads');
+    }
 
     // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio
     // del servicio que se cambiará parte del informe añadiendole la ruta en la cual se encuentra.

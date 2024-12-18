@@ -27,6 +27,7 @@ export class EvaluacionAcademicaService {
                 throw new BadRequestException('No se encuentra el informe del alumno disponible');
             }
     
+            console.log("informe desde el pepe",informe_alumno.estado)
             if (informe_alumno.estado !== Estado_informe.REVISION) {
                 throw new BadRequestException('El informe no está en estado de revisión');
             }
@@ -62,12 +63,12 @@ export class EvaluacionAcademicaService {
                     if(practica.tipo_practica == TipoPractica.PRACTICA_UNO){
                         await prisma.alumnosPractica.update({
                             where: { id_user: informe_alumno.id_alumno },
-                            data: { primer_practica: false }
+                            data: { segunda_practica: false }
                         });
                     }else {
                         await prisma.alumnosPractica.update({
                             where: { id_user: informe_alumno.id_alumno },
-                            data: { segunda_practica: false }
+                            data: { primer_practica: false }
                         })
                     }
                 }
@@ -100,10 +101,22 @@ export class EvaluacionAcademicaService {
                 data: { estado: Estado_informe.APROBADA },
             });
     
-            await prisma.practicas.update({
+            const practica = await prisma.practicas.update({
                 where: { id_practica: informe_alumno.practica.id_practica },
                 data: { estado: Estado_practica.FINALIZADA },
             });
+
+            if(practica.tipo_practica == TipoPractica.PRACTICA_UNO){
+                await prisma.alumnosPractica.update({
+                    where: { id_user: informe_alumno.id_alumno },
+                    data: { segunda_practica: false }
+                });
+            }else {
+                await prisma.alumnosPractica.update({
+                    where: { id_user: informe_alumno.id_alumno },
+                    data: { primer_practica: false }
+                })
+            }
     
             return {
                 message: 'Registro del informe exitoso',

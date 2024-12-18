@@ -364,9 +364,10 @@ export class InformeAlumnoService {
     async subirInforme(file: Express.Multer.File, data: InformeDto, rootPath: string) {
         const fs = require('fs');
         const path = require('path');
-        const oldFilePath = file.path;
+        const tempFilePath = file.path; // Ruta del archivo temporal
     
         try {
+            // Verifica si el alumno existe
             const existeAlumno = await this._databaseService.alumnosPractica.findUnique({
                 where: { id_user: +data.id_alumno },
                 include: { usuario: true },
@@ -376,7 +377,7 @@ export class InformeAlumnoService {
                 throw new NotFoundException(`No se encontró un alumno con el ID ${data.id_alumno}`);
             }
     
-            // Define la nueva ruta del archivo
+            // Define la carpeta destino según la práctica
             const practicaFolder =
                 data.tipo_practica === 'PRACTICA_UNO'
                     ? path.join(rootPath, 'informes-practica-uno', 'alumnos')
@@ -386,13 +387,11 @@ export class InformeAlumnoService {
                 fs.mkdirSync(practicaFolder, { recursive: true });
             }
     
+            // Define el nombre y ruta final del archivo
             const newFileName = `informe-${data.nombre_alumno.replace(/\s+/g, '-')}.pdf`;
             const newFilePath = path.join(practicaFolder, newFileName);
     
-            // Mueve el archivo a la carpeta final
-            fs.renameSync(oldFilePath, newFilePath);
-    
-            // Reemplaza el archivo si ya existe uno en estado CORRECCION
+            // Verifica si existe un informe en estado CORRECCIÓN
             const informeEnCorreccion = await this._databaseService.informesAlumno.findFirst({
                 where: {
                     id_alumno: +data.id_alumno,
@@ -401,11 +400,16 @@ export class InformeAlumnoService {
             });
     
             if (informeEnCorreccion) {
+                // Elimina el archivo existente si está en estado CORRECCIÓN
                 if (informeEnCorreccion.archivo && fs.existsSync(informeEnCorreccion.archivo)) {
                     fs.unlinkSync(informeEnCorreccion.archivo);
                     console.log(`Archivo anterior eliminado: ${informeEnCorreccion.archivo}`);
                 }
     
+                // Mueve el nuevo archivo desde la carpeta temporal
+                fs.renameSync(tempFilePath, newFilePath);
+    
+                // Actualiza el registro en la base de datos
                 await this._databaseService.informesAlumno.update({
                     where: { id_informe: informeEnCorreccion.id_informe },
                     data: {
@@ -415,12 +419,12 @@ export class InformeAlumnoService {
                 });
     
                 return {
-                    message: 'Informe reemplazado exitosamente en estado CORRECCION',
+                    message: 'Informe reemplazado exitosamente en estado CORRECCIÓN',
                     filePath: newFilePath,
                 };
             }
     
-            // Si no hay informe en CORRECCION, busca el de estado ESPERA
+            // Verifica si hay un informe en estado ESPERA
             const informeEnEspera = await this._databaseService.informesAlumno.findFirst({
                 where: {
                     id_alumno: +data.id_alumno,
@@ -429,6 +433,10 @@ export class InformeAlumnoService {
             });
     
             if (informeEnEspera) {
+                // Mueve el archivo desde la carpeta temporal
+                fs.renameSync(tempFilePath, newFilePath);
+    
+                // Actualiza el registro en la base de datos
                 await this._databaseService.informesAlumno.update({
                     where: { id_informe: informeEnEspera.id_informe },
                     data: {
@@ -448,13 +456,14 @@ export class InformeAlumnoService {
             console.error('Error al subir el informe:', error);
     
             // Elimina el archivo temporal si ocurre un error
-            if (fs.existsSync(oldFilePath)) {
-                fs.unlinkSync(oldFilePath);
+            if (fs.existsSync(tempFilePath)) {
+                fs.unlinkSync(tempFilePath);
             }
     
             throw error;
         }
     }
+    
     
     
 
