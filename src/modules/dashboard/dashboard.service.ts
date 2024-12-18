@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Estado_informe, Estado_practica, Tipo_usuario } from '@prisma/client';
-import { obtenerAcademico, obtenerAprobacionPrimerPractica, obtenerAprobacionSegundaPractica, obtenerCantidadAlumnosPractica, obtenerCantidadInformes, obtenerCantidadPracticasPorTipoPoranno, obtenerCantidadTotalAlumnosPorPractica, obtenerCargaDocente, obtenerDetallesPractica, obtenerEntregaCriticaInforme, obtenerListaInformes, obtenerPracticasAsociadasSupervisor } from '@prisma/client/sql';
+import { obtenerAcademico, obtenerAprobacionPrimerPractica, obtenerAprobacionSegundaPractica, obtenerCantidadAlumnosPractica, obtenerCantidadInformes, obtenerCantidadPracticasPorTipoPoranno, obtenerCantidadTotalAlumnosPorPractica, obtenerCargaDocente, obtenerDetallesPractica, obtenerEntregaCriticaInforme, obtenerListaInformes, obtenerPracticasAsociadasSupervisor, obtenerSeguimientoAcademicos } from '@prisma/client/sql';
 import { DatabaseService } from 'src/database/database/database.service';
 import { CantidadInformesInterface } from './dto/cantidad-informe.interface';
 import { CantidadPractica } from './dto/cantidad-practica-meses.dto';
@@ -375,5 +375,10 @@ export class DashboardService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async obtenerSeguimientoAcademicos(){
+    const seguimientoData = await this._databaseService.$queryRawTyped<any>(obtenerSeguimientoAcademicos());
+    return seguimientoData;
   }
 }

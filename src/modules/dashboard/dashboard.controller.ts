@@ -72,4 +72,9 @@ export class DashboardController {
   public async obtenerPromedioNotas(){
     return await this._dashboardService.obtenerNotaPromedioDeInformesEmpresas();
   }
+
+  @Get('obtener-seguimiento-academicos')
+  public async obtenerSeguimientoAcademicos(){
+    return await this._dashboardService.obtenerSeguimientoAcademicos();
+  }
 }

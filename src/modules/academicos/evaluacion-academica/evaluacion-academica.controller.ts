@@ -1,6 +1,7 @@
 import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { EvaluacionAcademicaService } from './evaluacion-academica.service';
 import { InformeEvaluativoDto } from '../dto/informe-evaluativo.dto';
+import { AsignarPreguntaDto } from 'src/modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 
 @Controller('evaluacion-academica')
 export class EvaluacionAcademicaController {
@@ -32,5 +33,15 @@ export class EvaluacionAcademicaController {
             }
             throw new InternalServerErrorException('Error interno al obtener las respuestas de los informes');
         }
+    }
+
+    @Get('obtener-preguntas-implementadas')
+    async obtenerPreguntasImplementadas(){
+        return await this.obtenerPreguntasImplementadas();
+    }
+
+    @Post('implementar-preguntas')
+    async implementarPreguntas(@Body() preguntas: AsignarPreguntaDto[]){
+        return await this._evaluacionAcademicaService.asociarPreguntasInforme(preguntas)
     }
 }

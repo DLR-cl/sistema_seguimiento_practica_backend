@@ -82,41 +82,7 @@ export class InformeConfidencialService {
 
     }
     
-    public async asignarInformeConfidencial(id_informe:number, id_academico: number){
-        try {
 
-            const informeConfidencial = await this._databaseService.informeConfidencial.findUnique({
-                where: {
-                    id_informe_confidencial: id_informe,
-                    estado: Estado_informe.ENVIADA
-                }
-            });
-
-            if(!informeConfidencial){
-                throw new BadRequestException('El informe confidencial no existe o aun no ha sido enviado');
-            }
-            
-            const asignacion = await this._databaseService.informeConfidencial.update({
-                where: {
-                    id_informe_confidencial: id_informe,
-                },
-                data: {
-                    id_academico: id_academico
-                }
-            });
-
-            return {
-                message: 'Informe Confidencial Asignado con éxito',
-                status: HttpStatus.OK,
-                data: asignacion
-            }
-        } catch (error) {
-            if(error instanceof BadRequestException){
-                throw error;
-            }
-            throw new InternalServerErrorException('Error interno al asignar informe confidencial');
-        }
-    }
 
 
     public async getInformesConfidenciales(id_supervisor: number){

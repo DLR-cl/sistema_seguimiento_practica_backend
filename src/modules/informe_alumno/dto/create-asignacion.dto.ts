@@ -13,4 +13,8 @@ export class CreateAsignacionDto{
     @IsNotEmpty()
     @IsNumber()
     id_academico: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    id_practica: number;
 }

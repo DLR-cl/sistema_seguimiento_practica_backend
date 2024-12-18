@@ -110,6 +110,14 @@ export class InformeAlumnoService {
                     fecha_termino_revision: fechaFin,
                 }
             })
+            // CAMBIAR ESTADO PRACTICA
+            const practica = await this._databaseService.practicas.update({
+                where: {
+                    id_practica: asignacion.id_practica,
+                }, data: {
+                    estado: Estado_practica.REVISION_GENERAL
+                }
+            })
             // Notificar SOLO al acádemico
             this._emailService.notificacionAsignacion(asignarInformeAlumno.id_academico, asignarInformeAlumno.id_informe);
     
