@@ -77,7 +77,10 @@ export class AlumnoPracticaService {
             include: {
                 practica: {
                     where: {
-                        estado: Estado_practica.ESPERA_INFORMES,
+                        OR: [
+                            {estado: Estado_practica.ESPERA_INFORMES},
+                            {estado: Estado_practica.REVISION_GENERAL},
+                        ],
                     }
                 },
                 informe: true,
