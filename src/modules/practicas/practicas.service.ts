@@ -189,7 +189,7 @@ export class PracticasService {
 
 
 
-    @Cron('14 12 * * *')
+    @Cron('05 16 * * *')
     private async generarInformeConfidencial() {
         try {
             const findPracticas: any = await this._databaseService.practicas.findMany({
@@ -223,7 +223,7 @@ export class PracticasService {
             throw error;
         }
     }
-    @Cron('14 12 * * *')
+    @Cron('05 16 * * *')
     private async createInformeAlumno() {
         try {
             const findPracticas: any = await this._databaseService.practicas.findMany({
@@ -263,7 +263,7 @@ export class PracticasService {
 
     // finalizar practica automaticamente
     //@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-    @Cron('13 12 * * *')
+    @Cron('50 15 * * *')
     private async actualizarEstadoPracticas(): Promise<void> {
       try {
         // Obtener las prácticas que aún no están finalizadas y cuya fecha de término ya pasó

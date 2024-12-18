@@ -435,5 +435,41 @@ export class InformeAlumnoService {
             throw error; 
         }
     }
+
+    async obtenerRespuestasInforme(id_informe: number) {
+        try {
+          // Consulta las respuestas asociadas al informe de alumno
+          const respuestas = await this._databaseService.respuestasInformeAlumno.findMany({
+            where: { id_informe },
+            include: {
+              pregunta: { // Relación con PreguntasImplementadasInformeAlumno
+                include: {
+                  preguntas: true, // Relación con Preguntas para obtener los detalles
+                },
+              },
+            },
+          });
+      
+          if (!respuestas || respuestas.length === 0) {
+            throw new BadRequestException('No se encontraron respuestas para este informe de alumno.');
+          }
+      
+          // Transformar las respuestas para devolver un formato más claro
+          const resultados = respuestas.map(res => ({
+            respuesta_texto: res.texto,
+            puntaje: res.puntaje,
+            nota: res.nota,
+            pregunta: res.pregunta.preguntas.enunciado_pregunta,
+          }));
+      
+          return resultados;
+        } catch (error) {
+          if (error instanceof BadRequestException) {
+            throw error;
+          }
+          throw new InternalServerErrorException('Error interno al obtener las respuestas del informe de alumno.');
+        }
+      }
+      
     
 }

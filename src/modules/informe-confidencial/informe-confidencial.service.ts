@@ -134,6 +134,38 @@ export class InformeConfidencialService {
         }
     }
 
-
-    
+    public async obtenerResultadosInformeConfidencial(id_informe: number) {
+        try {
+          // Consulta las respuestas asociadas al informe confidencial
+          const resultados = await this._databaseService.respuestasInformeConfidencial.findMany({
+            where: { informe_id: id_informe },
+            include: {
+              pregunta: {
+                include: {
+                  pregunta: true, // Incluye los detalles de la pregunta
+                },
+              },
+            },
+          });
+      
+          if (!resultados || resultados.length === 0) {
+            throw new BadRequestException('No se encontraron resultados para este informe confidencial.');
+          }
+      
+          // Transformar los resultados para devolver información más clara
+          const resultadosTransformados = resultados.map(res => ({
+            respuesta_texto: res.respuesta_texto,
+            puntos: res.puntos,
+            pregunta: res.pregunta.pregunta.enunciado_pregunta,
+          }));
+      
+          return resultadosTransformados;
+        } catch (error) {
+          if (error instanceof BadRequestException) {
+            throw error;
+          }
+          throw new InternalServerErrorException('Error interno al obtener los resultados del informe confidencial.');
+        }
+      }
+      
 }

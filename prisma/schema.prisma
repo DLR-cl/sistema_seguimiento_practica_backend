@@ -70,6 +70,7 @@ model Academico {
 
   informe_confidencial InformeConfidencial[]
   informe_alumno       InformesAlumno[]
+  informe_evaluacion   InformeEvaluacionAcademicos[]
 
   @@map("academico")
 }
@@ -120,11 +121,13 @@ model InformesAlumno {
   fecha_inicio_revision  DateTime? @db.Date
   fecha_termino_revision DateTime? @db.Date
 
-  practica    Practicas                 @relation(fields: [id_practica], references: [id_practica])
-  alumno      AlumnosPractica           @relation(fields: [id_alumno], references: [id_user])
-  academico   Academico?                @relation(fields: [id_academico], references: [id_user])
-  respuestas  RespuestasInformeAlumno[]
-  comentarios comentariosPractica[]
+  practica  Practicas       @relation(fields: [id_practica], references: [id_practica])
+  alumno    AlumnosPractica @relation(fields: [id_alumno], references: [id_user])
+  academico Academico?      @relation(fields: [id_academico], references: [id_user])
+
+  informe_academico InformeEvaluacionAcademicos?
+  respuestas        RespuestasInformeAlumno[]
+  comentarios       comentariosPractica[]
 }
 
 model comentariosPractica {
@@ -181,17 +184,18 @@ model InformeConfidencial {
   fecha_inicio_revision           DateTime?      @db.Date
   fecha_termino_revision          DateTime?      @db.Date
   // añadir fecha final real
-  fecha_inicio_practica           DateTime?     @db.Date
-  fecha_fin_practica              DateTime?     @db.Date
+  fecha_inicio_practica           DateTime?      @db.Date
+  fecha_fin_practica              DateTime?      @db.Date
 
-  fecha_real_revision             DateTime?      @db.Date
+  fecha_real_revision DateTime? @db.Date
   // relacion
-  id_supervisor                   Int            @db.Int
-  id_alumno_evaluado              Int            @db.Int
-  id_practica                     Int            @unique
-  id_academico                    Int?
+  id_supervisor       Int       @db.Int
+  id_alumno_evaluado  Int       @db.Int
+  id_practica         Int       @unique
+  id_academico        Int?
 
-  respuestas RespuestasInformeConfidencial[]
+  informe_academico InformeEvaluacionAcademicos?
+  respuestas        RespuestasInformeConfidencial[]
 
   practica   Practicas   @relation(fields: [id_practica], references: [id_practica])
   academico  Academico?  @relation(fields: [id_academico], references: [id_user])
@@ -199,6 +203,41 @@ model InformeConfidencial {
 }
 
 // falta algo, si bien se obtienen el puntaje de una pregunta en base a la respuesta, falta obtener el puntaje total de una dimension
+
+model InformeEvaluacionAcademicos {
+  id_informe              Int @id @default(autoincrement())
+  id_academico            Int
+  id_informe_alumno       Int @unique
+  id_informe_confidencial Int @unique
+
+ 
+  fecha_revision          DateTime  @db.Date
+
+  academico            Academico                     @relation(fields: [id_academico], references: [id_user])
+  informe_alumno       InformesAlumno                @relation(fields: [id_informe_alumno], references: [id_informe])
+  informe_confidencial InformeConfidencial           @relation(fields: [id_informe_confidencial], references: [id_informe_confidencial])
+  respuestas           RespuestasInformeEvaluacion[]
+}
+
+model PreguntasImplementadasInformeEvaluacion {
+  id_pregunta Int
+
+  respuestas RespuestasInformeEvaluacion[]
+  pregunta   Preguntas                     @relation(fields: [id_pregunta], references: [id_pregunta])
+
+  @@id([id_pregunta])
+}
+
+model RespuestasInformeEvaluacion {
+  respuesta_texto       String?                                 @db.VarChar(300)
+  puntos                Int?
+  pregunta_id           Int
+  informe_id            Int
+  informe_evaluacion    InformeEvaluacionAcademicos             @relation(fields: [informe_id], references: [id_informe])
+  pregunta_implementada PreguntasImplementadasInformeEvaluacion @relation(fields: [pregunta_id], references: [id_pregunta])
+
+  @@id([pregunta_id, informe_id])
+}
 
 model PreguntasImplementadasInformeAlumno {
   id_pregunta Int
@@ -218,6 +257,7 @@ model Preguntas {
 
   preguntas_implementadas_informe      PreguntasImplementadasInformeAlumno?
   preguntas_implementadas_confidencial PreguntasImplementadasInformeConfidencial?
+  preguntas_implementadas_evaluacion   PreguntasImplementadasInformeEvaluacion?
 
   dimension SubDimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
 }
@@ -294,6 +334,7 @@ enum Tipo_pregunta {
   CERRADA
   EVALUATIVA
   DESARROLLO_PROFESIONAL
+  REVISION_ACADEMICA
 }
 
 enum Estado_informe {
@@ -317,4 +358,11 @@ enum Tipo_asignatura {
   FORMACION_BASICA
   FORMACION_GENERAL
   FORMACION_PROFESIONAL
+}
+
+enum Calificacion {
+  TOTAL
+  REGULAR
+  SUFICIENTE
+  DEFICIENTE
 }

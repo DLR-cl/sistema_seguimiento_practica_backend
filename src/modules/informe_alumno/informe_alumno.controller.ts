@@ -139,4 +139,9 @@ export class InformeAlumnoController {
     public async editarComentario(@Body() data: Comentario) {
         return await this._informeAlumnoService.editarComentario(data)
     }
+
+    @Get('obtener-respuestas/:id')
+    public async obtenerRespuestaInforme(@Param('id', ParseIntPipe) informe_id: number){
+        return await this._informeAlumnoService.obtenerRespuestasInforme(informe_id);
+    }
 }

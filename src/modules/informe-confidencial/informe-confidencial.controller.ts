@@ -24,4 +24,9 @@ export class InformeConfidencialController {
         console.log(update);
         return await this._informeConfidencialService.actualizarInforme(+id_informe, update);
     }
+
+    @Get('resultados-informe/:id')
+    public async obtenerRespuestasInforme(@Param('id', ParseIntPipe) id_informe: number){
+        return await this._informeConfidencialService.obtenerResultadosInformeConfidencial(id_informe);
+    }
 }
