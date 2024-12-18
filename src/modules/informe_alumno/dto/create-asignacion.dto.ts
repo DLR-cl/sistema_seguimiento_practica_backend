@@ -3,7 +3,12 @@ import { IsNotEmpty, IsNumber } from "class-validator";
 export class CreateAsignacionDto{
     @IsNotEmpty()
     @IsNumber()
-    id_informe: number;
+    id_informe_alumno: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    id_informe_confidencial: number;
+
 
     @IsNotEmpty()
     @IsNumber()

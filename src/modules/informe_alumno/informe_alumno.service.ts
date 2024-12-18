@@ -43,19 +43,40 @@ export class InformeAlumnoService {
     }
     public async asignarInformeAlAcademico(asignacion: CreateAsignacionDto) {
         try {
-            // Buscar el informe por su ID y validar el estado permitido para asignación
-            const informe = await this._databaseService.informesAlumno.findFirst({
+            const academico = await this._databaseService.academico.findUnique({
                 where: {
-                    id_informe: asignacion.id_informe,
+                    id_user: asignacion.id_academico,
+                },
+                include: {
+                    usuario: {
+                        select: {
+                            nombre: true
+                        }
+                    }
+                }
+            })
+            // Buscar el informe por su ID y validar el estado permitido para asignación
+            const informeAlumno = await this._databaseService.informesAlumno.findUnique({
+                where: {
+                    id_informe: asignacion.id_informe_alumno,
                     estado: {
                         in: [Estado_informe.ENVIADA, Estado_informe.REVISION], // Estados permitidos
                     },
                 },
             });
-    
-            if (!informe) {
+            
+            const informeConfidencial = await this._databaseService.informeConfidencial.findUnique({
+                where: {
+                    id_informe_confidencial: asignacion.id_informe_confidencial,
+                    estado: {
+                        in: [Estado_informe.ENVIADA, Estado_informe.REVISION]
+                    }
+                },
+            });
+
+            if (!informeAlumno && !informeConfidencial) {
                 throw new BadRequestException(
-                    'El informe del alumno no existe, no ha sido enviado, o no está en revisión'
+                    'Deben existir ambos informes para asignar al academico.'
                 );
             }
     
@@ -65,9 +86,9 @@ export class InformeAlumnoService {
             fechaFin.setDate(fechaInicio.getDate() + 14);
     
             // Actualizar el informe con la asignación del académico
-            const asignarInforme = await this._databaseService.informesAlumno.update({
+            const asignarInformeAlumno = await this._databaseService.informesAlumno.update({
                 where: {
-                    id_informe: asignacion.id_informe,
+                    id_informe: asignacion.id_informe_alumno,
                 },
                 data: {
                     id_academico: asignacion.id_academico,
@@ -76,11 +97,25 @@ export class InformeAlumnoService {
                     fecha_termino_revision: fechaFin,
                 },
             });
+            
+            // Actualizar el informe confidencial
+            const asignarInformeConfidencial = await this._databaseService.informeConfidencial.update({
+                where: {
+                    id_informe_confidencial: asignacion.id_informe_confidencial
+                },
+                data: {
+                    id_academico: asignacion.id_academico,
+                    estado: Estado_informe.REVISION,
+                    fecha_inicio_revision: fechaInicio,
+                    fecha_termino_revision: fechaFin,
+                }
+            })
+            // Notificar SOLO al acádemico
+            this._emailService.notificacionAsignacion(asignarInformeAlumno.id_academico, asignarInformeAlumno.id_informe);
     
-            // Notificar al alumno (opcional)
-            this._emailService.notificacionAsignacion(asignarInforme.id_academico, asignarInforme.id_informe);
-    
-            return asignarInforme;
+            return {
+                message: `Se asignó exitosamente la revisión del informe a ${academico.usuario.nombre}, a partir de la fecha actual tiene 14 días para revisión.`
+            }
         } catch (error) {
             if (error instanceof BadRequestException) {
                 throw error;
