@@ -399,11 +399,11 @@ export class InformeAlumnoService {
     
                 await this._databaseService.informesAlumno.update({
                     where: {
-                        id_informe: informeEnCorreccion.id_informe,
+                        id_informe: +informeEnCorreccion.id_informe,
                         estado: Estado_informe.CORRECCION,
                     },
                     data: {
-                        id_alumno: data.id_alumno,
+                        id_alumno: +data.id_alumno,
                         archivo: rutaArchivo,
                         // Mantener estado en CORRECCION
                     },
