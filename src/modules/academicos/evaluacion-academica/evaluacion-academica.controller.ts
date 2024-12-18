@@ -22,7 +22,7 @@ export class EvaluacionAcademicaController {
         }
     }
 
-    @Get('informe-resultados/:id')
+    @Get('obtener-respuestas/:id')
     async obtenerPreguntasRespuestasContestadas(@Param('id', ParseIntPipe) informe_evaluativo_id: number){
         try {
             return await this._evaluacionAcademicaService.obtenerResultados(informe_evaluativo_id);
