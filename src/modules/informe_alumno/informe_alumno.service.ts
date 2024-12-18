@@ -405,6 +405,7 @@ export class InformeAlumnoService {
                     data: {
                         id_alumno: data.id_alumno,
                         archivo: rutaArchivo,
+                        estado: Estado_informe.REVISION
                         // Mantener estado en CORRECCION
                     },
                 });
