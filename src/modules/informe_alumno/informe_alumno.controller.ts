@@ -19,59 +19,35 @@ export class InformeAlumnoController {
 
 
     @Post('subir-informe')
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            destination: (req, file, callback) => {
-                const practicaFolder = 'uploads/temp'; // Carpeta temporal para almacenar el archivo
-                callback(null, practicaFolder);
-            },
-            filename: (req, file, callback) => {
-                const tempFileName = `${Date.now()}-${file.originalname}`; // Nombre temporal
-                callback(null, tempFileName);
-            }
-        })
-    }))
-    async subirInforme(
-        @UploadedFile(
-            new ParseFilePipe({
-                validators: [
-                    new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }),
-                    new FileTypeValidator({ fileType: 'application/pdf' }),
-                ],
-                exceptionFactory: (errors) => new BadRequestException('Archivo inválido'),
-            }),
-        ) file: Express.Multer.File,
-        @Body() data: InformeDto
-    ) {
-        // Verificar si los datos llegaron correctamente
-        console.log('Body:', data);
-        console.log('File:', file);
-
-        if (!data.nombre_alumno || !data.tipo_practica) {
-            throw new BadRequestException('Datos incompletos en el formulario');
+@UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+        destination: (req, file, callback) => {
+            const practicaFolder = 'uploads/temp'; // Carpeta temporal
+            callback(null, practicaFolder);
+        },
+        filename: (req, file, callback) => {
+            const tempFileName = `${Date.now()}-${file.originalname}`;
+            callback(null, tempFileName);
         }
+    })
+}))
+async subirInforme(
+    @UploadedFile(
+        new ParseFilePipe({
+            validators: [
+                new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }),
+                new FileTypeValidator({ fileType: 'application/pdf' }),
+            ],
+            exceptionFactory: (errors) => new BadRequestException('Archivo inválido'),
+        }),
+    ) file: Express.Multer.File,
+    @Body() data: InformeDto
+) {
+    console.log('Body:', data);
+    console.log('File:', file);
 
-        // Construir la nueva ruta y el nuevo nombre del archivo
-        const practicaFolder =
-            data.tipo_practica === 'PRACTICA_UNO'
-                ? 'uploads/informes-practica-uno/alumnos'
-                : 'uploads/informes-practica-dos/alumnos';
-        const extension = file.originalname.split('.').pop();
-        const newFileName = `informe-${data.nombre_alumno.replace(/\s+/g, '-')}.${extension}`;
-        const newPath = join(rootPath, practicaFolder, newFileName);
-
-        // Mover el archivo desde la carpeta temporal a la carpeta final
-        const fs = require('fs');
-        const oldPath = file.path;
-        fs.renameSync(oldPath, newPath);
-
-        // Retornar respuesta
-        return this._informeAlumnoService.subirInforme(
-            { ...file, path: newPath },
-            data,
-            rootPath
-        );
-    }
+    return this._informeAlumnoService.subirInforme(file, data, 'uploads');
+}
 
     // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio
     // del servicio que se cambiará parte del informe añadiendole la ruta en la cual se encuentra.

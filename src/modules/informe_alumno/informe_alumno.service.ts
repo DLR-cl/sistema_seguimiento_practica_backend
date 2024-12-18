@@ -363,6 +363,7 @@ export class InformeAlumnoService {
 
     async subirInforme(file: Express.Multer.File, data: InformeDto, rootPath: string) {
         const fs = require('fs');
+        const path = require('path');
         const oldFilePath = file.path;
     
         try {
@@ -375,6 +376,23 @@ export class InformeAlumnoService {
                 throw new NotFoundException(`No se encontró un alumno con el ID ${data.id_alumno}`);
             }
     
+            // Define la nueva ruta del archivo
+            const practicaFolder =
+                data.tipo_practica === 'PRACTICA_UNO'
+                    ? path.join(rootPath, 'informes-practica-uno', 'alumnos')
+                    : path.join(rootPath, 'informes-practica-dos', 'alumnos');
+    
+            if (!fs.existsSync(practicaFolder)) {
+                fs.mkdirSync(practicaFolder, { recursive: true });
+            }
+    
+            const newFileName = `informe-${data.nombre_alumno.replace(/\s+/g, '-')}.pdf`;
+            const newFilePath = path.join(practicaFolder, newFileName);
+    
+            // Mueve el archivo a la carpeta final
+            fs.renameSync(oldFilePath, newFilePath);
+    
+            // Reemplaza el archivo si ya existe uno en estado CORRECCION
             const informeEnCorreccion = await this._databaseService.informesAlumno.findFirst({
                 where: {
                     id_alumno: +data.id_alumno,
@@ -382,25 +400,12 @@ export class InformeAlumnoService {
                 },
             });
     
-            const practicaFolder =
-                data.tipo_practica === 'PRACTICA_UNO'
-                    ? 'uploads/informes-practica-uno/alumnos'
-                    : 'uploads/informes-practica-dos/alumnos';
-            const extension = file.originalname.split('.').pop();
-            const newFileName = `informe-${data.nombre_alumno.replace(/\s+/g, '-')}.${extension}`;
-            const newFilePath = join(rootPath, practicaFolder, newFileName);
-    
-            // Mover el archivo a la ubicación final
-            fs.renameSync(oldFilePath, newFilePath);
-    
             if (informeEnCorreccion) {
-                // Eliminar el archivo anterior
                 if (informeEnCorreccion.archivo && fs.existsSync(informeEnCorreccion.archivo)) {
-                    await fs.promises.unlink(informeEnCorreccion.archivo);
+                    fs.unlinkSync(informeEnCorreccion.archivo);
                     console.log(`Archivo anterior eliminado: ${informeEnCorreccion.archivo}`);
                 }
     
-                // Actualizar la base de datos con el nuevo archivo
                 await this._databaseService.informesAlumno.update({
                     where: { id_informe: informeEnCorreccion.id_informe },
                     data: {
@@ -415,12 +420,15 @@ export class InformeAlumnoService {
                 };
             }
     
-            const informeEnEspera = await this._databaseService.informesAlumno.findUnique({
-                where: { id_informe: +data.id_informe },
+            // Si no hay informe en CORRECCION, busca el de estado ESPERA
+            const informeEnEspera = await this._databaseService.informesAlumno.findFirst({
+                where: {
+                    id_alumno: +data.id_alumno,
+                    estado: Estado_informe.ESPERA,
+                },
             });
     
-            if (informeEnEspera && informeEnEspera.estado === Estado_informe.ESPERA) {
-                // Actualizar el informe a ENVIADA
+            if (informeEnEspera) {
                 await this._databaseService.informesAlumno.update({
                     where: { id_informe: informeEnEspera.id_informe },
                     data: {
@@ -437,21 +445,17 @@ export class InformeAlumnoService {
     
             throw new BadRequestException('No se puede subir el informe en el estado actual.');
         } catch (error) {
-            console.error('Error al subir informe:', error);
+            console.error('Error al subir el informe:', error);
     
-            // Si algo falla, elimina el archivo recién subido
-            try {
-                if (fs.existsSync(oldFilePath)) {
-                    await fs.promises.unlink(oldFilePath);
-                    console.log(`Archivo temporal eliminado: ${oldFilePath}`);
-                }
-            } catch (unlinkError) {
-                console.error(`Error al eliminar el archivo temporal: ${unlinkError.message}`);
+            // Elimina el archivo temporal si ocurre un error
+            if (fs.existsSync(oldFilePath)) {
+                fs.unlinkSync(oldFilePath);
             }
     
             throw error;
         }
     }
+    
     
 
     async obtenerRespuestasInforme(id_informe: number) {
