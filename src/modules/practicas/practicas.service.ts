@@ -53,17 +53,11 @@ export class PracticasService {
                     jefe_supervisor: true, // Relación con el modelo de supervisores
                 },
             });
-            if(nuevaPractica.tipo_practica == TipoPractica.PRACTICA_UNO){
                 await this._databaseService.alumnosPractica.update({
                     where: { id_user: nuevaPractica.id_alumno },
-                    data: { primer_practica: true }
+                    data: { primer_practica: true, segunda_practica: true }
                 })
-            }else {
-                await this._databaseService.alumnosPractica.update({
-                    where: { id_user: nuevaPractica.id_alumno },
-                    data: { segunda_practica: true }
-                })
-            }
+
             return new PracticaResponseDto(nuevaPractica);
             
 

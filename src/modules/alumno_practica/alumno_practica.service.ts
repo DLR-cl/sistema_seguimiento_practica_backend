@@ -112,20 +112,18 @@ export class AlumnoPracticaService {
     }
 
     public async getAlumnos(){
-        const alumnos: AlumnosDataDto[]= await this._databaseService.usuarios.findMany({
-            where:{
-                tipo_usuario: Tipo_usuario.ALUMNO_PRACTICA
-            },
-            select:{
-                id_usuario: true,
-                nombre: true,
-                correo: true,
-                rut: true,
-                tipo_usuario: true,
-                alumno_practica: true
+        const alumnos: AlumnosDataDto[]= await this._databaseService.alumnosPractica.findMany({
+            include: {
+                usuario: {
+                    select: {
+                        nombre: true,
+                        correo: true,
+                        rut: true,
+                        tipo_usuario: true,
+                    }
+                }
             }
-
-        });
+        })
         return alumnos;
     }
 
