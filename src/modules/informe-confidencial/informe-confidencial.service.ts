@@ -34,24 +34,25 @@ export class InformeConfidencialService {
                 }
             })
 
-            const informeAlumno = await this._databaseService.informeConfidencial.findFirst({
+            const practica = await this._databaseService.practicas.findUnique({
                 where: {
-                    id_practica: informes.id_practica,
-                    estado: Estado_informe.ENVIADA
+                    id_practica: informes.id_practica
+                },
+                include: {
+                    informe_alumno: true,
                 }
-
             });
-
-            if(informeAlumno){
+            if(practica.estado == Estado_practica.ESPERA_INFORMES && practica.informe_alumno){
                 const actualizarPractica = await this._databaseService.practicas.update({
                     where: {
-                        id_practica: informeAlumno.id_practica,
+                        id_practica: practica.id_practica,
                     },
                     data: {
                         estado: Estado_practica.INFORMES_RECIBIDOS,
                     }
                 })
             }
+
             return {
                 message: 'Actualización del informe realizada',
                 status: HttpStatus.OK

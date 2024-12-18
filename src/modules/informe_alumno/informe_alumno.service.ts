@@ -435,22 +435,19 @@ export class InformeAlumnoService {
                         estado: Estado_informe.ENVIADA
                     },
                 });
-                const informeConfidencial = await this._databaseService.informeConfidencial.findFirst({
+                const practica = await this._databaseService.practicas.findUnique({
                     where: {
                         id_practica: informeEnEspera.id_practica,
-                        estado: Estado_informe.ENVIADA
+                    },
+                    include: {
+                        informe_confidencial: true,
                     }
-    
                 });
-    
-                if(informeConfidencial){
-                    const actualizarPractica = await this._databaseService.practicas.update({
-                        where: {
-                            id_practica: informeConfidencial.id_practica,
-                        },
-                        data: {
-                            estado: Estado_practica.INFORMES_RECIBIDOS,
-                        }
+
+                if(practica.estado == Estado_practica.ESPERA_INFORMES && practica.informe_confidencial){
+                    await this._databaseService.practicas.update({
+                        where: { id_practica: practica.id_practica },
+                        data: { estado: Estado_practica.INFORMES_RECIBIDOS }
                     })
                 }
                 return {

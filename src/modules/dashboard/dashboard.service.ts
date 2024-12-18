@@ -22,7 +22,7 @@ export class DashboardService {
 
       let cantidadInformesAlumnos = 0;
       let cantidadInformesConfidenciales = 0;
-      
+
       const poseeInformes = await this._databaseService.academico.findUnique({
         where: {
           id_user: id_academico,
@@ -50,7 +50,7 @@ export class DashboardService {
           }
         });
 
-        cantidadInformesConfidenciales= await this._databaseService.informeConfidencial.count({
+        cantidadInformesConfidenciales = await this._databaseService.informeConfidencial.count({
           where: {
             id_academico: id_academico,
             NOT: {
@@ -63,9 +63,9 @@ export class DashboardService {
           }
         });
       } else {
-        if(poseeInformes.informe_alumno.length == 0){
+        if (poseeInformes.informe_alumno.length == 0) {
           cantidadInformesAlumnos = 0;
-          cantidadInformesConfidenciales= await this._databaseService.informeConfidencial.count({
+          cantidadInformesConfidenciales = await this._databaseService.informeConfidencial.count({
             where: {
               id_academico: id_academico,
               NOT: {
@@ -77,7 +77,7 @@ export class DashboardService {
               }
             }
           });
-        }else if(poseeInformes.informe_confidencial.length == 0){
+        } else if (poseeInformes.informe_confidencial.length == 0) {
           cantidadInformesConfidenciales = 0;
           cantidadInformesAlumnos = await this._databaseService.informesAlumno.count({
             where: {
@@ -150,7 +150,7 @@ export class DashboardService {
     }
   }
 
-  public async infoTablaSupervisorPractica(id_supervisor: number){
+  public async infoTablaSupervisorPractica(id_supervisor: number) {
     try {
       const data = await this._databaseService.$queryRawTyped<any>(obtenerPracticasAsociadasSupervisor(id_supervisor))
 
@@ -160,13 +160,13 @@ export class DashboardService {
     }
   }
 
-  public async obtenerCantidadAlumnosAsignadosSupervisor(id_supervisor: number){
+  public async obtenerCantidadAlumnosAsignadosSupervisor(id_supervisor: number) {
     try {
-      if(! await this._databaseService.jefesAlumno.findUnique({
+      if (! await this._databaseService.jefesAlumno.findUnique({
         where: {
           id_user: id_supervisor,
         }
-      })){
+      })) {
         throw new BadRequestException('Error, el supervisor no existe')
       }
 
@@ -174,40 +174,42 @@ export class DashboardService {
         where: {
           id_supervisor: id_supervisor,
           OR: [
-            {informe_confidencial: {
-              NOT: {
-                estado: "ENVIADA",
+            {
+              informe_confidencial: {
+                NOT: {
+                  estado: "ENVIADA",
+                }
               }
-            }},
+            },
             {
               informe_confidencial: null
             }
           ],
           NOT: {
             OR: [
-              {estado: "FINALIZADA"},
-              {estado: "REVISION_GENERAL"}
+              { estado: "FINALIZADA" },
+              { estado: "REVISION_GENERAL" }
             ]
- 
+
           }
         }
       });
 
 
-          const cantidadTotalInformes = await this._databaseService.informeConfidencial.count({
-            where: {
-              id_supervisor: id_supervisor
-            }
-          });
+      const cantidadTotalInformes = await this._databaseService.informeConfidencial.count({
+        where: {
+          id_supervisor: id_supervisor
+        }
+      });
 
-          return  {
-            cantAlumnosAsignados,
-            cantidadTotalInformes
-          }
+      return {
+        cantAlumnosAsignados,
+        cantidadTotalInformes
+      }
 
 
     } catch (error) {
-      if(error instanceof BadRequestException){
+      if (error instanceof BadRequestException) {
         throw error;
       }
 
@@ -224,31 +226,31 @@ export class DashboardService {
           estado: Estado_practica.CURSANDO,
         },
       });
-  
+
       const estudiantesEnProcesoDeRevison = await this._databaseService.practicas.count({
         where: {
           estado: Estado_practica.REVISION_GENERAL,
         },
       });
-  
+
       const estudiantesNoEntreganInforme = await this._databaseService.practicas.count({
         where: {
           estado: Estado_practica.ESPERA_INFORMES,
         },
       });
-  
+
       const cargaDocente = await this._databaseService.$queryRawTyped<CantidadInformesInterface>(obtenerCargaDocente());
       const cargaDocenteFormatted = cargaDocente.map((docente) => ({
         ...docente,
         cantidad_informes: +docente.cantidad_informes.toString(), // Convertimos BigInt a number
       }));
-  
+
       // Calcular la suma total de informes actuales
       const totalInformesActualesAsignados = cargaDocenteFormatted.reduce(
         (sum, docente) => sum + docente.cantidad_informes,
         0,
       );
-  
+
       // Obtener cantidad de docentes y capacidad máxima
       const cantidadDocentes = await this._databaseService.usuarios.count({
         where: {
@@ -257,9 +259,9 @@ export class DashboardService {
           },
         },
       });
-  
+
       const cantidadMaxTotalInformesAcademico = cantidadDocentes * MAX_INFORMES;
-  
+
       // Calcular el porcentaje de carga
 
 
@@ -276,23 +278,23 @@ export class DashboardService {
       throw new InternalServerErrorException('Error interno al obtener las estadísticas de los alumnos');
     }
   }
-  
+
   async obtenerAprobacionPracticas() {
     try {
       const primerPractica = await this._databaseService.$queryRawTyped<any>(obtenerAprobacionPrimerPractica());
       const segundaPractica = await this._databaseService.$queryRawTyped<any>(obtenerAprobacionSegundaPractica());
-  
+
       // Convertir los BigInt a number o string
       const primerPracticaFormatted = primerPractica.map((entry) => ({
         ...entry,
         cantidad: Number(entry.cantidad), // o entry.cantidad.toString() si prefieres string
       }));
-  
+
       const segundaPracticaFormatted = segundaPractica.map((entry) => ({
         ...entry,
         cantidad: Number(entry.cantidad), // o entry.cantidad.toString()
       }));
-  
+
       return {
         primerPractica: primerPracticaFormatted,
         segundaPractica: segundaPracticaFormatted,
@@ -305,13 +307,13 @@ export class DashboardService {
   async obtenerTotalPracticaAlumnos() {
     try {
       const cursando = await this._databaseService.$queryRawTyped<any>(obtenerCantidadTotalAlumnosPorPractica());
-  
+
       // Convertir BigInt a number
-      const cursandoFormatted = cursando.map((entry:any) => ({
+      const cursandoFormatted = cursando.map((entry: any) => ({
         ...entry,
         cantidad_estudiantes: Number(entry.cantidad_estudiantes), // Convertir BigInt a number
       }));
-      
+
       console.log(cursandoFormatted, 'hola como estas');
       return cursandoFormatted;
     } catch (error) {
@@ -320,7 +322,7 @@ export class DashboardService {
   }
 
 
-  async obtenerDetallesPracticaTodos(){
+  async obtenerDetallesPracticaTodos() {
     try {
       const detalles = await this._databaseService.$queryRawTyped<any>(obtenerDetallesPractica());
       return detalles;
@@ -328,7 +330,7 @@ export class DashboardService {
       throw new InternalServerErrorException('Error interno al obtener los detalles');
     }
   }
-  
+
   async obtenerCantidadPracticasPorTipoPorMesSegunAnno(year: number) {
     try {
       const practicas = await this._databaseService.$queryRawTyped<CantidadPractica>(
@@ -337,22 +339,22 @@ export class DashboardService {
 
       console.log(year)
       console.log(practicas)
-  
+
       // Si practicas es null o undefined, devolver un arreglo vacío
       if (!practicas || practicas.length === 0) {
         return [];
       }
-  
+
       // Parsear BigInt a Number con manejo seguro
 
-      const practicasParsed = practicas.map((p:any) => (
+      const practicasParsed = practicas.map((p: any) => (
         {
-        ...p,
-        total_practicas: typeof p.total_practicas === 'bigint'
-          ? Number(p.total_practicas)
-          : p.total_practica,
-      }));
-  
+          ...p,
+          total_practicas: typeof p.total_practicas === 'bigint'
+            ? Number(p.total_practicas)
+            : p.total_practica,
+        }));
+
       return practicasParsed;
     } catch (error) {
       throw new InternalServerErrorException(
@@ -360,9 +362,9 @@ export class DashboardService {
       );
     }
   }
-  
-  
-  async obtenerNotaPromedioDeInformesEmpresas(){
+
+
+  async obtenerNotaPromedioDeInformesEmpresas() {
     try {
       const promedioNota = await this._databaseService.informeConfidencial.aggregate({
         _avg: {
@@ -377,8 +379,59 @@ export class DashboardService {
     }
   }
 
-  async obtenerSeguimientoAcademicos(){
+  async obtenerSeguimientoAcademicos() {
     const seguimientoData = await this._databaseService.$queryRawTyped<any>(obtenerSeguimientoAcademicos());
     return seguimientoData;
   }
+
+  async obtenerResumenInformes(idAcademico: number) {
+    try {
+      const añoActual = new Date().getFullYear();
+
+      const inicioAño = new Date(añoActual, 0, 1); // 1 de enero del año actual
+      const finAño = new Date(añoActual + 1, 0, 1); // 1 de enero del próximo año
+
+      const informesRevisados = await this._databaseService.informesAlumno.count({
+        where: {
+          id_academico: idAcademico,
+          estado: Estado_informe.APROBADA,
+          fecha_inicio: {
+            gte: inicioAño,
+            lt: finAño,
+          },
+          practica: {
+            estado: Estado_practica.FINALIZADA,
+          },
+        },
+      });
+
+      const informesPorRevisar = await this._databaseService.informesAlumno.count({
+        where: {
+          id_academico: idAcademico,
+          estado: {
+            in: [Estado_informe.REVISION, Estado_informe.CORRECCION],
+          },
+          fecha_inicio: {
+            gte: inicioAño,
+            lt: finAño,
+          },
+          practica: {
+            estado: {
+              not: Estado_practica.FINALIZADA,
+            },
+          },
+        },
+      });
+
+      return {
+        revisados: informesRevisados,
+        porRevisar: informesPorRevisar,
+      };
+    } catch (error) {
+      console.error('Error al obtener el resumen de informes:', error);
+      throw new BadRequestException('Hubo un error al obtener el resumen de informes.');
+    }
+  }
+
+
 }

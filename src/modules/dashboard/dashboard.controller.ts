@@ -77,4 +77,9 @@ export class DashboardController {
   public async obtenerSeguimientoAcademicos(){
     return await this._dashboardService.obtenerSeguimientoAcademicos();
   }
+
+  @Get('academico/informes/conteo/:id_academico')
+  public async obtenerResumenInformes(@Param('id_academico', ParseIntPipe) id_academico: number){
+    return await this._dashboardService.obtenerResumenInformes(id_academico);
+  }
 }
