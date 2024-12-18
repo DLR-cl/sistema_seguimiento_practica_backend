@@ -42,7 +42,7 @@ export class InformeConfidencialService {
                     informe_alumno: true,
                 }
             });
-            if(practica.estado == Estado_practica.ESPERA_INFORMES && practica.informe_alumno){
+            if(practica.estado == Estado_practica.ESPERA_INFORMES && practica.informe_alumno.estado == Estado_informe.ENVIADA){
                 const actualizarPractica = await this._databaseService.practicas.update({
                     where: {
                         id_practica: practica.id_practica,

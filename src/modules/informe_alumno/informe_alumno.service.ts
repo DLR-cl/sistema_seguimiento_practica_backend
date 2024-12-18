@@ -444,7 +444,7 @@ export class InformeAlumnoService {
                     }
                 });
 
-                if(practica.estado == Estado_practica.ESPERA_INFORMES && practica.informe_confidencial){
+                if(practica.estado == Estado_practica.ESPERA_INFORMES && practica.informe_confidencial.estado == Estado_informe.ENVIADA){
                     await this._databaseService.practicas.update({
                         where: { id_practica: practica.id_practica },
                         data: { estado: Estado_practica.INFORMES_RECIBIDOS }
