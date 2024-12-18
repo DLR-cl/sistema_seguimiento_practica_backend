@@ -363,119 +363,96 @@ export class InformeAlumnoService {
 
     async subirInforme(file: Express.Multer.File, data: InformeDto, rootPath: string) {
         const fs = require('fs');
-        const filePath = file.path;
+        const oldFilePath = file.path;
     
         try {
-    
             const existeAlumno = await this._databaseService.alumnosPractica.findUnique({
-                where: {
-                    id_user: +data.id_alumno,
-                },
-                include: {
-                    usuario: true,
-                },
+                where: { id_user: +data.id_alumno },
+                include: { usuario: true },
             });
     
             if (!existeAlumno) {
                 throw new NotFoundException(`No se encontró un alumno con el ID ${data.id_alumno}`);
             }
     
-            // Buscamos un informe del alumno en estado CORRECCION
             const informeEnCorreccion = await this._databaseService.informesAlumno.findFirst({
                 where: {
                     id_alumno: +data.id_alumno,
-                    estado: Estado_informe.CORRECCION
-                }
+                    estado: Estado_informe.CORRECCION,
+                },
             });
     
-            const rutaArchivo = filePath;
+            const practicaFolder =
+                data.tipo_practica === 'PRACTICA_UNO'
+                    ? 'uploads/informes-practica-uno/alumnos'
+                    : 'uploads/informes-practica-dos/alumnos';
+            const extension = file.originalname.split('.').pop();
+            const newFileName = `informe-${data.nombre_alumno.replace(/\s+/g, '-')}.${extension}`;
+            const newFilePath = join(rootPath, practicaFolder, newFileName);
+    
+            // Mover el archivo a la ubicación final
+            fs.renameSync(oldFilePath, newFilePath);
     
             if (informeEnCorreccion) {
-                // Si hay un informe en CORRECCION, reemplazamos el archivo
+                // Eliminar el archivo anterior
                 if (informeEnCorreccion.archivo && fs.existsSync(informeEnCorreccion.archivo)) {
                     await fs.promises.unlink(informeEnCorreccion.archivo);
                     console.log(`Archivo anterior eliminado: ${informeEnCorreccion.archivo}`);
                 }
     
+                // Actualizar la base de datos con el nuevo archivo
                 await this._databaseService.informesAlumno.update({
-                    where: {
-                        id_informe: +informeEnCorreccion.id_informe,
-                        estado: Estado_informe.CORRECCION,
-                    },
+                    where: { id_informe: informeEnCorreccion.id_informe },
                     data: {
-                        id_alumno: +data.id_alumno,
-                        archivo: rutaArchivo,
-                        estado: Estado_informe.REVISION
-                        // Mantener estado en CORRECCION
+                        archivo: newFilePath,
+                        estado: Estado_informe.REVISION,
                     },
                 });
     
                 return {
                     message: 'Informe reemplazado exitosamente en estado CORRECCION',
-                    filePath: rutaArchivo,
+                    filePath: newFilePath,
                 };
             }
     
-            // Si no se encontró informe en CORRECCION, buscamos el que esté en ESPERA para hacer el primer envío
             const informeEnEspera = await this._databaseService.informesAlumno.findUnique({
-                where: {
-                    id_informe: +data.id_informe
-                }
+                where: { id_informe: +data.id_informe },
             });
     
             if (informeEnEspera && informeEnEspera.estado === Estado_informe.ESPERA) {
-                // Actualizar el informe a ENVIADA en el primer envío
+                // Actualizar el informe a ENVIADA
                 await this._databaseService.informesAlumno.update({
-                    where: {
-                        id_informe: +data.id_informe,
-                        estado: Estado_informe.ESPERA,
-                    },
+                    where: { id_informe: informeEnEspera.id_informe },
                     data: {
-                        id_alumno: +data.id_alumno,
-                        archivo: rutaArchivo,
-                        estado: Estado_informe.ENVIADA
+                        archivo: newFilePath,
+                        estado: Estado_informe.ENVIADA,
                     },
                 });
-                const practica = await this._databaseService.practicas.findUnique({
-                    where: {
-                        id_practica: informeEnEspera.id_practica,
-                    },
-                    include: {
-                        informe_confidencial: true,
-                    }
-                });
-
-                if(practica.estado == Estado_practica.ESPERA_INFORMES && practica.informe_confidencial.estado == Estado_informe.ENVIADA){
-                    await this._databaseService.practicas.update({
-                        where: { id_practica: practica.id_practica },
-                        data: { estado: Estado_practica.INFORMES_RECIBIDOS }
-                    })
-                }
+    
                 return {
                     message: 'Informe enviado exitosamente (de ESPERA a ENVIADA)',
-                    filePath: rutaArchivo,
+                    filePath: newFilePath,
                 };
             }
-
-            // verificar que se haya subido el otro informe 
-
     
-            // Si no hay informe en CORRECCION ni uno en ESPERA (para este id_informe), significa que no se puede subir
             throw new BadRequestException('No se puede subir el informe en el estado actual.');
-            
         } catch (error) {
-            // En caso de error, elimina el archivo recién subido
+            console.error('Error al subir informe:', error);
+    
+            // Si algo falla, elimina el archivo recién subido
             try {
-                if (fs.existsSync(filePath)) {
-                    await fs.promises.unlink(filePath);
-                    console.log(`Archivo eliminado: ${filePath}`);
+                if (fs.existsSync(oldFilePath)) {
+                    await fs.promises.unlink(oldFilePath);
+                    console.log(`Archivo temporal eliminado: ${oldFilePath}`);
                 }
             } catch (unlinkError) {
-                console.error(`Error al intentar eliminar el archivo: ${unlinkError.message}`);
+                console.error(`Error al eliminar el archivo temporal: ${unlinkError.message}`);
             }
-            throw error; 
+    
+            throw error;
         }
     }
+    
 
     async obtenerRespuestasInforme(id_informe: number) {
         try {
