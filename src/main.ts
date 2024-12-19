@@ -16,11 +16,22 @@ async function bootstrap() {
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-  app.enableCors(
-    {
-      origin: 'https://sistemapracticas.vercel.app'
-    }
-  )
+  app.enableCors({
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        'https://sistemapracticas.vercel.app',
+        'http://localhost:4200'
+      ];
+  
+      if (allowedOrigins.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // Si usas cookies o autenticación basada en sesión
+  });
+  
 
   await app.listen(3000);
 }
