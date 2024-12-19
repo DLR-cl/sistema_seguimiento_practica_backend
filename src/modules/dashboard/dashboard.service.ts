@@ -32,6 +32,15 @@ export class DashboardService {
           informe_confidencial: true,
         }
       })
+      
+      if (!poseeInformes) {
+        // Si no se encuentra el académico, devolver valores por defecto
+        return {
+          cantidad_informes_alumno: 0,
+          cantidad_informes_confidenciales: 0
+        };
+      }
+      
       console.log(poseeInformes);
       if (poseeInformes.informe_alumno.length > 0 && poseeInformes.informe_confidencial.length > 0) {
         cantidadInformesAlumnos = await this._databaseService.informesAlumno.count({

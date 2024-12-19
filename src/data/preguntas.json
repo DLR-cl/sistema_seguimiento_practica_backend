@@ -1,0 +1,65 @@
+[
+    {    
+        "enunciado_pregunta": "Redacción y escritura",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 3
+    },
+    {    
+        "enunciado_pregunta": "Numeración y notas al pie página (sin encabezado)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 3
+    },
+    {    
+        "enunciado_pregunta": "Portada: logos, título, nombre, carrera y fecha",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Resumen (máx. 1 pág)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Tabla de Contenidos (máx. 1 pág.)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Generalidades: objetivos y alcance (máx. 2 pág.)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Descripción Organización: Empresa y Área de Trabajo (máx. 3 pág.)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Descripción Tareas Realizadas: Enfoque sistémico (mín. 2 - máx. 3 pág.)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Relación Malla Curricular: Tópicos incluidos y faltantes (máx. 1 pág)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Conclusiones (máx. 1 pág)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Cumple con los Aspectos Mínimos Exigidos",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 5
+    },
+    {    
+        "enunciado_pregunta": "Observaciones u Otros Aspectos a Considerar",
+        "tipo_pregunta": "ABIERTA",
+        "id_dimension": 5
+    }
+
+
+
+]
