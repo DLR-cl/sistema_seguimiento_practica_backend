@@ -130,7 +130,7 @@ export class PracticasService {
 
     public async getAllPracticas() {
         try {
-            const practicas = await this._databaseService.$queryRawTyped<PracticaInfo>(obtenerInformesAlumnoPractica());
+            const practicas = await this._databaseService.$queryRawTyped<any>(obtenerInformesAlumnoPractica());
             return practicas
         } catch (error) {
             throw error;

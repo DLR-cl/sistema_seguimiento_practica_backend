@@ -23,13 +23,15 @@ async function bootstrap() {
         'http://localhost:4200'
       ];
   
-      if (allowedOrigins.includes(origin)) {
+      // Permitir solicitudes sin 'Origin' (como las de Postman)
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
       }
     },
   });
+  
   
 
   app.use((req, res, next) => {
