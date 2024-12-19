@@ -17,8 +17,6 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
   app.enableCors({
-    origin: 'http://localhost:4200', // El dominio desde el que se permiten las solicitudes (tu frontend)
-
   })
 
   await app.listen(3000);
