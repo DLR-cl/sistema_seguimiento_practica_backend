@@ -18,8 +18,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
   app.enableCors(
     {
-      origin: true,
-
+      origin: 'https://sistemapractica.vercel.app/'
     }
   )
 
