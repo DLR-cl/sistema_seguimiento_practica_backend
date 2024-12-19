@@ -16,8 +16,16 @@
         "descripcion": "Abarca el contenido del informe del alumno."
     },
     {
-        "nombre": "Evaluación General Informe Confidencial"
+        "nombre": "Evaluación General Informe Confidencial",
+        "descripcion": "Dado la evaluación del informe confidencial se determina la aprobación o desaprobación"
+    },
+    
+    {
+        "nombre": "Satisfacción con la experiencia de práctica",
+        "descripcion": "---"
+    },
+    {
+        "nombre": "Supervisión y apoyo recibido",
+        "descripcion": "---"
     }
-
-
 ]   
