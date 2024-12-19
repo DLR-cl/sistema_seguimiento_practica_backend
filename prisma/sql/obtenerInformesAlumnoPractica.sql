@@ -38,10 +38,10 @@ LEFT JOIN
 LEFT JOIN 
     InformesAlumno ia ON p.id_practica = ia.id_practica
 LEFT JOIN 
-    Academico ac ON ia.id_academico = ac.id_user
+    academico ac ON ia.id_academico = ac.id_user
 LEFT JOIN 
-    Usuario ua ON ac.id_user = ua.id_usuario
+    usuario ua ON ac.id_user = ua.id_usuario
 LEFT JOIN 
     InformeConfidencial ic ON p.id_practica = ic.id_practica
 LEFT JOIN 
-    Usuario us ON ic.id_supervisor = us.id_usuario;
+    usuario us ON ic.id_supervisor = us.id_usuario;

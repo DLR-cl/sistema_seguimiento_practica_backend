@@ -7,13 +7,13 @@ SELECT
     DATE_ADD(DATE(infC.fecha_inicio), INTERVAL 14 DAY) AS fecha_limite_entrega,
     DATEDIFF(DATE_ADD(DATE(infC.fecha_inicio), INTERVAL 14 DAY), CURDATE()) AS dias_restantes
 FROM
-    practicas AS p
+    Practicas AS p
 LEFT JOIN
     usuario AS s ON p.id_supervisor = s.id_usuario
 LEFT JOIN
     usuario AS a ON a.id_usuario = p.id_alumno
 LEFT JOIN
-    informeconfidencial AS infC ON infC.id_supervisor = s.id_usuario 
+    InformeConfidencial AS infC ON infC.id_supervisor = s.id_usuario 
                                  AND infC.id_alumno_evaluado = a.id_usuario
                                  AND infC.id_practica = p.id_practica -- Asegura que pertenece a la práctica
 WHERE

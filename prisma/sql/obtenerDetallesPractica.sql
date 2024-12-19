@@ -7,7 +7,7 @@ SELECT
     END AS tipo_practica, 
     p.estado AS estado_practica
 FROM 
-    Usuario u
+    usuario u
 JOIN 
     alumno_practica ap ON u.id_usuario = ap.id_user
 JOIN 

@@ -2,8 +2,8 @@
 SELECT 
     COUNT(u.id_usuario) as cantidad_alumnos_practicas
 FROM
-    Usuario u
+    usuario u
 LEFT JOIN
-    practicas p ON u.id_usuario = p.id_alumno
+    Practicas p ON u.id_usuario = p.id_alumno
 WHERE
     p.estado = "CURSANDO"

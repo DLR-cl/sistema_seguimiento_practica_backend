@@ -6,6 +6,6 @@ SELECT
     u.tipo_usuario,
     u.correo
 FROM
-    Usuario u
+    usuario u
 WHERE
     u.tipo_usuario IN ("ACADEMICO", "JEFE_CARRERA", "JEFE_DEPARTAMENTO") AND u.id_usuario = ?

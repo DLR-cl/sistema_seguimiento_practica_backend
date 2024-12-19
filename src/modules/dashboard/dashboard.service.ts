@@ -149,16 +149,29 @@ export class DashboardService {
       throw new InternalServerErrorException('Error interno al momento de obtener los informes de entrega critica');
     }
   }
-
   public async infoTablaSupervisorPractica(id_supervisor: number) {
     try {
-      const data = await this._databaseService.$queryRawTyped<any>(obtenerPracticasAsociadasSupervisor(id_supervisor))
-
-      return data;
+      const data = await this._databaseService.$queryRawTyped<any>(
+        obtenerPracticasAsociadasSupervisor(id_supervisor)
+      );
+  
+      // Convertir manualmente los valores bigint
+      const parsedData = data.map((row) => ({
+        ...row,
+        id_supervisor: Number(row.id_supervisor), // O usar BigInt(row.id_supervisor) si es necesario
+        id_alumno: Number(row.id_alumno),
+        id_informe_confidencial: Number(row.id_informe_confidencial),
+        id_practica: Number(row.id_practica),
+        dias_restantes: Number(row.dias_restantes), // Convertir dias_restantes a Number
+      }));
+  
+      return parsedData;
     } catch (error) {
       throw error;
     }
   }
+  
+  
 
   public async obtenerCantidadAlumnosAsignadosSupervisor(id_supervisor: number) {
     try {
@@ -283,26 +296,28 @@ export class DashboardService {
     try {
       const primerPractica = await this._databaseService.$queryRawTyped<any>(obtenerAprobacionPrimerPractica());
       const segundaPractica = await this._databaseService.$queryRawTyped<any>(obtenerAprobacionSegundaPractica());
-
-      // Convertir los BigInt a number o string
-      const primerPracticaFormatted = primerPractica.map((entry) => ({
+  
+      // Convertir los BigInt a number o string y manejar valores nulos o indefinidos
+      const primerPracticaFormatted = (primerPractica ?? []).map((entry) => ({
         ...entry,
-        cantidad: Number(entry.cantidad), // o entry.cantidad.toString() si prefieres string
+        cantidad: entry?.cantidad ? Number(entry.cantidad) : 0, // Si no existe, asignar 0
       }));
-
-      const segundaPracticaFormatted = segundaPractica.map((entry) => ({
+  
+      const segundaPracticaFormatted = (segundaPractica ?? []).map((entry) => ({
         ...entry,
-        cantidad: Number(entry.cantidad), // o entry.cantidad.toString()
+        cantidad: entry?.cantidad ? Number(entry.cantidad) : 0, // Si no existe, asignar 0
       }));
-
+  
+      // Verificar si los arreglos están vacíos y asignarles un valor por defecto
       return {
-        primerPractica: primerPracticaFormatted,
-        segundaPractica: segundaPracticaFormatted,
+        primerPractica: primerPracticaFormatted.length > 0 ? primerPracticaFormatted : [{ cantidad: 0 }],
+        segundaPractica: segundaPracticaFormatted.length > 0 ? segundaPracticaFormatted : [{ cantidad: 0 }],
       };
     } catch (error) {
       throw new InternalServerErrorException('Error interno al obtener la aprobación de las prácticas');
     }
   }
+  
 
   async obtenerTotalPracticaAlumnos() {
     try {
@@ -325,8 +340,10 @@ export class DashboardService {
   async obtenerDetallesPracticaTodos() {
     try {
       const detalles = await this._databaseService.$queryRawTyped<any>(obtenerDetallesPractica());
+
       return detalles;
     } catch (error) {
+      console.log(error)
       throw new InternalServerErrorException('Error interno al obtener los detalles');
     }
   }

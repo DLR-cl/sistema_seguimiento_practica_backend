@@ -4,7 +4,7 @@ SELECT
     p.tipo_practica AS tipo_practica,
     DATEDIFF(DATE(p.fecha_termino), DATE(CURDATE())) AS dias_restantes_practica
 FROM 
-    practicas as p
+    Practicas as p
 LEFT JOIN
     usuario AS a ON a.id_usuario = p.id_alumno
 WHERE 

@@ -10,11 +10,11 @@ SELECT
     DATEDIFF(DATE_ADD(DATE(infC.fecha_inicio), INTERVAL 14 DAY), CURDATE()) AS dias_restantes,
     p.id_practica
 FROM
-    practicas AS p
+    Practicas AS p
 LEFT JOIN
     usuario AS u ON p.id_supervisor = u.id_usuario
 LEFT JOIN
-    informeconfidencial AS infC ON p.id_practica = infC.id_practica
+    InformeConfidencial AS infC ON p.id_practica = infC.id_practica
 LEFT JOIN
     usuario AS al ON p.id_alumno = al.id_usuario
 WHERE

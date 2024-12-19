@@ -9,7 +9,7 @@ SELECT
 FROM   
     InformesAlumno AS infA
 LEFT JOIN
-    Usuario AS a ON a.id_usuario = infA.id_alumno
+    usuario AS a ON a.id_usuario = infA.id_alumno
 LEFT JOIN
     Practicas AS p ON p.id_alumno = a.id_usuario
 WHERE
