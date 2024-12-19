@@ -5,8 +5,8 @@ import { PracticaInfo, PracticaResponseDto } from "./dto/practica-response.dto";
 import { AlumnoPracticaService } from "../alumno_practica/alumno_practica.service";
 import { Estado_informe, Estado_practica, Practicas, TipoPractica } from "@prisma/client";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { MailService } from "src/mail/mail.service";
-import { SendEmailDto } from "src/mail/dto/mail.dto";
+import { MailService } from "../../mail/mail.service";
+import { SendEmailDto } from "../../mail/dto/mail.dto";
 import { obtenerInformesAlumnoPractica } from "@prisma/client/sql";
 import { CreateInformeConfidencialDto } from "../informe-confidencial/dto/create-informe-confidencial.dto";
 

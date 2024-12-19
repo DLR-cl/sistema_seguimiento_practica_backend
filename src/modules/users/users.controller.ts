@@ -2,8 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } fro
 import { UsersService } from './users.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { Tipo_usuario } from '@prisma/client';
-import { AuthRegisterDto } from 'src/auth/dto/authRegisterDto.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AuthRegisterDto } from '../../auth/dto/authRegisterDto.dto';
+import { AuthGuard } from '../../auth/guards/auth.guard';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 
 @Controller('users')

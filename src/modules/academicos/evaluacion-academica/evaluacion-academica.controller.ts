@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { EvaluacionAcademicaService } from './evaluacion-academica.service';
 import { InformeEvaluativoDto } from '../dto/informe-evaluativo.dto';
-import { AsignarPreguntaDto } from 'src/modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
+import { AsignarPreguntaDto } from '../../../modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 
 @Controller('evaluacion-academica')
 export class EvaluacionAcademicaController {

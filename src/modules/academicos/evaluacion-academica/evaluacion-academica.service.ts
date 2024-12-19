@@ -1,8 +1,8 @@
 import { BadRequestException, Body, HttpStatus, Injectable, Post } from '@nestjs/common';
 import { InformeEvaluativoDto, RespuestasInformeEvaluativo } from '../dto/informe-evaluativo.dto';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../../database/database/database.service';
 import { Estado_informe, Estado_practica, Prisma, TipoPractica } from '@prisma/client';
-import { AsignarPreguntaDto } from 'src/modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
+import { AsignarPreguntaDto } from '../../../modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 
 @Injectable()
 export class EvaluacionAcademicaService {

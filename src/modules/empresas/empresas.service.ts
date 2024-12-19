@@ -2,7 +2,7 @@ import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, L
 import { DatabaseService } from "../../database/database/database.service";
 import { createEmpresasDto } from "./dto/create-empresas.dto";
 import { Empresas } from "@prisma/client";
-import { AuthGuard } from "src/auth/guards/auth.guard";
+import { AuthGuard } from "../../auth/guards/auth.guard";
 import { Cron, CronExpression } from "@nestjs/schedule";
 
 @Injectable()

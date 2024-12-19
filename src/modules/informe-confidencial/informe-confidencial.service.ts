@@ -1,5 +1,5 @@
 import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../database/database/database.service';
 import { ActualizarInformeConfidencialDto, CreateInformeConfidencialDto } from './dto/create-informe-confidencial.dto';
 import { AlumnoPracticaService } from '../alumno_practica/alumno_practica.service';
 import { JefeAlumnoService } from '../jefe_alumno/jefe_alumno.service';

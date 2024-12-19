@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { Estado_informe } from '@prisma/client';
 import { obtenerInformeConfidencialSupersivor, obtenerInformesAcademicos, obtenerPracticaAlumnoVencimiento, obtenerPracticasAsociadasSupervisor } from '@prisma/client/sql';
-import { DatabaseService } from 'src/database/database/database.service';
-import { SendEmailDto } from 'src/mail/dto/mail.dto';
-import { MailService } from 'src/mail/mail.service';
+import { DatabaseService } from '../../database/database/database.service';
+import { SendEmailDto } from '../../mail/dto/mail.dto';
+import { MailService } from '../../mail/mail.service';
 
 @Injectable()
 export class EmailAvisosService {

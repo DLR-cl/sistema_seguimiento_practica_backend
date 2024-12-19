@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../database/database/database.service';
 import { crearAsignaturaDto, crearAsignaturasDto } from './dto/crear-asignatura.dto';
 import { Asignaturas } from '@prisma/client';
 

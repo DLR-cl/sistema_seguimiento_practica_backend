@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { JefeAlumnoDto } from './dto/jefe-alumno.dto';
 import { JefeAlumnoService } from './jefe_alumno.service';
-import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Roles } from '../../auth/decorators/roles.decorator';
 import { Tipo_usuario } from '@prisma/client';
 
 @Controller('jefe-alumno')

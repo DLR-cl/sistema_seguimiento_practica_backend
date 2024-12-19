@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
-import { UserFromToken } from 'src/auth/decorators/userToken.decorator';
+import { UserFromToken } from '../../auth/decorators/userToken.decorator';
 import { CantidadPracticaPorMesesDto } from './dto/cantidad-practica-meses.dto';
 
 @Controller('dashboard')

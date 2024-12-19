@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../database/database/database.service';
 import { AsignarPreguntaDto} from './dto/asignar-preguntas.dto';
 import { Preguntas } from '@prisma/client';
 import { PreguntasService } from '../preguntas/preguntas.service';

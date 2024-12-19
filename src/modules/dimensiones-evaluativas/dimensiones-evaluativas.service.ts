@@ -1,5 +1,5 @@
 import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../database/database/database.service';
 import { CrearDimensionDto } from './dto/crear-dimension.dto';
 import internal from 'stream';
 

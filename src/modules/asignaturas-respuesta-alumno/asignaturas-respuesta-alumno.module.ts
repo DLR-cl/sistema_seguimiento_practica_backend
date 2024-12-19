@@ -3,7 +3,7 @@ import { AsignaturasRespuestaAlumnoController } from './asignaturas-respuesta-al
 import { AsignaturasRespuestaAlumnoService } from './asignaturas-respuesta-alumno.service';
 import { InformeAlumnoModule } from '../informe_alumno/informe_alumno.module';
 import { RespuestasInformeAlumnoModule } from '../respuestas-informe-alumno/respuestas-informe-alumno.module';
-import { DatabaseModule } from 'src/database/database/database.module';
+import { DatabaseModule } from '../../database/database/database.module';
 
 
 @Module({

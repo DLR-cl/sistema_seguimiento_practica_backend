@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../database/database/database.service';
 import { AsociarPreguntasDto } from './dto/asociar-preguntas.dto';
 import { RespuestasInformeAlumnoService } from '../respuestas-informe-alumno/respuestas-informe-alumno.service';
 

@@ -1,11 +1,10 @@
 import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from '../../database/database/database.service';
-import { AuthRegisterDto } from 'src/auth/dto/authRegisterDto.dto';
+import { AuthRegisterDto } from '../../auth/dto/authRegisterDto.dto';
 import { encrypt } from '../../auth/libs/bcryp';
 import { compare } from 'bcrypt';
-import { AuthLoginDto } from 'src/auth/dto/authLoginDto.dto';
 import { JwtService } from '@nestjs/jwt';
-import { isRole } from 'src/utils/user.roles';
+import { isRole } from '../../utils/user.roles';
 import { Tipo_usuario, TipoPractica } from '@prisma/client';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';

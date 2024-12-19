@@ -2,10 +2,10 @@ import { BadRequestException, HttpStatus, Injectable, InternalServerErrorExcepti
 import { JefeAlumnoDto } from './dto/jefe-alumno.dto';
 
 import { ResponseJefeAlumnoDto } from './dto/response-jefe-alumno.dto';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthService } from '../../auth/auth.service';
 import { DatabaseService } from '../../database/database/database.service';
 import { Usuarios } from '@prisma/client';
-import { AuthRegisterDto } from 'src/auth/dto/authRegisterDto.dto';
+import { AuthRegisterDto } from '../../auth/dto/authRegisterDto.dto';
 import { UsersService } from '../users/users.service';
 import { InformesPractica, InforPractica } from '../practicas/entities/list-practica.entity';
 import { info } from 'console';
