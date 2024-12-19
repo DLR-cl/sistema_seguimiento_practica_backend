@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { AsignarPreguntasDto } from '../preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 import { AsignaturasService } from './asignaturas.service';
 import { crearAsignaturaDto, crearAsignaturasDto } from './dto/crear-asignatura.dto';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';

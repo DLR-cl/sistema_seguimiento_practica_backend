@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
-import { AsignarPreguntaDto, AsignarPreguntasDto } from '../preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
+import { AsignarPreguntaDto} from '../preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 
 @Injectable()
 export class PreguntasImplementadasConfidencialService {
@@ -21,10 +21,10 @@ export class PreguntasImplementadasConfidencialService {
         }
     }
 
-    public async implementarPreguntas(preguntas: AsignarPreguntasDto){
+    public async implementarPreguntas(preguntas: AsignarPreguntaDto[]){
         try {
             const implementar = await this._databaseService.preguntasImplementadasInformeConfidencial.createMany({
-                data: preguntas.preguntas,
+                data: preguntas,
             });
 
             return implementar;
@@ -42,15 +42,15 @@ export class PreguntasImplementadasConfidencialService {
         })
     };
 
-    public async actualizarPreguntas(preguntas: AsignarPreguntasDto){
-        try {
-            const preguntasCambiadas = await this._databaseService.preguntasImplementadasInformeAlumno.updateMany({
-                data: preguntas.preguntas,
-            });
+    // public async actualizarPreguntas(preguntas: AsignarPreguntaDto){
+    //     try {
+    //         const preguntasCambiadas = await this._databaseService.preguntasImplementadasInformeAlumno.updateMany({
+    //             data: preguntas,
+    //         });
 
-            return preguntasCambiadas;
-        } catch (error) {
-            throw error;
-        }
-    }
+    //         return preguntasCambiadas;
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
 }

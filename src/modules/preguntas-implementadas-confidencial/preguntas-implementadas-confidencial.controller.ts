@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Put } from '@nestjs/common';
 import { PreguntasImplementadasConfidencialService } from './preguntas-implementadas-confidencial.service';
-import { AsignarPreguntaDto, AsignarPreguntasDto } from '../preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
+import { AsignarPreguntaDto} from '../preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 
 @Controller('preguntas-implementadas-confidencial')
 export class PreguntasImplementadasConfidencialController {
@@ -14,16 +14,16 @@ export class PreguntasImplementadasConfidencialController {
     }
 
     @Post('crear-varios')
-    public async implementarPreguntas(@Body() preguntas: AsignarPreguntasDto){
-        return await this._preguntasConfidencial.implementarPreguntas(preguntas);
+    public async implementarPreguntas(@Body() pregunta: AsignarPreguntaDto[]){
+        return await this._preguntasConfidencial.implementarPreguntas(pregunta);
     }
     @Get()
     public async obtenerPreguntas(){
         return await this._preguntasConfidencial.mostrarPreguntas();
     }
 
-    @Put('actualizar-varios')
-    public async actualizarPreguntas(preguntas: AsignarPreguntasDto){
-        return this._preguntasConfidencial.actualizarPreguntas(preguntas);
-    }
+    // @Put('actualizar-varios')
+    // public async actualizarPreguntas(preguntas: AsignarPreguntaDto[]){
+    //     return this._preguntasConfidencial.actualizarPreguntas(preguntas);
+    // }
 }

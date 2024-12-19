@@ -34,6 +34,7 @@ export class JefeAlumnoService {
                 id_user: usuario.id_usuario,
                 cargo: jefe_alumno.cargo,
                 id_empresa: jefe_alumno.id_empresa,
+                numero_telefono: jefe_alumno.numero_telefono
             }
         });
 

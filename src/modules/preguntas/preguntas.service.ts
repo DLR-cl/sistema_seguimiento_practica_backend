@@ -15,7 +15,7 @@ export class PreguntasService {
 
     public async crearPregunta(pregunta: CrearPreguntaDto){
         try {
-            if(!await this._databaseService.subDimensionesEvaluativas.findUnique({
+            if(!await this._databaseService.dimensionesEvaluativas.findUnique({
                 where: {
                     id_dimension: pregunta.id_dimension,
                 }
@@ -73,7 +73,8 @@ export class PreguntasService {
                     total: 0
                 };
             }
-    
+            
+            console.log(preguntasFiltradas)
             // Insertar solo las preguntas filtradas
             const nuevasPreguntas = await this._databaseService.preguntas.createMany({
                 data: preguntasFiltradas,
@@ -141,7 +142,7 @@ export class PreguntasService {
 
     public async obtenerPreguntasPorDimension(id_dimension: number){
         try {
-            const dimension = await this._dimensionesService.obtenerSubdimension(id_dimension);
+            const dimension = await this._dimensionesService.getDimension(id_dimension);
             if(!dimension){
                 throw new BadRequestException('La subdimension que busca no existe en el sistema')
             };

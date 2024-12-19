@@ -51,12 +51,12 @@ model AlumnosPractica {
 }
 
 model JefesAlumno {
-  id_user    Int    @id
-  cargo      String @db.VarChar(60)
-  id_empresa Int
-
-  informe   InformeConfidencial[]
-  practicas Practicas[]
+  id_user         Int                   @id
+  cargo           String                @db.VarChar(60)
+  id_empresa      Int
+  numero_telefono String                @db.VarChar(30)
+  informe         InformeConfidencial[]
+  practicas       Practicas[]
 
   usuario Usuarios @relation(fields: [id_user], references: [id_usuario], onDelete: Cascade)
   empresa Empresas @relation(fields: [id_empresa], references: [id_empresa])
@@ -76,11 +76,12 @@ model Academico {
 }
 
 model Empresas {
-  id_empresa          Int    @id @default(autoincrement())
-  nombre_razon_social String @db.VarChar(100)
-  ubicacion           String @db.VarChar(100)
-  rubro               String @db.VarChar(100)
-  nombre_gerente      String @db.VarChar(200)
+  id_empresa          Int         @id @default(autoincrement())
+  nombre_razon_social String      @db.VarChar(100)
+  ubicacion           String      @db.VarChar(100)
+  rubro               String      @db.VarChar(100)
+  caracter_empresa    TipoEmpresa
+  tamano_empresa      String      @db.VarChar(100)// nombre y apellido
 
   jefe_supervisor JefesAlumno[]
 }
@@ -211,8 +212,7 @@ model InformeEvaluacionAcademicos {
   id_informe_alumno       Int @unique
   id_informe_confidencial Int @unique
 
- 
-  fecha_revision          DateTime  @db.Date
+  fecha_revision DateTime @db.Date
 
   academico            Academico                     @relation(fields: [id_academico], references: [id_user])
   informe_alumno       InformesAlumno                @relation(fields: [id_informe_alumno], references: [id_informe])
@@ -252,7 +252,7 @@ model PreguntasImplementadasInformeAlumno {
 
 model Preguntas {
   id_pregunta        Int           @id @default(autoincrement())
-  enunciado_pregunta String        @unique @db.VarChar(200)
+  enunciado_pregunta String        @unique @db.VarChar(400)
   tipo_pregunta      Tipo_pregunta
   id_dimension       Int
 
@@ -260,7 +260,7 @@ model Preguntas {
   preguntas_implementadas_confidencial PreguntasImplementadasInformeConfidencial?
   preguntas_implementadas_evaluacion   PreguntasImplementadasInformeEvaluacion?
 
-  dimension SubDimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
+  dimension DimensionesEvaluativas @relation(fields: [id_dimension], references: [id_dimension])
 }
 
 model PreguntasImplementadasInformeConfidencial {
@@ -282,22 +282,14 @@ model RespuestasInformeConfidencial {
   @@id([pregunta_id, informe_id])
 }
 
-model SubDimensionesEvaluativas {
-  id_dimension     Int         @id @default(autoincrement())
-  nombre           String      @db.VarChar(100)
-  descripcion      String      @db.VarChar(200)
-  idDimensionPadre Int
-  preguntas        Preguntas[]
 
-  dimensionPadre DimensionesEvaluativas @relation(fields: [idDimensionPadre], references: [id_dimension])
-}
 
 model DimensionesEvaluativas {
   id_dimension Int    @id @default(autoincrement())
-  nombre       String
-  descripcion  String
+  nombre       String @db.VarChar(200)
+  descripcion  String @db.VarChar(400)
 
-  subDimensiones SubDimensionesEvaluativas[]
+  lista_preguntas Preguntas[]
 }
 
 model Asignaturas {
@@ -336,6 +328,14 @@ enum Tipo_pregunta {
   EVALUATIVA
   DESARROLLO_PROFESIONAL
   REVISION_ACADEMICA
+  HABILIDADES_TECNICAS
+  VINCULACION_MEDIO
+  SALARIO_ESTIMADO
+}
+
+enum TipoEmpresa {
+  PRIVADA
+  PUBLICA
 }
 
 enum Estado_informe {

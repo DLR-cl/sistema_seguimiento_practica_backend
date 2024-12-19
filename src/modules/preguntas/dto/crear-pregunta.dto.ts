@@ -10,7 +10,7 @@ export class CrearPreguntaDto {
 
     @IsEnum(Tipo_pregunta)
     @IsNotEmpty()
-    tipo_pregunta: Tipo_pregunta
+    tipo_pregunta: Tipo_pregunta;
 
     @IsNotEmpty()
     @IsNumber()

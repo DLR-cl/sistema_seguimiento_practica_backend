@@ -2,7 +2,6 @@ import { BadRequestException, HttpCode, HttpException, HttpStatus, Injectable, L
 import { DatabaseService } from "../../database/database/database.service";
 import { createEmpresasDto } from "./dto/create-empresas.dto";
 import { Empresas } from "@prisma/client";
-import { EmpresasDataDto } from "./dto/empresas-data.dto";
 import { AuthGuard } from "src/auth/guards/auth.guard";
 import { Cron, CronExpression } from "@nestjs/schedule";
 
@@ -39,7 +38,7 @@ export class EmpresasService {
     };
 
     public async getEmpresas(){
-        const empresas: EmpresasDataDto[] = await this._databaseService.empresas.findMany({
+        const empresas: Empresas[] = await this._databaseService.empresas.findMany({
             include:{
                 jefe_supervisor: {
                     include: {

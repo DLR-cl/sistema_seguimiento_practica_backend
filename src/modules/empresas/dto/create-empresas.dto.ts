@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { TipoEmpresa } from "@prisma/client";
+import { IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export class createEmpresasDto {
     
@@ -13,9 +14,13 @@ export class createEmpresasDto {
     @IsString()
     @IsNotEmpty()
     rubro: string;
+    
+    @IsEnum(TipoEmpresa)
+    @IsNotEmpty()
+    caracter_empresa: TipoEmpresa;
 
     @IsString()
     @IsNotEmpty()
-    nombre_gerente: string;
-    
+    tamano_empresa: string;
+
 }

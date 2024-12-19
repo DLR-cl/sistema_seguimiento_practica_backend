@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
-import { AsignarPreguntaDto, AsignarPreguntasDto } from './dto/asignar-preguntas.dto';
+import { AsignarPreguntaDto} from './dto/asignar-preguntas.dto';
 import { Preguntas } from '@prisma/client';
 import { PreguntasService } from '../preguntas/preguntas.service';
 import { responsePreguntas } from './dto/response-preguntas.dto';
@@ -12,10 +12,10 @@ export class PreguntasImplementadasInformeAlumnoService {
         private readonly _preguntaService: PreguntasService,
     ){ }
 
-    public async asignarPreguntas(asignarPreguntas: AsignarPreguntasDto){
+    public async asignarPreguntas(asignarPreguntas: AsignarPreguntaDto[]){
         try {
             
-            for(let preg of asignarPreguntas.preguntas){
+            for(let preg of asignarPreguntas){
                 const existe = await this._preguntaService.obtenerPreguntaById(preg.id_pregunta);
                 if(!existe){
                     throw new BadRequestException('Pregunta no existe');
@@ -23,7 +23,7 @@ export class PreguntasImplementadasInformeAlumnoService {
                 };
 
             const preguntasAsignadas = await this._databaseService.preguntasImplementadasInformeAlumno.createMany({
-                    data: asignarPreguntas.preguntas,
+                    data: asignarPreguntas,
             });
 
             return preguntasAsignadas;
