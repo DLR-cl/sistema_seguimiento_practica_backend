@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotAcceptableException, Logger } from "@nestjs/common";
 import { createPracticaDto } from "./dto/create-practicas.dto";
 import { DatabaseService } from "../../database/database/database.service";
-import { PracticaInfo, PracticaResponseDto } from "./dto/practica-response.dto";
+import { PracticaDetalle, PracticaResponseDto } from "./dto/practica-response.dto";
 import { AlumnoPracticaService } from "../alumno_practica/alumno_practica.service";
 import { Estado_informe, Estado_practica, Practicas, TipoPractica } from "@prisma/client";
 import { Cron, CronExpression } from "@nestjs/schedule";
@@ -130,7 +130,7 @@ export class PracticasService {
 
     public async getAllPracticas() {
         try {
-            const practicas = await this._databaseService.$queryRawTyped<any>(obtenerInformesAlumnoPractica());
+            const practicas = await this._databaseService.$queryRawTyped<PracticaDetalle>(obtenerInformesAlumnoPractica());
             return practicas
         } catch (error) {
             throw error;
