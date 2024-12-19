@@ -1,39 +1,53 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { Observable } from "rxjs";
-import { Request } from "express";
-import { JwtService } from "@nestjs/jwt";
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  constructor(
+    private jwtService: JwtService,
+    private reflector: Reflector,
+  ) {}
 
-    constructor(private jwtService: JwtService){}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const req = context.switchToHttp().getRequest();
 
-    async canActivate(context: ExecutionContext): Promise<boolean> {
-        
-        const request = context.switchToHttp().getRequest();
-        const token = this.extractToken(request);
-
-        console.log(token);
-        if(!token){
-            throw new UnauthorizedException('No tiene permisos para acceder');
-        }
-
-        try {
-            const payload = await this.jwtService.verifyAsync(token, {
-                secret: process.env.JWT_SECRET,
-            });
-            request['user'] = payload;
-            console.log(payload);
-        } catch(error){
-            throw new UnauthorizedException();
-        }
-
-        return true;
+    // Verificar si la ruta es pública
+    const isPublic = this.reflector.get<boolean>('isPublic', context.getHandler());
+    if (isPublic) {
+      return true;
     }
 
-    private extractToken(request: Request): string | undefined {
-        const [type, token] = request.headers.authorization?.split(' ') ?? [];
-
-        return type=== 'Bearer' ? token: undefined;
+    // Obtener el token del encabezado Authorization
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+      throw new UnauthorizedException('Encabezado de autorización no encontrado.');
     }
+
+    const token = authHeader.split(' ')[1]; // Formato esperado: "Bearer <token>"
+    if (!token) {
+      throw new UnauthorizedException('Token no encontrado en el encabezado.');
+    }
+
+    try {
+      // Validar el token y extraer el payload
+      const payload = await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
+      req['user'] = payload; // Agregar el payload al objeto request
+
+      // Verificar si es el primer inicio de sesión
+      if (payload.primerSesion) {
+        const handler = context.getHandler();
+        const routeName = handler.name; // Nombre de la función del controlador
+
+        // Permitir solo la ruta específica para cambiar contraseña
+        if (routeName !== 'changePassword') {
+          throw new ForbiddenException('Debe cambiar su contraseña antes de continuar.');
+        }
+      }
+
+      return true;
+    } catch (error) {
+      throw new UnauthorizedException('Token inválido o expirado.');
+    }
+  }
 }

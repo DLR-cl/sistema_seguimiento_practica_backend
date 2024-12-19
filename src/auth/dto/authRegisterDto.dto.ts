@@ -2,9 +2,6 @@ import { IsEmail, IsNotEmpty, IsString, IsEnum } from "class-validator";
 import { Tipo_usuario } from "@prisma/client";
 export class AuthRegisterDto {
 
-    @IsString()
-    @IsNotEmpty()
-    password: string;
 
     @IsEmail()
     @IsNotEmpty()
