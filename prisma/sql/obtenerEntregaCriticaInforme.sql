@@ -7,10 +7,10 @@ SELECT
     DATE(infA.fecha_inicio_revision) AS inicio_revision,
     DATE(infA.fecha_termino_revision) AS fin_revision
 FROM   
-    InformesAlumno AS infA
+    practicas AS p
 LEFT JOIN
-    usuario AS a ON a.id_usuario = infA.id_alumno
+    usuario AS a ON a.id_usuario = p.id_alumno
 LEFT JOIN
-    Practicas AS p ON p.id_alumno = a.id_usuario
+    informesalumno AS infA ON infA.id_practica = p.id_practica
 WHERE
    infA.id_academico = ? AND p.estado != "CURSANDO" AND p.estado != "FINALIZADA" AND DATEDIFF(DATE(infA.fecha_termino_revision), DATE(CURDATE())) < 3;
