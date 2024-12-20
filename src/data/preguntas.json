@@ -135,14 +135,19 @@
         "id_dimension": 6
     },
     {
+        "enunciado_pregunta": "¿Qué asignatura te ha servido para tu práctica?",
+        "tipo_pregunta": "DESARROLLO_PROFESIONAL",
+        "id_dimension": 7
+    },
+    {
         "enunciado_pregunta": "¿El supervisor de tu práctica te brindó suficiente orientación y apoyo para cumplir tus objetivos?",
         "tipo_pregunta": "CERRADA",
-        "id_dimension": 7
+        "id_dimension": 8
     },
     {
         "enunciado_pregunta": "¿La institución educativa estuvo presente y apoyó tus necesidades durante la práctica?",
         "tipo_pregunta": "CERRADA",
-        "id_dimension": 7
+        "id_dimension": 8
     }
 
 

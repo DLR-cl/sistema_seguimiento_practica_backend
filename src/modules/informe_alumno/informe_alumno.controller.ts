@@ -4,7 +4,7 @@ import { InformeAlumnoService } from './informe_alumno.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { InformeDto } from './dto/informe_pdf.dto';
+import { Informe, InformeDto } from './dto/informe_pdf.dto';
 import e, { Response } from 'express';
 import { CreateAsignacionDto } from './dto/create-asignacion.dto';
 import { AprobacionInformeDto, Comentario } from './dto/aprobacion-informe.dto';
@@ -13,6 +13,7 @@ import { InformeRevisionService } from './services/informe-revision.service';
 import { InformeStorageService } from './services/informe-storage.service';
 import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
+import { CreateRespuestaInformAlumnoDto } from './dto/class/respuestas';
 
 const rootPath = process.cwd();
 @Controller('informe-alumno')
@@ -49,14 +50,14 @@ export class InformeAlumnoController {
                 exceptionFactory: (errors) => new BadRequestException('Archivo inválido'),
             }),
         ) file: Express.Multer.File,
-        @Body() rawData: string
+        @Body() rawData: InformeDto
     ) {
         console.log('File:', file);
-        const parsedData = JSON.parse(rawData);
+        const parsedData = JSON.parse(rawData.respuestas);
 
     // Convertir los datos planos al DTO usando class-transformer
-    const data = plainToInstance(InformeDto, parsedData);
-
+    const data = plainToInstance(CreateRespuestaInformAlumnoDto, parsedData);
+    
     // Validar el DTO
     const errors = await validate(data);
     if (errors.length > 0) {
@@ -72,7 +73,7 @@ export class InformeAlumnoController {
         });
     }
 
-        return this._informestorageService.subirInforme(file, data, 'uploads');
+        // return this._informestorageService.subirInforme(file, rawData, 'uploads');
     }
 
     // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio

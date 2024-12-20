@@ -101,7 +101,7 @@ export class InformeStorageService {
             });
 
             // Crea las respuestas
-            await this.crearRespuesta(prisma, data.respuestas);
+            // await this.crearRespuesta(prisma, data.respuestas);
 
             return {
               message: 'Informe enviado exitosamente (de ESPERA a ENVIADA)',
