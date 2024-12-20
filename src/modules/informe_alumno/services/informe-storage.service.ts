@@ -16,7 +16,10 @@ export class InformeStorageService {
   async subirInforme(file: Express.Multer.File, data: InformeDto, rootPath: string) {
     return await informeMutex.runExclusive(async () => {
       const tempFilePath = file.path;
-
+      if (!fs.existsSync(tempFilePath)) {
+        throw new BadRequestException('El archivo temporal no existe o no está accesible.');
+      }
+      
       try {
         // Inicia una transacción
         return await this._databaseService.$transaction(async (prisma) => {
