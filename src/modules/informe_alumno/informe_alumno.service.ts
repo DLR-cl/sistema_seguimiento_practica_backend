@@ -132,14 +132,14 @@ export class InformeAlumnoService {
                 },
             });
 
-            let existe: boolean = false;
+            let existe: boolean = true;
 
             if (!informe) {
                 throw new BadRequestException('Error, el informe no existe o no está enviado.')
             }
 
             if (informe.estado in [Estado_informe.ENVIADA, Estado_informe.REVISION, Estado_informe.APROBADA, Estado_informe.DESAPROBADA]) {
-                existe = true;
+                existe = false;
             }
 
 
