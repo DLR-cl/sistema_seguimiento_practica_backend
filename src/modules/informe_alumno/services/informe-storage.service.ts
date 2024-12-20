@@ -3,7 +3,7 @@ import { DatabaseService } from 'src/database/database/database.service';
 import { Informe, InformeDto } from '../dto/informe_pdf.dto';
 import { Mutex } from 'async-mutex';
 import * as fs from 'fs';
-import { Estado_informe, Tipo_pregunta } from '@prisma/client';
+import { Estado_informe, Estado_practica, Tipo_pregunta } from '@prisma/client';
 import { resolve } from 'path';
 import { CreateRespuestaInformAlumnoDto } from '../dto/class/respuestas';
 
@@ -101,8 +101,22 @@ export class InformeStorageService {
             });
 
             // Crea las respuestas
-            // await this.crearRespuesta(prisma, data.respuestas);
+            await this.crearRespuesta(prisma, data.respuestas);
+            const practica = await this._databaseService.practicas.findUnique({
+              where: {
+                id_practica: informeEnEspera.id_practica,
+              },
+              include: {
+                informe_confidencial: true
+              }
+            });
 
+            if(practica.informe_confidencial.estado == Estado_informe.ENVIADA && practica.informe_confidencial){
+              await this._databaseService.practicas.update({
+                where: { id_practica: informeEnEspera.id_practica },
+                data: { estado: Estado_practica.INFORMES_RECIBIDOS }
+              })
+            }
             return {
               message: 'Informe enviado exitosamente (de ESPERA a ENVIADA)',
               filePath: newFilePath,

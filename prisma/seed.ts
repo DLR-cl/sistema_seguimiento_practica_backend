@@ -79,6 +79,10 @@ async function main() {
       skipDuplicates: true
     })
 
+    await prisma.preguntasImplementadasInformeConfidencial.createMany({
+      data: preguntasInformeConfidencial
+    })
+
   await prisma.asignaturas.createMany({
     data: asignaturas as crearAsignaturaDto[],
     skipDuplicates: true

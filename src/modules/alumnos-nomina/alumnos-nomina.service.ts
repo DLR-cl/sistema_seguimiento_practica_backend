@@ -24,7 +24,6 @@ export class AlumnosNominaService {
         const nuevosAlumnos = datos.filter((alumno) => !rutsExistentes.has(alumno.rut));
         const actualizables = datos.filter((alumno) => {
             const existente = alumnosExistentes.find((dbAlumno) => dbAlumno.rut === alumno.rut);
-            console.log(invertirYCapitalizarNombre(alumno.nombre));
             return existente && (existente.nombre !== alumno.nombre || existente.correo !== alumno.email);
         });
         const duplicados = datos.filter((alumno) => {

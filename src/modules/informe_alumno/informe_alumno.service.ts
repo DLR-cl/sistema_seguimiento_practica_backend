@@ -144,7 +144,7 @@ export class InformeAlumnoService {
 
 
             return {
-                existeRespuesta: existe
+                correccion: existe
             }
         } catch (error) {
             if (error instanceof BadRequestException) {

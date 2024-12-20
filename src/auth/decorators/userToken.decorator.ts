@@ -1,25 +1,37 @@
 import { createParamDecorator, ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
+
+// Custom exception for reusability
+class TokenException extends UnauthorizedException {
+  constructor(message: string) {
+    super(message || 'Token inválido o expirado');
+  }
+}
 
 export const UserFromToken = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
+  async (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
 
+    // Verificar que el encabezado Authorization existe
     if (!authHeader) {
-      throw new UnauthorizedException('Encabezado Authorization no encontrado');
+      throw new TokenException('Encabezado Authorization no encontrado');
     }
 
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-      throw new UnauthorizedException('Token no proporcionado');
+    // Validar que el token esté en formato Bearer
+    const [bearer, token] = authHeader.split(' ');
+    if (bearer !== 'Bearer' || !token) {
+      throw new TokenException('Token no proporcionado o formato incorrecto');
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'TU_SECRETO_JWT');
+      // Utilizar JwtService para verificar el token
+      const jwtService = new JwtService({ secret: process.env.JWT_SECRET || 'TU_SECRETO_JWT' });
+      const decoded = jwtService.verify(token);
+
       return decoded; // Devuelve el payload decodificado
     } catch (err) {
-      throw new UnauthorizedException('Token inválido o expirado');
+      throw new TokenException(err.message);
     }
   },
 );
