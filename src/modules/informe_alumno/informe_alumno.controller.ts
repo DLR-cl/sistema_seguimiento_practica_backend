@@ -11,6 +11,8 @@ import { AprobacionInformeDto, Comentario } from './dto/aprobacion-informe.dto';
 import { InformeManagementService } from './services/informe-management.service';
 import { InformeRevisionService } from './services/informe-revision.service';
 import { InformeStorageService } from './services/informe-storage.service';
+import { validate } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
 
 const rootPath = process.cwd();
 @Controller('informe-alumno')
@@ -20,7 +22,7 @@ export class InformeAlumnoController {
         private readonly _informeAlumnoService: InformeAlumnoService,
         private readonly _informemanagamentService: InformeManagementService,
         private readonly _informerevisonService: InformeRevisionService,
-        private readonly _informestorageService: InformeStorageService 
+        private readonly _informestorageService: InformeStorageService
     ) { }
 
 
@@ -47,9 +49,28 @@ export class InformeAlumnoController {
                 exceptionFactory: (errors) => new BadRequestException('Archivo inválido'),
             }),
         ) file: Express.Multer.File,
-        @Body() data: InformeDto
+        @Body() rawData: string
     ) {
         console.log('File:', file);
+        const parsedData = JSON.parse(rawData);
+
+    // Convertir los datos planos al DTO usando class-transformer
+    const data = plainToInstance(InformeDto, parsedData);
+
+    // Validar el DTO
+    const errors = await validate(data);
+    if (errors.length > 0) {
+        // Formatear los errores
+        const formattedErrors = errors.map(err => ({
+            property: err.property,
+            constraints: err.constraints,
+        }));
+
+        throw new BadRequestException({
+            message: 'Errores de validación',
+            errors: formattedErrors,
+        });
+    }
 
         return this._informestorageService.subirInforme(file, data, 'uploads');
     }
