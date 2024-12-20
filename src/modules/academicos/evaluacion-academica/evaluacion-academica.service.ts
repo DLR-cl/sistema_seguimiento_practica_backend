@@ -27,7 +27,6 @@ export class EvaluacionAcademicaService {
                 throw new BadRequestException('No se encuentra el informe del alumno disponible');
             }
     
-            console.log("informe desde el pepe",informe_alumno.estado)
             if (informe_alumno.estado !== Estado_informe.REVISION) {
                 throw new BadRequestException('El informe no está en estado de revisión');
             }

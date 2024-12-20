@@ -37,7 +37,6 @@ export class AlumnoPracticaService {
         }
         
         const usuario = await this._userService.signUp(crearUser);
-        console.log(usuario);
         const alumno = await this._databaseService.alumnosPractica.create({
             data: {
                 id_user: usuario.id_usuario,

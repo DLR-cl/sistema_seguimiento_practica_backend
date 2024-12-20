@@ -49,7 +49,6 @@ export class InformeAlumnoController {
         ) file: Express.Multer.File,
         @Body() data: InformeDto
     ) {
-        console.log('Body:', data);
         console.log('File:', file);
 
         return this._informestorageService.subirInforme(file, data, 'uploads');

@@ -31,7 +31,6 @@ export class UsersController {
   @UseGuards(AuthGuard) // Protege la ruta con el AuthGuard
   @Patch('change-password')
   async changePassword(@Req() req: any, @Body() changePasswordDto: ChangePasswordDto) {
-    console.log(req.user);
     const userId = req.user.id_usuario; // Extrae el ID del usuario del token JWT
     return this.usersService.changePassword(userId, changePasswordDto);
   }
