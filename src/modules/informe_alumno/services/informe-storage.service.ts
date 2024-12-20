@@ -1,6 +1,6 @@
 import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database/database.service';
-import { InformeDto } from '../dto/informe_pdf.dto';
+import { Informe, InformeDto } from '../dto/informe_pdf.dto';
 import { Mutex } from 'async-mutex';
 import * as fs from 'fs';
 import { Estado_informe, Tipo_pregunta } from '@prisma/client';
@@ -13,7 +13,7 @@ const informeMutex = new Mutex(); // Mutex para controlar concurrencia
 export class InformeStorageService {
   constructor(private readonly _databaseService: DatabaseService) {}
 
-  async subirInforme(file: Express.Multer.File, data: InformeDto, rootPath: string) {
+  async subirInforme(file: Express.Multer.File, data: Informe, rootPath: string) {
     return await informeMutex.runExclusive(async () => {
       const tempFilePath = file.path;
       if (!fs.existsSync(tempFilePath)) {

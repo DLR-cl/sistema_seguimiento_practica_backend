@@ -50,13 +50,14 @@ export class InformeAlumnoController {
                 exceptionFactory: (errors) => new BadRequestException('Archivo inválido'),
             }),
         ) file: Express.Multer.File,
-        @Body() rawData: InformeDto
+        @Body() rawData: any
     ) {
-        console.log('File:', file);
         const parsedData = JSON.parse(rawData.respuestas);
-
+        const data: Informe = {
+            ...rawData,
+            respuestas: parsedData
+        }
     // Convertir los datos planos al DTO usando class-transformer
-    const data = plainToInstance(CreateRespuestaInformAlumnoDto, parsedData);
     
     // Validar el DTO
     const errors = await validate(data);
@@ -73,7 +74,7 @@ export class InformeAlumnoController {
         });
     }
 
-        // return this._informestorageService.subirInforme(file, rawData, 'uploads');
+        return this._informestorageService.subirInforme(file, data, 'uploads');
     }
 
     // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio
