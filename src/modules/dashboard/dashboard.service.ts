@@ -420,7 +420,6 @@ export class DashboardService {
       const informesRevisados = await this._databaseService.informesAlumno.count({
         where: {
           id_academico: idAcademico,
-          estado: Estado_informe.APROBADA,
           fecha_inicio: {
             gte: inicioAño,
             lt: finAño,
