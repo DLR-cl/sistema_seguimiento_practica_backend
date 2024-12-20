@@ -55,6 +55,10 @@ export class InformeAlumnoService {
                     }
                 }
             })
+
+            if(!academico){
+                throw new BadRequestException('No existe academico')
+            }
             // Buscar el informe por su ID y validar el estado permitido para asignación
             const informeAlumno = await this._databaseService.informesAlumno.findUnique({
                 where: {
@@ -125,6 +129,7 @@ export class InformeAlumnoService {
                 message: `Se asignó exitosamente la revisión del informe a ${academico.usuario.nombre}, a partir de la fecha actual tiene 14 días para revisión.`
             }
         } catch (error) {
+            console.log(error)
             if (error instanceof BadRequestException) {
                 throw error;
             }
