@@ -13,4 +13,4 @@ LEFT JOIN
 LEFT JOIN
     Practicas AS p ON p.id_alumno = a.id_usuario
 WHERE
-   infA.id_academico = ? AND p.estado != "CURSANDO" AND DATEDIFF(DATE(infA.fecha_termino_revision), DATE(CURDATE())) < 3;
+   infA.id_academico = ? AND p.estado != "CURSANDO" AND p.estado != "FINALIZADA" AND DATEDIFF(DATE(infA.fecha_termino_revision), DATE(CURDATE())) < 3;
