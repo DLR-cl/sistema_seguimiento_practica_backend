@@ -14,9 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator seed {
-  provider = "prisma-seeder"
-}
 model AlumnasNomina {
   id_alumno Int    @id @default(autoincrement())
   rut       String @unique @db.VarChar(10)
