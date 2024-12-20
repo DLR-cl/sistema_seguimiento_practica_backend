@@ -21,6 +21,17 @@ model AlumnasNomina {
   email     String @db.VarChar(100)
 }
 
+model Administrador {
+  id            Int          @id @default(autoincrement())
+  nombre        String
+  correo        String       @unique
+  password      String
+  tipo_usuario  Tipo_usuario // puede ser admin, jefe departamento y jefe de usuario
+  primerSesion  Boolean     @default(true)
+  creadoEn      DateTime     @default(now())
+  actualizadoEn DateTime     @updatedAt
+}
+
 model Usuarios {
   id_usuario      Int                   @id @default(autoincrement())
   password        String                @db.VarChar(250)
@@ -81,7 +92,7 @@ model Empresas {
   ubicacion           String      @db.VarChar(100)
   rubro               String      @db.VarChar(100)
   caracter_empresa    TipoEmpresa
-  tamano_empresa      String      @db.VarChar(100)// nombre y apellido
+  tamano_empresa      String      @db.VarChar(100) // nombre y apellido
 
   jefe_supervisor JefesAlumno[]
 }
@@ -281,8 +292,6 @@ model RespuestasInformeConfidencial {
 
   @@id([pregunta_id, informe_id])
 }
-
-
 
 model DimensionesEvaluativas {
   id_dimension Int    @id @default(autoincrement())

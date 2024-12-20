@@ -31,7 +31,15 @@ export class UsersController {
   @UseGuards(AuthGuard) // Protege la ruta con el AuthGuard
   @Patch('change-password')
   async changePassword(@Req() req: any, @Body() changePasswordDto: ChangePasswordDto) {
-    const userId = req.user.id_usuario; // Extrae el ID del usuario del token JWT
-    return this.usersService.changePassword(userId, changePasswordDto);
+    const { id_usuario, rol } = req.user; // Extrae el ID y rol del usuario del token JWT
+  
+    if (rol === 'ADMIN' || rol === 'JEFE_DEPARTAMENTO' || rol === 'JEFE_USUARIO') {
+      // Si es administrador o jefe, cambia la contraseña en el servicio correspondiente
+      return this.usersService.changeAdminPassword(id_usuario, changePasswordDto);
+    }
+  
+    // Si es un usuario regular, cambia la contraseña en el servicio de usuarios
+    return this.usersService.changePassword(id_usuario, changePasswordDto);
   }
+  
 }
