@@ -5,9 +5,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { InformeDto } from './dto/informe_pdf.dto';
-import { Response } from 'express';
+import e, { Response } from 'express';
 import { CreateAsignacionDto } from './dto/create-asignacion.dto';
 import { AprobacionInformeDto, Comentario } from './dto/aprobacion-informe.dto';
+import { InformeManagementService } from './services/informe-management.service';
+import { InformeRevisionService } from './services/informe-revision.service';
+import { InformeStorageService } from './services/informe-storage.service';
 
 const rootPath = process.cwd();
 @Controller('informe-alumno')
@@ -15,6 +18,9 @@ export class InformeAlumnoController {
 
     constructor(
         private readonly _informeAlumnoService: InformeAlumnoService,
+        private readonly _informemanagamentService: InformeManagementService,
+        private readonly _informerevisonService: InformeRevisionService,
+        private readonly _informestorageService: InformeStorageService 
     ) { }
 
 
@@ -46,7 +52,7 @@ export class InformeAlumnoController {
         console.log('Body:', data);
         console.log('File:', file);
 
-        return this._informeAlumnoService.subirInforme(file, data, 'uploads');
+        return this._informestorageService.subirInforme(file, data, 'uploads');
     }
 
     // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio
@@ -99,22 +105,22 @@ export class InformeAlumnoController {
 
     @Patch('asociar-informe')
     public async asociarInforme(@Body() data: CreateAsignacionDto) {
-        return await this._informeAlumnoService.asignarInformeAlAcademico(data);
+        return await this._informemanagamentService.asignarInformeAlAcademico(data);
     }
 
     @Patch('aprobar-informe')
     public async aprobarInforme(@Body() data: AprobacionInformeDto) {
-        return await this._informeAlumnoService.aprobarInforme(data);
+        return await this._informerevisonService.aprobarInforme(data);
     }
 
     @Post('comentarios')
     public async generarComentario(@Body() data: Comentario[]) {
-        return await this._informeAlumnoService.crearComentarios(data);
+        return await this._informerevisonService.crearComentarios(data);
     }
 
     @Patch('editar-comentario')
     public async editarComentario(@Body() data: Comentario) {
-        return await this._informeAlumnoService.editarComentario(data)
+        return await this._informerevisonService.editarComentario(data)
     }
 
     @Get('obtener-respuestas/:id')

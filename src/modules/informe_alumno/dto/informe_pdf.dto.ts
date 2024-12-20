@@ -1,6 +1,6 @@
 import { TipoPractica } from "@prisma/client";
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
-
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { CreateRespuestaInformAlumnoDto } from "./class/respuestas"; 
 export class InformeDto {
 
     @IsNotEmpty()
@@ -18,4 +18,8 @@ export class InformeDto {
     @IsNotEmpty()
     @IsEnum(TipoPractica)
     tipo_practica: TipoPractica
+
+    @IsNotEmpty()
+    @IsArray()
+    respuestas: CreateRespuestaInformAlumnoDto[];
 }

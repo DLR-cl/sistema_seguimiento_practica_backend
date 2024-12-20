@@ -8,9 +8,12 @@ import { AuthModule } from '../../auth/auth.module';
 import { UsersModule } from '../users/users.module';
 import { EmailAvisosService } from '../email-avisos/email-avisos.service';
 import { EmailAvisosModule } from '../email-avisos/email-avisos.module';
+import { InformeManagementService } from './services/informe-management.service';
+import { InformeRevisionService } from './services/informe-revision.service';
+import { InformeStorageService } from './services/informe-storage.service';
 
 @Module({
-  providers: [InformeAlumnoService,Object],
+  providers: [InformeAlumnoService,Object, InformeManagementService, InformeRevisionService, InformeStorageService],
   controllers: [InformeAlumnoController],
   exports: [InformeAlumnoService],
   imports: [DatabaseModule, AlumnoPracticaModule, PracticasModule, AuthModule, UsersModule, EmailAvisosModule]
