@@ -52,29 +52,33 @@ export class InformeAlumnoController {
         ) file: Express.Multer.File,
         @Body() rawData: any
     ) {
-        const parsedData = JSON.parse(rawData.respuestas);
-        const data: Informe = {
-            ...rawData,
-            respuestas: parsedData
+        if(rawData.respuesta){
+
+            const parsedData = JSON.parse(rawData.respuestas);
+            const data: Informe = {
+                ...rawData,
+                respuestas: parsedData
+            }
+            // Convertir los datos planos al DTO usando class-transformer
+            
+            // Validar el DTO
+            const errors = await validate(data);
+            if (errors.length > 0) {
+                // Formatear los errores
+                const formattedErrors = errors.map(err => ({
+                    property: err.property,
+                    constraints: err.constraints,
+                }));
+                
+                throw new BadRequestException({
+                    message: 'Errores de validación',
+                    errors: formattedErrors,
+                });
+            }
+            
+            return this._informestorageService.subirInforme(file, data, 'uploads');
         }
-    // Convertir los datos planos al DTO usando class-transformer
-    
-    // Validar el DTO
-    const errors = await validate(data);
-    if (errors.length > 0) {
-        // Formatear los errores
-        const formattedErrors = errors.map(err => ({
-            property: err.property,
-            constraints: err.constraints,
-        }));
-
-        throw new BadRequestException({
-            message: 'Errores de validación',
-            errors: formattedErrors,
-        });
-    }
-
-        return this._informestorageService.subirInforme(file, data, 'uploads');
+        return this._informestorageService.subirInforme(file, rawData, 'uploads')
     }
 
     // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio
