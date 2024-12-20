@@ -20,7 +20,6 @@ import { MailModule } from './mail/mail.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AsignaturasModule } from './modules/asignaturas/asignaturas.module';
-import { RespuestasInformeAlumnoModule } from './modules/respuestas-informe-alumno/respuestas-informe-alumno.module';
 import { AcademicosModule } from './modules/academicos/academicos.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { EmailAvisosModule } from './modules/email-avisos/email-avisos.module';
@@ -51,7 +50,6 @@ import { AlumnosNominaModule } from './modules/alumnos-nomina/alumnos-nomina.mod
     MailModule,
     SwaggerModule,
     AsignaturasModule,
-    RespuestasInformeAlumnoModule,
     AcademicosModule,
     DashboardModule,
     EmailAvisosModule,
