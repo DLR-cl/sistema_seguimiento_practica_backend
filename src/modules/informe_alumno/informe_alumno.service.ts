@@ -138,7 +138,7 @@ export class InformeAlumnoService {
                 throw new BadRequestException('Error, el informe no existe o no está enviado.')
             }
 
-            if (informe.estado in [Estado_informe.ENVIADA, Estado_informe.REVISION, Estado_informe.APROBADA, Estado_informe.DESAPROBADA]) {
+            if (informe.estado == Estado_informe.REVISION) {
                 existe = false;
             }
 
