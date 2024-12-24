@@ -123,6 +123,7 @@ export class EvaluacionAcademicaService {
     
             return {
                 message: 'Registro del informe exitoso',
+                id_informe: informeEvaluativo.id_informe,
                 status: HttpStatus.OK,
             };
         });

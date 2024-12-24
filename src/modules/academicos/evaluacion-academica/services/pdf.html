@@ -7,66 +7,65 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="font-sans bg-gray-100 p-8 h-[80%]">
-    <div class="flex items-center mb-8">
+    <div class="flex items-center mb-[1rem]">
         <!-- Logo UTA -->
         <div class="flex-shrink-0">
-            <img src="../icon/logo-uta.png" alt="Logo UTA" class="w-[5rem] h-auto">
+            <img src="data:image/png;base64,{{logoUtaBase64}}" alt="Logo UTA" class="w-[3rem] h-auto">
         </div>
     
         <!-- Línea con Textos en los Extremos -->
         <div class="flex-1 flex flex-col justify-between mx-4">
-            <!-- Textos Superior e Inferior -->
             <div class="flex justify-between items-center">
                 <!-- Texto Superior Izquierdo -->
                 <div class="text-left">
-                    <h1 class="text-md font-bold uppercase">Universidad de Tarapacá</h1>
-                    <h2 class="text-[1rem] italic">Arica – Chile</h2>
+                    <h1 class="text-md font-bold uppercase text-[.8rem]">Universidad de Tarapacá</h1>
+                    <h2 class="text-[.7rem] italic">Arica – Chile</h2>
                 </div>
     
                 <!-- Texto Inferior Derecho -->
                 <div class="text-right">
-                    <h3 class="text-md font-semibold">Departamento de Ingeniería Industrial y de Sistemas</h3>
-                    <h4 class="text-[1rem] italic">Jefatura Carrera de Ingeniería Civil Industrial</h4>
+                    <h3 class="text-md font-semibold text-[.8rem]">Departamento de Ingeniería Industrial y de Sistemas</h3>
+                    <h4 class="text-[.7rem] italic">Jefatura Carrera de Ingeniería Civil Industrial</h4>
                 </div>
             </div>
-            <!-- Línea Horizontal -->
             <hr class="border-t border-black mt-2">
         </div>
     
         <!-- Logo Ingeniería -->
         <div class="flex-shrink-0">
-            <img src="../icon/logo-iici.webp" alt="Logo Ingeniería" class="w-[5rem] h-auto">
+            <img src="data:image/webp;base64,{{logoIngenieriaBase64}}" alt="Logo Ingeniería" class="w-[3rem] h-auto">
         </div>
     </div>
     
     
+    
 
     <!-- Título de Evaluación -->
-    <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold uppercase">Evaluación Práctica Profesional</h1>
-        <h2 class="text-lg uppercase mt-2">Ingeniería Civil Industrial</h2>
+    <div class="text-center mb-[1rem]">
+        <h1 class="text-[1.2rem] font-bold uppercase">Evaluación Práctica Profesional</h1>
+        <h2 class="text-[.8rem] uppercase mt-[-.4rem]">Ingeniería Civil Industrial</h2>
     </div>
 
     <!-- Sección de Identificación -->
     <div class="mb-8">
-        <h3 class="text-lg font-bold mb-4">Identificación</h3>
+        <h3 class="text-[1rem] font-bold mb-4 text-center">Identificación</h3>
         <table class="table-auto border border-black w-full text-left">
             <tbody>
                 <tr>
-                    <td class="border border-black  px-4 py-2 font-semibold">Nombre del Alumno</td>
-                    <td class="border border-black border-r-0 px-4 py-2 text-[.7rem]">{{nombreAlumno}}</td>
+                    <td class="border border-black font-semibold text-[.8rem] max-w-[2rem]">Nombre del Alumno</td>
+                    <td class="border border-black border-r-0 text-[.7rem]">{{nombreAlumno}}</td>
                 </tr>
                 <tr>
-                    <td class="border border-black px-4 py-2 font-semibold">Empresa</td>
-                    <td class="border border-black px-4 py-2 text-[.7rem]">{{empresa}}</td>
-                    <td class="border border-black px-4 py-2 font-semibold">Tipo de Práctica</td>
-                    <td class="border border-black px-4 py-2">{{tipoPractica}}</td>
+                    <td class="border border-black font-semibold text-[.8rem]">Empresa</td>
+                    <td class="border border-black text-[.7rem]">{{empresa}}</td>
+                    <td class="border border-black font-semibold text-[.8rem]">Tipo de Práctica</td>
+                    <td class="border border-black text-[.7rem]">{{tipoPractica}}</td>
                 </tr>
                 <tr>
-                    <td class="border border-black px-4 py-2 font-semibold">Profesor Revisor</td>
-                    <td class="border border-black px-4 py-2 text-[.7rem]">{{profesorRevisor}}</td>
-                    <td class="border border-black px-4 py-2 font-semibold">Fecha Revisión</td>
-                    <td class="border border-black px-4 py-2 text-[.7rem]">{{fechaRevision}}</td>
+                    <td class="border border-black  text-[.8rem] font-semibold">Profesor Revisor</td>
+                    <td class="border border-black  text-[.7rem]">{{profesorRevisor}}</td>
+                    <td class="border border-black  text-[.8rem] font-semibold">Fecha Revisión</td>
+                    <td class="border border-black  text-[.7rem]">{{fechaRevision}}</td>
                 </tr>
             </tbody>
         </table>
@@ -75,97 +74,103 @@
     
 
     <!-- Evaluación del Informe -->
-    <div class="mb-8">
-        <h3 class="text-lg font-bold">Evaluación del Informe</h3>
+    <div class="mb-[1.4rem]">
+        <h3 class="text-[1rem] font-bold">Evaluación del Informe</h3>
 
         <!-- Tabla de Aspectos -->
         <table class="w-full mt-4 border-collapse border border-gray-400">
             <thead class="bg-gray-200">
                 
                 <tr>
-                    <th class="border border-gray-400 px-4 py-2">Aspecto</th>
-                    <th class="border border-gray-400 px-4 py-2">Ítem</th>
-                    <th class="border border-gray-400 px-4 py-2">T</th>
-                    <th class="border border-gray-400 px-4 py-2">R</th>
-                    <th class="border border-gray-400 px-4 py-2">S</th>
-                    <th class="border border-gray-400 px-4 py-2">D</th>
+                    <th class="border border-gray-400 ">Aspecto</th>
+                    <th class="border border-gray-400 ">Ítem</th>
+                    <th class="border border-gray-400 ">T</th>
+                    <th class="border border-gray-400 ">R</th>
+                    <th class="border border-gray-400 ">S</th>
+                    <th class="border border-gray-400 ">D</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- Aspecto: Formato -->
                 <tr>
-                    <td class="border border-gray-400 px-4 py-2 font-semibold text-[.8rem]" rowspan="2">{{getFromList respuestas 0 'dimension'}}</td>
-                    <td class="border border-gray-400 px-4 py-2 text-[.7rem]">{{getFromList respuestas 0 'pregunta'}}</td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
+                    <td class="border border-gray-400 font-semibold text-[.8rem]" rowspan="2">{{getFromList respuestas 0 'dimension'}}</td>
+                    <td class="border border-gray-400 text-[.7rem]">{{getFromList respuestas 0 'pregunta'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 0 'respuesta' 'Total'}}</td>
+                    <td class="border border-gray-400 ">
+                        {{getFromListWithCondition respuestas 0 'respuesta' 'Regular'}}
+                    </td>
+                    <td class="border border-gray-400 ">
+                        {{getFromListWithCondition respuestas 0 'respuesta' 'Suficiente'}}
+                    </td>
+                    <td class="border border-gray-400 ">
+                        {{getFromListWithCondition respuestas 0 'respuesta' 'Deficiente'}}
+                    </td>
                 </tr>
                 <tr>
-                    <td class="border border-gray-400 px-4 py-2 text-[.7rem]">{{getFromList respuestas 1 'pregunta'}}</td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
+                    <td class="border border-gray-400 text-[.7rem]">{{getFromList respuestas 1 'pregunta'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 1 'respuesta' 'Total'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 1 'respuesta' 'Regular'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 1 'respuesta' 'Suficiente'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 1 'respuesta' 'Deficiente'}}</td>
                 </tr>
                 
                 <!-- Aspecto: Estructura -->
                 <tr>
-                    <td class="border border-gray-400 px-4 py-2 font-semibold text-[.8rem]" rowspan="8"> {{getFromList respuestas 2 'dimension'}}</td>
-                    <td class="border border-gray-400 px-4 py-2 text-[.7rem]">{{getFromList respuestas 2 'pregunta'}}</td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
+                    <td class="border border-gray-400 font-semibold text-[.8rem]" rowspan="8"> {{getFromList respuestas 2 'dimension'}}</td>
+                    <td class="border border-gray-400  text-[.7rem]">{{getFromList respuestas 2 'pregunta'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 2 'respuesta' 'Total'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 2 'respuesta' 'Regular'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 2 'respuesta' 'Suficiente'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 2 'respuesta' 'Deficiente'}}</td>
                 </tr>
                 <tr>
-                    <td class="border border-gray-400 px-4 py-2 text-[.7rem]">{{getFromList respuestas 3 'pregunta'}}</td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
+                    <td class="border border-gray-400  text-[.7rem]">{{getFromList respuestas 3 'pregunta'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 3 'respuesta' 'Total'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 3 'respuesta' 'Regular'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 3 'respuesta' 'Suficiente'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 3 'respuesta' 'Deficiente'}}</td>
                 </tr>
                 <tr>
-                    <td class="border border-gray-400 px-4 py-2 text-[.7rem]">{{getFromList respuestas 4 'pregunta'}}</td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
+                    <td class="border border-gray-400  text-[.7rem]">{{getFromList respuestas 4 'pregunta'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 4 'respuesta' 'Total'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 4 'respuesta' 'Regular'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 4 'respuesta' 'Suficiente'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 4 'respuesta' 'Deficiente'}}</td>
                 </tr>
                 <tr>
-                    <td class="border border-gray-400 px-4 py-2 text-[.7rem]">{{getFromList respuestas 5 'pregunta'}}</td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
+                    <td class="border border-gray-400  text-[.7rem]">{{getFromList respuestas 5 'pregunta'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 5 'respuesta' 'Total'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 5 'respuesta' 'Regular'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 5 'respuesta' 'Suficiente'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 5 'respuesta' 'Deficiente'}}</td>
                 </tr>
                 <tr>
-                    <td class="border border-gray-400 px-4 py-2 text-[.7rem]">{{getFromList respuestas 6 'pregunta'}}</td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
+                    <td class="border border-gray-400  text-[.7rem]">{{getFromList respuestas 6 'pregunta'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 6 'respuesta' 'Total'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 6 'respuesta' 'Regular'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 6 'respuesta' 'Suficiente'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 6 'respuesta' 'Deficiente'}}</td>
                 </tr>
                 <tr>
-                    <td class="border border-gray-400 px-4 py-2 text-[.7rem]">{{getFromList respuestas 7 'pregunta'}}</td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
+                    <td class="border border-gray-400  text-[.7rem]">{{getFromList respuestas 7 'pregunta'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 7 'respuesta' 'Total'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 7 'respuesta' 'Regular'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 7 'respuesta' 'Suficiente'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 7 'respuesta' 'Deficiente'}}</td>
                 </tr>
                 <tr>
-                    <td class="border border-gray-400 px-4 py-2 text-[.7rem]">{{getFromList respuestas 8 'pregunta'}}</td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
+                    <td class="border border-gray-400 text-[.7rem]">{{getFromList respuestas 8 'pregunta'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 8 'respuesta' 'Total'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 8 'respuesta' 'Regular'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 8 'respuesta' 'Suficiente'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 8 'respuesta' 'Deficiente'}}</td>
                 </tr>
                 <tr>
-                    <td class="border border-gray-400 px-4 py-2 text-[.7rem]">{{getFromList respuestas 9 'pregunta'}}</td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
-                    <td class="border border-gray-400 px-4 py-2"></td>
+                    <td class="border border-gray-400 text-[.7rem]">{{getFromList respuestas 9 'pregunta'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 9 'respuesta' 'Total'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 9 'respuesta' 'Regular'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 9 'respuesta' 'Suficiente'}}</td>
+                    <td class="border border-gray-400 ">{{getFromListWithCondition respuestas 9 'respuesta' 'Deficiente'}}</td>
                 </tr>
                 
                 <!-- Añade más Aspectos y Ítems según sea necesario -->
@@ -173,13 +178,13 @@
         </table>
         
 
-        <p class="text-sm mt-4">T: Total, R: Regular, S: Suficiente, D: Deficiente</p>
-        <p class="text-sm mt-2 font-semibold">Nota: Con uno o más ítems deficientes, se rechaza el Informe del Alumno.</p>
+        <p class="text-[.6rem] text-right">T: Total, R: Regular, S: Suficiente, D: Deficiente</p>
+        <p class="text-[.8rem] font-semibold">Nota: Con uno o más ítems deficientes, se rechaza el Informe del Alumno.</p>
     </div>
 
     <!-- Evaluación General -->
-    <div class="mb-8">
-        <h3 class="text-lg font-bold">
+    <div class="mb-[.9rem]">
+        <h3 class="text-[1rem] font-bold">
             Evaluación General Informe Alumno
             <span class="font-normal">(marcar con una X):</span>
         </h3>
@@ -187,17 +192,25 @@
             <tbody>
                 <tr>
                     <td class="border border-black px-4 py-2 font-semibold text-[.7rem]">Cumple con los Aspectos Mínimos Exigidos</td>
-                    <td class="border border-black px-4 py-2 text-center">SÍ</td>
+                    <td class="border border-black px-4 py-2 text-center text-[.8rem]">SÍ</td>
+                    {{#equals estadoAprobacion true}}
+                    <td class="border border-black px-4 py-2 text-center">X</td>
+                    {{else}}
                     <td class="border border-black px-4 py-2 text-center"></td>
-                    <td class="border border-black px-4 py-2 text-center">NO</td>
+                    {{/equals}}
+                    <td class="border border-black px-4 py-2 text-center text-[.8rem]">NO</td>
+                    {{#equals estadoAprobacion false}}
+                    <td class="border border-black px-4 py-2 text-center">X</td>
+                    {{else}}
                     <td class="border border-black px-4 py-2 text-center"></td>
+                    {{/equals}}
                 </tr>
             </tbody>
         </table>
     </div>
     <!-- Evaluación General -->
-    <div class="mb-8">
-        <h3 class="text-lg font-bold">
+    <div class="mb-[.7rem]">
+        <h3 class="text-[1rem] font-bold">
             Evaluación General Informe Confidencial
             <span class="font-normal">(marcar con una X):</span>
         </h3>
@@ -205,31 +218,31 @@
             <tbody>
                 <tr>
                     <td class="border border-black px-4 py-2 font-semibold text-[.7rem]">Cumple con los Aspectos Mínimos Exigidos</td>
-                    <td class="border border-black px-4 py-2 text-center">SÍ</td>
-                    <td class="border border-black px-4 py-2 text-center"></td>
-                    <td class="border border-black px-4 py-2 text-center">NO</td>
-                    <td class="border border-black px-4 py-2 text-center"></td>
+                    <td class="border border-black px-4 py-2 text-center text-[.8rem]">SÍ</td>
+                    <td class="border border-black px-4 py-2 text-center ">{{getFromListWithCondition respuestas 11 'respuesta' 'Si'}}</td>
+                    <td class="border border-black px-4 py-2 text-center text-[.8rem]">NO</td>
+                    <td class="border border-black px-4 py-2 text-center">{{getFromListWithCondition respuestas 11 'respuesta' 'No'}}</td>
                 </tr>
             </tbody>
         </table>
     </div>
     
-    <div class="mb-8">
+    <div class="mb-[1rem]">
         <table class="w-full border-collapse border border-black">
             <thead>
                 <tr>
-                    <th class="border border-black px-4 py-2 text-left font-semibold italic text-[.8rem]" >
+                    <th class="border border-black text-left font-semibold italic text-[.8rem]" >
                         Observaciones u Otros Aspectos a Considerar:
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td class="border border-black px-4 py-8">
+                    <td class="border border-black">
                         <ul class="list-disc pl-8">
-                            <li></li>
-                            <li></li>
-                            <li></li>
+                            <li>Le falta comillas</li>
+                            <li>Le falta comillas</li>
+                            <li>Le falta comillas</li>
                         </ul>
                     </td>
                 </tr>
@@ -238,7 +251,7 @@
     </div>
     
     <!-- Firma y Pie de Página -->
-    <div class="mt-16 text-center">
+    <div class="mt-[1rem] text-center">
         <p class="mb-2">Firma Profesor Revisor: ____________________________</p>
         <p class="text-sm">Avda. 18 Septiembre 2222 - Fono: 58-2205277 - E-mail: ici@uta.cl - Arica-Chile</p>
     </div>

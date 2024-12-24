@@ -141,6 +141,7 @@ export class InformeStorageService {
   private async crearRespuesta(prisma, respuestas: CreateRespuestaInformAlumnoDto[]) {
     try {
         for (let res of respuestas) {
+          console.log(respuestas)
             if (res.asignaturas) {
                 // Crea la respuesta principal
                 const respuesta = await prisma.respuestasInformeAlumno.create({
@@ -158,6 +159,7 @@ export class InformeStorageService {
                     res.id_pregunta
                 );
             } else if (res.puntaje) {
+              console.log(res)
                 // Verifica si la pregunta es de tipo evaluativa
                 const findPregunta = await prisma.preguntasImplementadasInformeAlumno.findUnique({
                     where: {
@@ -176,7 +178,9 @@ export class InformeStorageService {
                         puntaje: res.puntaje,
                     },
                 });
-            } else {
+            } else if(res.texto) {
+              console.log("res", res)
+
                 // Crea una respuesta con texto
                 await prisma.respuestasInformeAlumno.create({
                     data: {

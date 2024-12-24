@@ -39,6 +39,7 @@ export class GeneratorPdfService {
 
         const datosIdentificacion: IdentificacionInterface = await this.obtenerDatos(id_practica, id_docente);
         const datosRespuesta: FormatoRespuestaEvaluativaInterface[] = await this.obtenerRespuestas(id_informe_evaluativo);
+        const aprobacion: boolean = this.estadoAprobacion(datosRespuesta);
 
         const dataIdentificacionHTML = {
             logoUtaBase64: fs.readFileSync(logoUtaPath, 'base64'),
@@ -48,7 +49,8 @@ export class GeneratorPdfService {
             tipoPractica: datosIdentificacion.tipo_practica,
             profesorRevisor: datosIdentificacion.profesor_revisor,
             respuestas: datosRespuesta,
-            fechaRevision: new Date()
+            fechaRevision: new Date(),
+            estadoAprobacion: aprobacion,
         }
         console.log(datosRespuesta)
         Handlebars.registerHelper('getFromList', function (list, index, attr) {
@@ -57,6 +59,18 @@ export class GeneratorPdfService {
             }
             return ''; // Devuelve vacío si no encuentra el atributo
         });
+
+        Handlebars.registerHelper('equals', function (a, b, options) {
+            return a === b ? options.fn(this) : options.inverse(this);
+        });
+        Handlebars.registerHelper('getFromListWithCondition', function (list, index, attr, conditionValue) {
+            if (Array.isArray(list) && list[index] && list[index][attr] !== undefined) {
+                return list[index][attr] === conditionValue ? 'X' : '';
+            }
+            return ''; // Devuelve vacío si el índice o el atributo no existen
+        });
+        
+        
 
 
         const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
@@ -117,6 +131,16 @@ export class GeneratorPdfService {
         }
     }
 
+    private estadoAprobacion(respuestas: FormatoRespuestaEvaluativaInterface[]){
+        let aprobacion = true;
+        for(let res of respuestas){
+            if(res.respuesta == 'Deficiente'){
+                aprobacion = false
+            };
+        };
+
+        return aprobacion;
+    }
     private async obtenerRespuestas(id_informe_evaluativo: number) {
         try {
 
