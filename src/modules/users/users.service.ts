@@ -132,6 +132,31 @@ export class UsersService {
     }
   }
 
+  public async obtenerSecretarias(){
+    try {
+      const usuarios = await this.databaseService.usuarios.findMany({
+        where: {
+          tipo_usuario: {
+            in: [
+              Tipo_usuario.SECRETARIA_CARRERA, Tipo_usuario.JEFE_DEPARTAMENTO
+            ]
+          },
+        },
+        select: {
+          nombre: true,
+          rut: true,
+          id_usuario: true,
+          correo: true,
+          tipo_usuario: true,
+        }
+      })
+      return usuarios;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async changeAdminPassword(adminId: number, changePasswordDto: ChangePasswordDto) {
     const { oldPassword, newPassword } = changePasswordDto;
 

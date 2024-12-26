@@ -19,6 +19,7 @@ export class AcademicosController {
 
     @Post()
     public registrarAcademico(@Body() academico: CreateAcademicoDto){
+        console.log(academico)
         return this._academicoService.crearAcademico(academico);
     }
 
