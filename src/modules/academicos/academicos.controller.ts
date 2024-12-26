@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, Patch, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, InternalServerErrorException, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
 import { AcademicosService } from './academicos.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -6,6 +6,7 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { CrearInformeCorreccion } from './dto/create-correccion-informe.dto';
 import { Response } from 'express';
+import { EstadisticaService } from './services/estadistica.service';
 const rootPath = process.cwd();
 
 @Controller('academicos')
@@ -13,6 +14,7 @@ export class AcademicosController {
 
     constructor(
         private readonly _academicoService: AcademicosService,
+        private readonly _estadisticaService: EstadisticaService,
     ){}
 
     @Post()
@@ -142,6 +144,15 @@ export class AcademicosController {
                     throw error; // Manejo de error si el archivo no existe
                 }
                 throw new Error('Error al intentar descargar el archivo');
+            }
+        }
+
+        @Get('estadistica/estado-aprobacion')
+        async getEstadoAprobacionAcademico(@Query('id_academico', ParseIntPipe) id_academico){
+            try {
+                return this._estadisticaService.cantidadReprobadosAprobadosPorAcademico(id_academico);
+            } catch (error) {
+                throw new InternalServerErrorException('Error interno al obtener la cantidad de aprobados y reprobados')
             }
         }
 }
