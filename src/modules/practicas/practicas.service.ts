@@ -27,22 +27,22 @@ export class PracticasService {
                 select: { primer_practica: true, segunda_practica: true }
             });
 
-            if(alumno.primer_practica && practica.tipo_practica == TipoPractica.PRACTICA_UNO){
+            if (alumno.primer_practica && practica.tipo_practica == TipoPractica.PRACTICA_UNO) {
                 throw new BadRequestException('El alumno ya se encuentra cursando la practica uno.')
             }
 
-            if(alumno.segunda_practica && practica.tipo_practica == TipoPractica.PRACTICA_DOS){
+            if (alumno.segunda_practica && practica.tipo_practica == TipoPractica.PRACTICA_DOS) {
                 throw new BadRequestException('El alumno ya se encuentra cursando la segunda practica.')
             }
 
             if (practica.fecha_termino <= practica.fecha_inicio) {
                 throw new BadRequestException('La fecha de término debe ser posterior a la fecha de inicio.');
             }
-            
+
             if (practica.cantidad_horas < practica.horas_semanales) {
                 throw new BadRequestException('La cantidad de horas totales no puede ser menor a las horas semanales.');
             }
-            
+
             const nuevaPractica = await this._databaseService.practicas.create({
                 data: {
                     ...practica,
@@ -53,13 +53,13 @@ export class PracticasService {
                     jefe_supervisor: true, // Relación con el modelo de supervisores
                 },
             });
-                await this._databaseService.alumnosPractica.update({
-                    where: { id_user: nuevaPractica.id_alumno },
-                    data: { primer_practica: true, segunda_practica: true }
-                })
+            await this._databaseService.alumnosPractica.update({
+                where: { id_user: nuevaPractica.id_alumno },
+                data: { primer_practica: true, segunda_practica: true }
+            })
 
             return new PracticaResponseDto(nuevaPractica);
-            
+
 
 
         } catch (error) {
@@ -231,115 +231,60 @@ export class PracticasService {
         }
     }
 
+    public async extenderPractica(id_practica: number, fecha_fin_ext: Date){
+        // buscar si el estado de la practica
 
-
-    //@Cron('05 16 * * *')
-    public async generarInformeConfidencial() {
-        try {
-            const findPracticas: any = await this._databaseService.practicas.findMany({
-                where: {
-                    estado: Estado_practica.ESPERA_INFORMES,
-                    informe_confidencial: null,
-                },
-            });
-            console.log(findPracticas)
-            if (findPracticas.length != 0) {
-                const informesConfidencial = await Promise.all(findPracticas.map(async (practica) => {
-
-                    const informe = {
-                        id_supervisor: practica.id_supervisor,
-                        id_practica: practica.id_practica,
-                        id_alumno_evaluado: practica.id_alumno,
-                        fecha_inicio: practica.fecha_termino, // Fecha de término de la práctica
-                        estado: Estado_informe.ESPERA
-                    }
-
-                    // Asegurarse de que ambas fechas son objetos Date antes de comparar
-                    if (new Date() > new Date(informe.fecha_inicio)) {
-                        // Si la fecha actual es posterior a la fecha de término de la práctica, genera el informe
-                        return await this._databaseService.informeConfidencial.create({
-                            data: informe,
-                        });
-                    }
-                }));
+        const practica = await this._databaseService.practicas.findUnique({
+            where: { id_practica: id_practica },
+            include: { 
+                informe_alumno: true,
+                informe_confidencial: true,
             }
-        } catch (error) {
-            throw error;
+        });
+        if(!practica){
+            throw new BadRequestException(`Error, la práctica con id ${id_practica} no existe`);
         }
-    }
-    //@Cron('05 16 * * *')
-    public async generarInformeAlumno() {
-        try {
-            const findPracticas: any = await this._databaseService.practicas.findMany({
-                where: {
-                    estado: Estado_practica.ESPERA_INFORMES,
-                    informe_alumno: null,
-                },
-            });
 
-            if (findPracticas.length != 0) {
-                const informesConfidencial = await Promise.all(findPracticas.map(async (practica) => {
+        if(practica.estado == Estado_practica.ESPERA_INFORMES){
+            // llamar funciones para borrar los informes (los informes ya existen)
+            await this.borrarInformes(practica.informe_alumno.id_informe, practica.informe_confidencial.id_informe_confidencial);
 
-                    const informe = {
-                        id_practica: practica.id_practica,
-                        id_alumno: practica.id_alumno,
-                        estado: Estado_informe.ESPERA,
-                        fecha_inicio: practica.fecha_termino
-                    }
+            const actPractica = await this._databaseService.practicas.update({
+                where: {id_practica: id_practica },
+                data: { fecha_termino: fecha_fin_ext}
+            })
 
-                    // Asegurarse de que ambas fechas son objetos Date antes de comparar
-                    if (new Date() > new Date(informe.fecha_inicio)) {
-                        // Si la fecha actual es posterior a la fecha de término de la práctica, genera el informe
-                        return await this._databaseService.informesAlumno.create({
-                            data: informe,
-                        });
-                    }
-                }));
-
-                return this._databaseService.informeConfidencial.findMany();
+            return {
+                message: `La practica ha sido extendida hasta ${fecha_fin_ext}`,
+                data: actPractica
             }
-            return {}
 
-        } catch (error) {
-            throw error;
+        }else if(practica.estado == Estado_practica.CURSANDO){
+            // editar fecha de termino
+            const actPractica = await this._databaseService.practicas.update({
+                where: {id_practica: id_practica },
+                data: { fecha_termino: fecha_fin_ext}
+            })
+
+            return {
+                message: `La practica ha sido extendida hasta ${fecha_fin_ext}`,
+                data: actPractica
+            }
+        }else {
+            // una practia en revision para adelante no se puede editar o extender
+            throw new BadRequestException('Las practicas solo se pueden extender antes del periodo de espera de informes');
         }
+
+
     }
 
-    // finalizar practica automaticamente
-    //@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-    // @Cron('50 15 * * *')
-    public async actualizarEstadoPracticas(): Promise<void> {
-        try {
-            // Obtener las prácticas que están en estado CURSANDO y cuya fecha de término ya pasó
-            const practicasPorFinalizar = await this._databaseService.practicas.findMany({
-                where: {
-                    estado: Estado_practica.CURSANDO,
-                    fecha_termino: { lt: new Date() }, // Fecha de término anterior a la fecha actual
-                },
-            });
-    
-            if (practicasPorFinalizar.length === 0) {
-                this.logger.log('No hay prácticas que necesiten ser finalizadas.');
-                return;
-            }
-    
-            // Actualizar el estado de las prácticas a ESPERA_INFORMES
-            const updates = practicasPorFinalizar.map((practica) =>
-                this._databaseService.practicas.update({
-                    where: { id_practica: practica.id_practica },
-                    data: { estado: Estado_practica.ESPERA_INFORMES },
-                })
-            );
-    
-            await Promise.all(updates);
-    
-            this.logger.log(
-                `Se actualizaron ${practicasPorFinalizar.length} prácticas a estado ESPERA_INFORMES.`
-            );
-        } catch (error) {
-            this.logger.error('Error al actualizar el estado de las prácticas.', error);
-        }
-    }
-    
+    private async borrarInformes(id_informe_al: number, id_informe_conf: number){
+        await this._databaseService.informeConfidencial.delete({
+            where: { id_informe_confidencial: id_informe_conf }
+        });
 
+        await this._databaseService.informesAlumno.delete({
+            where: {id_informe: id_informe_al }
+        });
+    }
 }

@@ -1,6 +1,7 @@
 import { HttpStatus } from "@nestjs/common";
 import { Practicas } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
+import { IsDate, IsNotEmpty, IsNumber } from "class-validator";
 
 export class PracticaResponseDto {
     message: 'Practica Creada con Éxito';
@@ -47,3 +48,12 @@ export class PracticaDetalle {
     academico_rut?: string; // RUT del académico (puede ser null)
   }
   
+export class ExtensionPractica {
+    @IsNumber()
+    @IsNotEmpty()
+    id_practica: number;
+
+    @IsDate()
+    @IsNotEmpty()
+    fecha_fin_ext: Date;
+}
