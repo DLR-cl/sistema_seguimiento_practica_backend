@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { UserFromToken } from '../../auth/decorators/userToken.decorator';
 import { CantidadPracticaPorMesesDto } from './dto/cantidad-practica-meses.dto';
@@ -48,6 +48,15 @@ export class DashboardController {
   public async obtenerCantidadAlumnosAsignadosSupervisor(@UserFromToken() user: any) {
     const id_supervisor = user.id_usuario;
     return await this._dashboardService.obtenerCantidadAlumnosAsignadosSupervisor(id_supervisor);
+  }
+
+  @Get('empresa/estadisticas/tipo-empresas')
+  public async obtenerCantidadPorTipoEmpresa(){
+    try {
+      return await this._analiticaService.obtenerCantidadTipoEmpresa();
+    } catch (error) {
+      throw new InternalServerErrorException('Error interno al obtener la cantida de empresas por tipo')
+    }
   }
 
   @Get('estadistica-practicas-dashboard-jefe-carrera')

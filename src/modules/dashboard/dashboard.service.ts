@@ -289,11 +289,11 @@ export class DashboardService {
 
       // Retornar resultados
       return {
-        estudiantes_practica: estudiantesEnPractica,
-        estudiantes_revision: estudiantesEnProcesoDeRevison,
-        informes_sin_enviar: estudiantesNoEntreganInforme,
-        total_asignados: totalInformesActualesAsignados,
-        max_informes: cantidadMaxTotalInformesAcademico,
+        estudiantes_practica: estudiantesEnPractica || 0,
+        estudiantes_revision: estudiantesEnProcesoDeRevison || 0,
+        informes_sin_enviar: estudiantesNoEntreganInforme || 0,
+        total_asignados: totalInformesActualesAsignados || 0,
+        max_informes: cantidadMaxTotalInformesAcademico || 0,
 
       };
     } catch (error) {

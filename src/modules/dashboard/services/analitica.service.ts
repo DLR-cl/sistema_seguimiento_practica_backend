@@ -44,4 +44,22 @@ export class AnaliticaService {
         return resultado;
     }
     
+
+    async obtenerCantidadTipoEmpresa() {
+        const empresasPrivadas = await this._databaseService.empresas.count({
+            where: { caracter_empresa: "PRIVADA"}
+        });
+
+        const empresasPublicas = await this._databaseService.empresas.count({
+            where: { caracter_empresa: "PUBLICA"}
+        })
+    
+    
+        return {
+            privada: empresasPrivadas,
+            publica: empresasPublicas
+        };
+    }
+    
+    
 }
