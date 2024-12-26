@@ -42,7 +42,7 @@ export class AcademicosController {
         storage: diskStorage({
             destination: (req, file, callback) => {
                 // Carpeta temporal para evitar depender de datos del body
-                const folderPath = join(rootPath, 'uploads', 'temp-correcciones');
+                const folderPath = join(rootPath, 'uploads', 'temp');
                 callback(null, folderPath);
             },
             filename: (req, file, callback) => {
