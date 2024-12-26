@@ -9,11 +9,11 @@ SELECT DISTINCT
     DATE(infA.fecha_inicio_revision) AS inicio_revision,
     DATE(infA.fecha_termino_revision) AS fin_revision
 FROM   
-    practicas AS p
+    Practicas AS p
 LEFT JOIN
     usuario AS a ON a.id_usuario = p.id_alumno
 LEFT JOIN
-    informesalumno AS infA ON infA.id_practica = p.id_practica
+    InformesAlumno AS infA ON infA.id_practica = p.id_practica
 WHERE
     infA.id_academico = ? -- Incluir solo informes asignados al académico 1
     AND p.estado != 'CURSANDO';
