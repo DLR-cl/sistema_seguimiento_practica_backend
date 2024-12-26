@@ -2,14 +2,22 @@ import { Body, Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { UserFromToken } from '../../auth/decorators/userToken.decorator';
 import { CantidadPracticaPorMesesDto } from './dto/cantidad-practica-meses.dto';
+import { AnaliticaService } from './services/analitica.service';
 
 @Controller('dashboard')
 export class DashboardController {
-  constructor(private readonly _dashboardService: DashboardService) {}
+  constructor(private readonly _dashboardService: DashboardService,
+    private readonly _analiticaService: AnaliticaService,
+  ) {}
 
   @Get()
   public async obtenerCantidadEstudiantesEnPractica() {
     return await this._dashboardService.obtenerCantidadEstudiantesEnPractica();
+  }
+
+  @Get('informe-alumno/respuestas-historicas')
+  public async obtenerRespuestasHistoricasInformeAlumno(){
+    return await this._analiticaService.obtenerTotalHistoricoRespuestasInformeAlumno();
   }
 
   @Get('info-informes')
