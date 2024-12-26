@@ -5,10 +5,8 @@ import * as preguntasInformeEvaluativo from '../src/data/asignarPreguntasInforme
 import * as preguntasInformeAlumno from '../src/data/asignarPreguntasInformeAlumnos.json'
 import * as preguntasInformeConfidencial from '../src/data/asignarPreguntasInformeConfidencial.json'
 import * as asignaturas from '../src/data/asignaturas.json'
-import { crearAsignaturaDto } from '../../../modules/asignaturas/dto/crear-asignatura.dto';
-import { CrearPreguntaDto } from 'src/modules/preguntas/dto/crear-pregunta.dto';
-import { AsignarPreguntaDto } from 'src/modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 import { encrypt } from '../src/auth/libs/bcryp';
+import { AsignarPreguntaDto, crearAsignaturaDto, CrearPreguntaDto } from './dto/dto';
 const prisma = new PrismaClient();
 
 async function main() {

@@ -39,7 +39,7 @@ export class UsersController {
   async changePassword(@Req() req: any, @Body() changePasswordDto: ChangePasswordDto) {
     const { id_usuario, rol } = req.user; // Extrae el ID y rol del usuario del token JWT
   
-    if (rol === 'ADMINISTRADOR' || rol === 'JEFE_DEPARTAMENTO' || rol === 'JEFE_CARRERA') {
+    if (rol === 'ADMINISTRADOR' || rol === 'JEFE_DEPARTAMENTO' || rol === 'JEFE_CARRERA' || rol==='SECRETARIA_DEPARTAMENTO' || rol === 'SECRETARIA_CARRERA') {
       // Si es administrador o jefe, cambia la contraseña en el servicio correspondiente
       return this.usersService.changeAdminPassword(id_usuario, changePasswordDto);
     }
