@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Estado_informe, TipoPractica } from '@prisma/client';
 import { Response } from 'express';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../../../database/database/database.service';
 import { startOfWeek, endOfWeek } from 'date-fns';
 @Injectable()
 export class ReportesExcelService {

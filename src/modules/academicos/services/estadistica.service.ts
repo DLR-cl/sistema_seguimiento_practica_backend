@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Estado_informe, Estado_practica } from '@prisma/client';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../../database/database/database.service';
 
 @Injectable()
 export class EstadisticaService {

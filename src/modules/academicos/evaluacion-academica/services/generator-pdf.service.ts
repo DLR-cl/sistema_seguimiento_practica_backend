@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../../../database/database/database.service';
 import { FormatoRespuestaEvaluativaInterface } from '../interface/responseRespuesta.interface';
 import { obtenerRespuestasInformeEvaluativo } from '@prisma/client/sql';
 import { IdentificacionInterface } from '../interface/identificacion.interface';

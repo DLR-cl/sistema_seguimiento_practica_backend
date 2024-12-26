@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Estado_informe, Estado_practica } from '@prisma/client';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../../database/database/database.service';
 import { CreateAsignacionDto } from '../dto/create-asignacion.dto';
-import { EmailAvisosService } from 'src/modules/email-avisos/email-avisos.service';
+import { EmailAvisosService } from '../../../modules/email-avisos/email-avisos.service';
 
 @Injectable()
 export class InformeManagementService {

@@ -1,5 +1,5 @@
 import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../../database/database/database.service';
 import { Informe, InformeDto } from '../dto/informe_pdf.dto';
 import { Mutex } from 'async-mutex';
 import * as fs from 'fs';

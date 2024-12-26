@@ -5,7 +5,7 @@ import { UsersService } from '../users/users.service';
 import { AuthService } from '../../auth/auth.service';
 import { DatabaseService } from '../../database/database/database.service';
 import { AuthModule } from '../../auth/auth.module';
-import { DatabaseModule } from 'src/database/database/database.module';
+import { DatabaseModule } from '../../database/database/database.module';
 import { UsersModule } from '../users/users.module';
 import { EmailAvisosModule } from '../email-avisos/email-avisos.module';
 
