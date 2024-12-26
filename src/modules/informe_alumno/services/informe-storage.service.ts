@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import { Estado_informe, Estado_practica, Tipo_pregunta } from '@prisma/client';
 import { resolve } from 'path';
 import { CreateRespuestaInformAlumnoDto } from '../dto/class/respuestas';
+import { Express } from 'express';
 
 const informeMutex = new Mutex(); // Mutex para controlar concurrencia
 
