@@ -14,42 +14,15 @@ export class InformeManagementService {
 
     public async asignarInformeAlAcademico(asignacion: CreateAsignacionDto) {
         try {
-            const academico = await this._databaseService.academico.findUnique({
-                where: {
-                    id_user: asignacion.id_academico,
-                },
-                include: {
-                    usuario: {
-                        select: {
-                            nombre: true
-                        }
-                    }
-                }
-            })
-            // Buscar el informe por su ID y validar el estado permitido para asignación
-            const informeAlumno = await this._databaseService.informesAlumno.findUnique({
-                where: {
-                    id_informe: asignacion.id_informe_alumno,
-                    estado: {
-                        in: [Estado_informe.ENVIADA, Estado_informe.REVISION], // Estados permitidos
-                    },
-                },
-            });
 
-            const informeConfidencial = await this._databaseService.informeConfidencial.findUnique({
-                where: {
-                    id_informe_confidencial: asignacion.id_informe_confidencial,
-                    estado: {
-                        in: [Estado_informe.ENVIADA, Estado_informe.REVISION]
-                    }
-                },
+            const practica = await this._databaseService.practicas.findUnique({
+                where: { id_practica: asignacion.id_practica }
             });
-
-            if (!informeAlumno && !informeConfidencial) {
-                throw new BadRequestException(
-                    'Deben existir ambos informes para asignar al academico.'
-                );
+            if(!practica){
+                throw new BadRequestException('Error, no existe practica');
             }
+
+            await this.verificarInformes(asignacion.id_informe_alumno, asignacion.id_academico, asignacion.id_informe_confidencial);
 
             // Definir fechas de inicio y fin de la revisión
             const fechaInicio = new Date();
@@ -81,19 +54,13 @@ export class InformeManagementService {
                     fecha_termino_revision: fechaFin,
                 }
             })
-            // CAMBIAR ESTADO PRACTICA
-            const practica = await this._databaseService.practicas.update({
-                where: {
-                    id_practica: asignacion.id_practica,
-                }, data: {
-                    estado: Estado_practica.REVISION_GENERAL
-                }
-            })
+
+            await this.actualizarEstadoPractica(asignacion.id_practica);
             // Notificar SOLO al acádemico
-            this._emailService.notificacionAsignacion(asignarInformeAlumno.id_academico, asignarInformeAlumno.id_informe);
+            // this._emailService.notificacionAsignacion(asignarInformeAlumno.id_academico, asignarInformeAlumno.id_informe);
 
             return {
-                message: `Se asignó exitosamente la revisión del informe a ${academico.usuario.nombre}, a partir de la fecha actual tiene 14 días para revisión.`
+                message: `Se asignó exitosamente la revisión del informe, a partir de la fecha actual tiene 14 días para revisión.`
             }
         } catch (error) {
             if (error instanceof BadRequestException) {
@@ -104,4 +71,60 @@ export class InformeManagementService {
             );
         }
     }
+
+
+    private async verificarInformes(id_informe_al: number, id_academico: number, id_informe_conf: number) {
+        const academico = await this._databaseService.academico.findUnique({
+            where: {
+                id_user: id_academico,
+            },
+            include: {
+                usuario: {
+                    select: {
+                        nombre: true
+                    }
+                }
+            }
+        })
+        if (!academico) {
+            throw new BadRequestException('Error, no existe el academico para asignar informe');
+        }
+        // Buscar el informe por su ID y validar el estado permitido para asignación
+        const informeAlumno = await this._databaseService.informesAlumno.findUnique({
+            where: {
+                id_informe: id_informe_al,
+                estado: {
+                    in: [Estado_informe.ENVIADA, Estado_informe.REVISION], // Estados permitidos
+                },
+            },
+        });
+
+        const informeConfidencial = await this._databaseService.informeConfidencial.findUnique({
+            where: {
+                id_informe_confidencial: id_informe_conf,
+                estado: {
+                    in: [Estado_informe.ENVIADA, Estado_informe.REVISION]
+                }
+            },
+        });
+
+        if (!informeAlumno && !informeConfidencial) {
+            throw new BadRequestException('Error, uno de los dos informes no existe');
+        }
+
+        return true;
+
+    }
+
+    private async actualizarEstadoPractica(id_practica: number) {
+        // CAMBIAR ESTADO PRACTICA
+        await this._databaseService.practicas.update({
+            where: {
+                id_practica: id_practica,
+            }, data: {
+                estado: Estado_practica.REVISION_GENERAL
+            }
+        })
+    }
+
 }
