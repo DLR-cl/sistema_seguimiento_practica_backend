@@ -16,8 +16,8 @@ export class DashboardController {
   }
 
   @Get('informe-alumno/respuestas-historicas')
-  public async obtenerRespuestasHistoricasInformeAlumno(){
-    return await this._analiticaService.obtenerTotalHistoricoRespuestasInformeAlumno();
+  public async obtenerRespuestasHistoricasInformeEvaluacion(){
+    return await this._analiticaService.obtenerTotalHistoricoRespuestasInformeEvaluacion();
   }
 
   @Get('info-informes')

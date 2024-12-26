@@ -8,36 +8,35 @@ export class AnaliticaService {
         private readonly _databaseService: DatabaseService,
     ){}
 
-    async obtenerTotalHistoricoRespuestasInformeAlumno() {
+    async obtenerTotalHistoricoRespuestasInformeEvaluacion() {
         // Obtener todas las respuestas y los nombres de las preguntas
-        const respuestas = await this._databaseService.preguntasImplementadasInformeAlumno.findMany({
-            select: {
-                id_pregunta: true,
-                respuestas: true,
-                preguntas: {
-                    select: {
-                        enunciado_pregunta: true, // Trae el nombre de la pregunta relacionada
-                    },
-                },
+        const respuestas = await this._databaseService.preguntasImplementadasInformeEvaluacion.findMany({
+            include: {
+                respuestas: true, // Suponiendo que 'respuestas' es un array relacionado
+                pregunta: true,   // Incluye el modelo relacionado 'pregunta'
             },
         });
     
         // Agrupar las respuestas por el nombre de la pregunta y contar cada tipo
         const resultado = respuestas.reduce((acc, item) => {
-            const nombrePregunta = item.preguntas?.enunciado_pregunta || 'Pregunta desconocida';
-            const respuesta = item.respuestas;
+            const nombrePregunta = item.pregunta?.enunciado_pregunta || 'Pregunta desconocida';
     
-            if (!acc[nombrePregunta]) {
-                acc[nombrePregunta] = {
-                    Total: 0,
-                    Suficiente: 0,
-                    Deficiente: 0,
-                    Regular: 0,
-                };
-            }
+            // Si las respuestas son un array, procesarlas
+            item.respuestas.forEach((respuestaItem) => {
+                const respuesta = respuestaItem.respuesta_texto; // Ajusta según la estructura de 'respuesta'
     
-            // Incrementar el contador correspondiente
-            acc[nombrePregunta][respuesta] = (acc[nombrePregunta][respuesta] || 0) + 1;
+                if (!acc[nombrePregunta]) {
+                    acc[nombrePregunta] = {
+                        Total: 0,
+                        Suficiente: 0,
+                        Deficiente: 0,
+                        Regular: 0,
+                    };
+                }
+    
+                // Incrementar el contador correspondiente
+                acc[nombrePregunta][respuesta] = (acc[nombrePregunta][respuesta] || 0) + 1;
+            });
     
             return acc;
         }, {});
@@ -45,7 +44,4 @@ export class AnaliticaService {
         return resultado;
     }
     
-    async obtenerTotalHistoricoRespuestasInformeConfidencial(){
-        
-    }
 }
