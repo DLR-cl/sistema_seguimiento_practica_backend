@@ -1,0 +1,35 @@
+[
+    { 
+        "nombre": "Evaluación del desempeño del practicante",
+        "descripcion": "Se evalúan las habilidades, conocimientos y actitudes del practicante, considerando su nivel de profesionalismo y desempeño durante la ejecución de sus actividades prácticas."
+    },
+    {
+        "nombre": "Desafíos de mejora para la carrera",
+        "descripcion":"Identificación de oportunidades de mejora en el plan de estudios de la carrera, basadas en los desafíos encontrados por los practicantes durante su experiencia profesional."
+    },
+    {
+        "nombre": "Formato",
+        "descripcion": "Dimension para identificar aspectos como la redacción y estructura inicial del informe del alumno."
+    },
+    {
+        "nombre": "Estructura",
+        "descripcion": "Abarca el contenido del informe del alumno."
+    },
+    {
+        "nombre": "Evaluación General Informe Confidencial",
+        "descripcion": "Dado la evaluación del informe confidencial se determina la aprobación o desaprobación"
+    },
+    
+    {
+        "nombre": "Satisfacción con la experiencia de práctica",
+        "descripcion": "---"
+    },
+    {
+        "nombre": "Desarrollo Profesional",
+        "descripcion": "---"
+    },
+    {
+        "nombre": "Supervisión y apoyo recibido",
+        "descripcion": "---"
+    }
+]   

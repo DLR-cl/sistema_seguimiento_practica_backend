@@ -12,6 +12,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL_DEPLOY")
+  shadowDatabaseUrl = env("DATABASE_URL_SHADOW")
 }
 
 model AlumnasNomina {
@@ -19,6 +20,17 @@ model AlumnasNomina {
   rut       String @unique @db.VarChar(10)
   nombre    String @db.VarChar(200)
   email     String @db.VarChar(100)
+}
+
+model Administrador {
+  id            Int          @id @default(autoincrement())
+  nombre        String
+  correo        String       @unique
+  password      String
+  tipo_usuario  Tipo_usuario // puede ser admin, jefe departamento y jefe de usuario
+  primerSesion  Boolean     @default(true)
+  creadoEn      DateTime     @default(now())
+  actualizadoEn DateTime     @updatedAt
 }
 
 model Usuarios {
@@ -81,7 +93,7 @@ model Empresas {
   ubicacion           String      @db.VarChar(100)
   rubro               String      @db.VarChar(100)
   caracter_empresa    TipoEmpresa
-  tamano_empresa      String      @db.VarChar(100)// nombre y apellido
+  tamano_empresa      String      @db.VarChar(100) // nombre y apellido
 
   jefe_supervisor JefesAlumno[]
 }
@@ -282,8 +294,6 @@ model RespuestasInformeConfidencial {
   @@id([pregunta_id, informe_id])
 }
 
-
-
 model DimensionesEvaluativas {
   id_dimension Int    @id @default(autoincrement())
   nombre       String @db.VarChar(200)
@@ -310,7 +320,8 @@ enum Tipo_usuario {
   JEFE_CARRERA
   ALUMNO_PRACTICA
   JEFE_DEPARTAMENTO
-  SECRETARIA
+  SECRETARIA_DEPARTAMENTO
+  SECRETARIA_CARRERA
   JEFE_EMPLEADOR
   ACADEMICO
   ADMINISTRADOR

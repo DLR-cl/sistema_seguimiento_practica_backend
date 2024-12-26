@@ -4,10 +4,16 @@ import { InformeAlumnoService } from './informe_alumno.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { InformeDto } from './dto/informe_pdf.dto';
-import { Response } from 'express';
+import { Informe, InformeDto } from './dto/informe_pdf.dto';
+import e, { Response } from 'express';
 import { CreateAsignacionDto } from './dto/create-asignacion.dto';
 import { AprobacionInformeDto, Comentario } from './dto/aprobacion-informe.dto';
+import { InformeManagementService } from './services/informe-management.service';
+import { InformeRevisionService } from './services/informe-revision.service';
+import { InformeStorageService } from './services/informe-storage.service';
+import { validate } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
+import { CreateRespuestaInformAlumnoDto } from './dto/class/respuestas';
 
 const rootPath = process.cwd();
 @Controller('informe-alumno')
@@ -15,6 +21,9 @@ export class InformeAlumnoController {
 
     constructor(
         private readonly _informeAlumnoService: InformeAlumnoService,
+        private readonly _informemanagamentService: InformeManagementService,
+        private readonly _informerevisonService: InformeRevisionService,
+        private readonly _informestorageService: InformeStorageService
     ) { }
 
 
@@ -41,12 +50,35 @@ export class InformeAlumnoController {
                 exceptionFactory: (errors) => new BadRequestException('Archivo inválido'),
             }),
         ) file: Express.Multer.File,
-        @Body() data: InformeDto
+        @Body() rawData: any
     ) {
-        console.log('Body:', data);
-        console.log('File:', file);
+        if(rawData.respuesta){
 
-        return this._informeAlumnoService.subirInforme(file, data, 'uploads');
+            const parsedData = JSON.parse(rawData.respuestas);
+            const data: Informe = {
+                ...rawData,
+                respuestas: parsedData
+            }
+            // Convertir los datos planos al DTO usando class-transformer
+            
+            // Validar el DTO
+            const errors = await validate(data);
+            if (errors.length > 0) {
+                // Formatear los errores
+                const formattedErrors = errors.map(err => ({
+                    property: err.property,
+                    constraints: err.constraints,
+                }));
+                
+                throw new BadRequestException({
+                    message: 'Errores de validación',
+                    errors: formattedErrors,
+                });
+            }
+            
+            return this._informestorageService.subirInforme(file, data, 'uploads');
+        }
+        return this._informestorageService.subirInforme(file, rawData, 'uploads')
     }
 
     // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio
@@ -99,22 +131,22 @@ export class InformeAlumnoController {
 
     @Patch('asociar-informe')
     public async asociarInforme(@Body() data: CreateAsignacionDto) {
-        return await this._informeAlumnoService.asignarInformeAlAcademico(data);
+        return await this._informemanagamentService.asignarInformeAlAcademico(data);
     }
 
     @Patch('aprobar-informe')
     public async aprobarInforme(@Body() data: AprobacionInformeDto) {
-        return await this._informeAlumnoService.aprobarInforme(data);
+        return await this._informerevisonService.aprobarInforme(data);
     }
 
     @Post('comentarios')
     public async generarComentario(@Body() data: Comentario[]) {
-        return await this._informeAlumnoService.crearComentarios(data);
+        return await this._informerevisonService.crearComentarios(data);
     }
 
     @Patch('editar-comentario')
     public async editarComentario(@Body() data: Comentario) {
-        return await this._informeAlumnoService.editarComentario(data)
+        return await this._informerevisonService.editarComentario(data)
     }
 
     @Get('obtener-respuestas/:id')

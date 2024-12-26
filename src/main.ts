@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
 import * as multer from 'multer';
 import * as cookieParser from 'cookie-parser';
+import { allowedNodeEnvironmentFlags } from 'process';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,19 +18,11 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
   app.enableCors({
-    origin: (origin, callback) => {
-      const allowedOrigins = [
-        'https://sistemapracticas.vercel.app',
-        'http://localhost:4200'
-      ];
-  
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
   });
+  
   
 
   app.use((req, res, next) => {
@@ -46,6 +39,6 @@ async function bootstrap() {
   
   
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT ||3000);
 }
 bootstrap();

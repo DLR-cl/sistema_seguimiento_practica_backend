@@ -19,39 +19,67 @@ export class AuthService {
     private readonly _usuarioService: UsersService,
     private readonly _jwtService: JwtService,
     private readonly _databaseService: DatabaseService,
-  ) {}
+  ) { }
 
-  async signIn(authLoginDto: AuthLoginDto) {
-    try {
-      const user = await this._usuarioService.findUserByEmail(authLoginDto.correo);
+async signIn(authLoginDto: AuthLoginDto) {
+  try {
+    // Buscar usuario por correo
+    const user = await this._usuarioService.findUserByEmail(authLoginDto.correo);
 
-      if (!user || !(await compare(authLoginDto.password, user.password))) {
-        throw new UnauthorizedException('Contraseña o Correo inválidos');
+    if (!user) {
+      // Si no es usuario, buscar en administradores
+      const admin = await this._databaseService.administrador.findUnique({
+        where: { correo: authLoginDto.correo },
+      });
+
+      if (!admin || !(await compare(authLoginDto.password, admin.password))) {
+        throw new UnauthorizedException('Contraseña o correo incorrectos');
       }
 
-      // Generar el token JWT
-      const payload = { id_usuario: user.id_usuario, correo: user.correo, rol: user.tipo_usuario, nombre: user.nombre };
-      const access_token = await this._jwtService.signAsync(payload, { secret: jwtConstants.secret });
-
-      if (user.primerSesion) {
-        // Respuesta directa si es el primer inicio de sesión
-        return {
-          message: 'Primer inicio de sesión. Por favor, cambie su contraseña.',
-          access_token,
-          primerInicioSesion: true,
-        };
-      }
-
-      // Respuesta de inicio de sesión exitoso
-      return {
-        message: 'Inicio de sesión exitoso',
-        access_token,
-        primerInicioSesion: false,
-      };
-    } catch (error) {
-      throw error instanceof HttpException
-        ? error
-        : new InternalServerErrorException('Error interno al hacer login');
+      // Generar token para administrador
+      return this.generateLoginResponse(admin, 'Administrador');
     }
+
+    // Validar la contraseña del usuario
+    if (!(await compare(authLoginDto.password, user.password))) {
+      throw new UnauthorizedException('Contraseña o correo incorrectos');
+    }
+
+    // Generar token para usuario
+    return this.generateLoginResponse(user, 'Usuario');
+  } catch (error) {
+    // Manejo de errores
+    throw error instanceof HttpException
+      ? error
+      : new InternalServerErrorException('Error interno al hacer login');
   }
+}
+
+private async generateLoginResponse(entity: any, role: string) {
+  const payload = {
+    id_usuario: entity.id_usuario || entity.id,
+    correo: entity.correo,
+    rol: entity.tipo_usuario,
+    nombre: entity.nombre,
+  };
+
+  const access_token = await this._jwtService.signAsync(payload, { secret: jwtConstants.secret });
+
+  // Respuesta para primer inicio de sesión
+  if (entity.primerSesion) {
+    return {
+      message: `Primer inicio de sesión para ${role}. Por favor, cambie su contraseña.`,
+      access_token,
+      primerInicioSesion: true,
+    };
+  }
+
+  // Respuesta de inicio de sesión exitoso
+  return {
+    message: `Inicio de sesión exitoso para ${role}.`,
+    access_token,
+    primerInicioSesion: false,
+  };
+}
+
 }

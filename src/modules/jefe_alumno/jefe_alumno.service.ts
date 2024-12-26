@@ -145,7 +145,6 @@ export class JefeAlumnoService {
                     estado_entrega: estado,
                     tipo_practica: informe.tipo_practica
                 }
-                console.log(inforPractica);
                 informes.push(inforPractica);
             }
             const listaInformes: InformesPractica = {

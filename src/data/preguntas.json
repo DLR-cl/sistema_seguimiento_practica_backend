@@ -1,0 +1,155 @@
+[
+    {    
+        "enunciado_pregunta": "Redacción y escritura",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 3
+    },
+    {    
+        "enunciado_pregunta": "Numeración y notas al pie página (sin encabezado)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 3
+    },
+    {    
+        "enunciado_pregunta": "Portada: logos, título, nombre, carrera y fecha",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Resumen (máx. 1 pág)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Tabla de Contenidos (máx. 1 pág.)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Generalidades: objetivos y alcance (máx. 2 pág.)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Descripción Organización: Empresa y Área de Trabajo (máx. 3 pág.)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Descripción Tareas Realizadas: Enfoque sistémico (mín. 2 - máx. 3 pág.)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Relación Malla Curricular: Tópicos incluidos y faltantes (máx. 1 pág)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Conclusiones (máx. 1 pág)",
+        "tipo_pregunta": "REVISION_ACADEMICA",
+        "id_dimension": 4
+    },
+    {    
+        "enunciado_pregunta": "Cumple con los Aspectos Mínimos Exigidos",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 5
+    },
+    {    
+        "enunciado_pregunta": "Observaciones u Otros Aspectos a Considerar",
+        "tipo_pregunta": "ABIERTA",
+        "id_dimension": 5
+    },
+    {
+        "enunciado_pregunta": "¿Qué tan conforme está con el desempeño del practicante en términos de trabajo en equipo, comunicación y capacidad para recibir y aplicar instrucciones de sus supervisores?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 1
+    },
+    {
+        "enunciado_pregunta": "¿Cómo evalúa la actitud y el interés sobre los procesos e instalaciones del área en el que el practicante trabajó?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 1
+    },
+    {
+        "enunciado_pregunta": "¿Cómo lo evalúa el compromiso con la calidad y excelencia en la realización de las actividades, labores y funciones que desempeñó durante el periodo de práctica?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 1
+    },
+    {
+        "enunciado_pregunta": "¿Cómo lo evalúa en términos de la capacidad para organizar su propio trabajo y cumplir con las actividades, labores y funciones asignadas drento de los plazos establecidos?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 1
+    },
+    {
+        "enunciado_pregunta": "¿Cómo lo evalúa en términos de las habilidades de liderazgo y la capacidad de guiar a otros de manera efectiva?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 1
+    },
+    {
+        "enunciado_pregunta": "¿Qué software utiliza su empresa con mayor frecuencia en el área donde se realizó la práctica?",
+        "tipo_pregunta": "HABILIDADES_TECNICAS",
+        "id_dimension": 1
+    },
+    {
+        "enunciado_pregunta": "¿Cómo evalúa la preparación y competencias adquiridas por el/la estudiante a través de la carrera de Ingeniería Civil Industrial para cumplir con las exigencias de su rol durante la práctica?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 2
+    },
+    {
+        "enunciado_pregunta": "¿Estaría la empresa dispuesta a recibir más estudiantes en práctica en el futuro, con el objetivo de establecer una vinculación a largo pazo con nuestro programa de prácticas?",
+        "tipo_pregunta": "VINCULACION_MEDIO",
+        "id_dimension": 2
+    },
+    {
+        "enunciado_pregunta": "En relación con su experiencia con practicantes de otras instuciones. ¿Cómo se considera el nivel de competencia, habildiades y desempeño profesional de los estudiantes de esta carrera?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 2
+    },
+    {
+        "enunciado_pregunta": "En su opinión, ¿Cuál considera que sería una posible remuneración acorde a su reciente experiencia sobre el perfil y competencias de un egresado de la carrera de Ingeniería Civil Industrial durante su primer año de desempeño profesional en su empresa?",
+        "tipo_pregunta": "SALARIO_ESTIMADO",
+        "id_dimension": 2
+    },
+    {
+        "enunciado_pregunta": "En una escala del 1 al 5, ¿Cómo evaluaría su nivel de satisfacción con el desempeño del/la estudiante durante su periodo de práctica?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 2
+    },
+    {
+        "enunciado_pregunta": "Comente su percepción sobre la formación profesional que recibe el/la estudiante de la Universidad de Tarapacá, destacando fortalezas y habilidades a mejorar que considere relevantes.",
+        "tipo_pregunta": "ABIERTA",
+        "id_dimension": 2
+    },
+    {
+        "enunciado_pregunta": "¿Qué recomendaciones nos podría brindar respecto a las capacidades, conocimientos, competencias y habilidades que sean necesarias fortalecer en la formación de los/las estudiantes?",
+        "tipo_pregunta": "ABIERTA",
+        "id_dimension": 2
+    },
+    {
+        "enunciado_pregunta": "¿Consideras que las actividades realizadas durante la práctica fueron relevantes para tu carrera?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 6
+    },
+    {
+        "enunciado_pregunta": "¿El ambiente de trabajo favoreció tu desarrollo profesional y personal?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 6
+    },
+    {
+        "enunciado_pregunta": "¿Qué asignatura te ha servido para tu práctica?",
+        "tipo_pregunta": "DESARROLLO_PROFESIONAL",
+        "id_dimension": 7
+    },
+    {
+        "enunciado_pregunta": "¿El supervisor de tu práctica te brindó suficiente orientación y apoyo para cumplir tus objetivos?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 8
+    },
+    {
+        "enunciado_pregunta": "¿La institución educativa estuvo presente y apoyó tus necesidades durante la práctica?",
+        "tipo_pregunta": "CERRADA",
+        "id_dimension": 8
+    }
+
+
+
+]

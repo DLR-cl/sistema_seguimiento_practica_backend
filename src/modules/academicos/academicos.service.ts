@@ -115,7 +115,7 @@ export class AcademicosService {
             // Verifica si el informe existe y tiene el estado ENVIADA
             const existeInforme = await this._databaseService.informesAlumno.findUnique({
                 where: {
-                    id_informe: data.id_informe,
+                    id_informe: +data.id_informe,
                     estado: Estado_informe.REVISION
                 }
             });
@@ -133,8 +133,8 @@ export class AcademicosService {
             const filePath = join(rootPath, file.path); // Ruta ya establecida por el interceptor
             const informe = await this._databaseService.informesAlumno.update({
                 where: {
-                    id_informe: data.id_informe,
-                    id_academico: data.id_academico,
+                    id_informe: +data.id_informe,
+                    id_academico: +data.id_academico,
                     estado: Estado_informe.REVISION
                 },
                 data: {

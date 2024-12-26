@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { RespuestaInformeConfidencialController } from './respuesta-informe-confidencial.controller';
 import { RespuestaInformeConfidencialService } from './respuesta-informe-confidencial.service';
-import { DatabaseModule } from 'src/database/database/database.module';
+import { DatabaseModule } from '../../database/database/database.module';
 
 @Module({
   controllers: [RespuestaInformeConfidencialController],

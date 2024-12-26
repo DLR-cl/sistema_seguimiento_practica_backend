@@ -20,6 +20,12 @@ export class UsersController {
   }
   @Get('lista-rol/:rol')
   public async obtenerUsuariosByRol(@Param('rol') rol: string){
+    if(rol === "SECRETARIA"){
+      const rolSecretariaDep = Tipo_usuario[(rol+'_DEPARTAMENTO').toUpperCase() as keyof typeof Tipo_usuario];
+      const rolSecretariaCar = Tipo_usuario[(rol+'_CARRERA').toUpperCase() as keyof typeof Tipo_usuario];
+      
+      return await this.usersService.obtenerSecretarias()
+    }
     const rolUsuario = Tipo_usuario[rol.toUpperCase() as keyof typeof Tipo_usuario];
 
     if (!rolUsuario) {
@@ -31,8 +37,15 @@ export class UsersController {
   @UseGuards(AuthGuard) // Protege la ruta con el AuthGuard
   @Patch('change-password')
   async changePassword(@Req() req: any, @Body() changePasswordDto: ChangePasswordDto) {
-    console.log(req.user);
-    const userId = req.user.id_usuario; // Extrae el ID del usuario del token JWT
-    return this.usersService.changePassword(userId, changePasswordDto);
+    const { id_usuario, rol } = req.user; // Extrae el ID y rol del usuario del token JWT
+  
+    if (rol === 'ADMINISTRADOR' || rol === 'JEFE_DEPARTAMENTO' || rol === 'JEFE_CARRERA') {
+      // Si es administrador o jefe, cambia la contraseña en el servicio correspondiente
+      return this.usersService.changeAdminPassword(id_usuario, changePasswordDto);
+    }
+  
+    // Si es un usuario regular, cambia la contraseña en el servicio de usuarios
+    return this.usersService.changePassword(id_usuario, changePasswordDto);
   }
+  
 }
