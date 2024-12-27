@@ -125,7 +125,7 @@ export class AcademicosService {
             }
     
             // Verifica si el académico tiene permisos
-            if (existeInforme.id_academico !== data.id_academico) {
+            if (existeInforme.id_academico !== +data.id_academico) {
                 throw new UnauthorizedException('No posee permisos suficientes para enviar una corrección');
             }
     
