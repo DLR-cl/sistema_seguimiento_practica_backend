@@ -43,6 +43,9 @@ export class AnaliticaService {
     
         return resultado;
     }
+
+   
+    
     
 
     async obtenerCantidadTipoEmpresa() {
