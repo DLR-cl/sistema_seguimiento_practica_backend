@@ -8,3 +8,9 @@ export interface EmpresaGroupByResult {
 export interface EmpresaTipoCantidad {
     [caracterEmpresa: string]: number; // Ejemplo: { PUBLICA: 1, PRIVADA: 2 }
 }
+
+export interface DatosEmpresasTamano {
+    tipo_empresa: String;
+    tamano_categoria: String;
+    total: BigInt;
+}
