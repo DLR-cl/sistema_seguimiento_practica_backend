@@ -232,7 +232,7 @@
             <thead>
                 <tr>
                     <th class="border border-black text-left font-semibold italic text-[.8rem]" >
-                        Observaciones u Otros Aspectos a Considerar:
+                        {{getFromList respuestas 12 'pregunta'}}:
                     </th>
                 </tr>
             </thead>
@@ -240,9 +240,7 @@
                 <tr>
                     <td class="border border-black">
                         <ul class="list-disc pl-8">
-                            <li>Le falta comillas</li>
-                            <li>Le falta comillas</li>
-                            <li>Le falta comillas</li>
+                            <p>{{getFromList respuestas 12 'respuesta'}}</p>
                         </ul>
                     </td>
                 </tr>
