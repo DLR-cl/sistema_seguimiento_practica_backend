@@ -1,11 +1,12 @@
 import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database/database.service';
+import { DatabaseService } from '../../../database/database/database.service';
 import { Informe, InformeDto } from '../dto/informe_pdf.dto';
 import { Mutex } from 'async-mutex';
 import * as fs from 'fs';
 import { Estado_informe, Estado_practica, Tipo_pregunta } from '@prisma/client';
 import { resolve } from 'path';
 import { CreateRespuestaInformAlumnoDto } from '../dto/class/respuestas';
+import { Express } from 'express';
 
 const informeMutex = new Mutex(); // Mutex para controlar concurrencia
 

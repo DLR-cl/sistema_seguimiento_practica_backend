@@ -20,6 +20,12 @@ export class UsersController {
   }
   @Get('lista-rol/:rol')
   public async obtenerUsuariosByRol(@Param('rol') rol: string){
+    if(rol === "SECRETARIA"){
+      const rolSecretariaDep = Tipo_usuario[(rol+'_DEPARTAMENTO').toUpperCase() as keyof typeof Tipo_usuario];
+      const rolSecretariaCar = Tipo_usuario[(rol+'_CARRERA').toUpperCase() as keyof typeof Tipo_usuario];
+      
+      return await this.usersService.obtenerSecretarias()
+    }
     const rolUsuario = Tipo_usuario[rol.toUpperCase() as keyof typeof Tipo_usuario];
 
     if (!rolUsuario) {
