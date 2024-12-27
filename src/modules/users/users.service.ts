@@ -131,7 +131,7 @@ export class UsersService {
       throw error;
     }
   }
-
+  //hola
   public async obtenerSecretarias(){
     try {
       const usuarios = await this.databaseService.usuarios.findMany({
