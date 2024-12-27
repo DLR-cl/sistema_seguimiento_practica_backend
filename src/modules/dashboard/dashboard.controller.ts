@@ -15,6 +15,16 @@ export class DashboardController {
     return await this._dashboardService.obtenerCantidadEstudiantesEnPractica();
   }
 
+  @Get('informe-confidencial/resultados-historicos/:id')
+  public async obtenerRespuestasHistoricoInformeConfidencialByDimension(@Param('id', ParseIntPipe) id_dimension: number){
+    try {
+      return await this.obtenerRespuestasHistoricoInformeConfidencialByDimension(id_dimension);
+    } catch (error) {
+      throw new InternalServerErrorException('Error interno al obtener los resultados historicos');
+    }
+  }
+
+  
   @Get('informe-alumno/respuestas-historicas')
   public async obtenerRespuestasHistoricasInformeEvaluacion(){
     return await this._analiticaService.obtenerTotalHistoricoRespuestasInformeEvaluacion();
