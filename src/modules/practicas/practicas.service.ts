@@ -181,7 +181,31 @@ export class PracticasService {
                 }
             });
 
-            return practica;
+            const alumno = await this._databaseService.alumnosPractica.findUnique({
+                where: {id_user: practica.id_alumno },
+                include: {
+                    usuario: {select: { nombre: true }}
+                }
+            });
+
+            const supervisor = await this._databaseService.jefesAlumno.findUnique({
+                where: { id_user: practica.id_supervisor },
+                include: {
+                    empresa: true,
+                    usuario: true,
+                }
+            });
+
+
+
+            const datos_extra = {
+                ...practica,
+                nombre_empresa: supervisor.empresa.nombre_razon_social,
+                nombre_supervisor: supervisor.usuario.nombre,
+                nombre_alumno: alumno.usuario.nombre
+            }
+
+            return datos_extra;
         } catch (error) {
             if (error instanceof BadRequestException) {
                 throw error;
