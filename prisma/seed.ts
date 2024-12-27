@@ -5,10 +5,8 @@ import * as preguntasInformeEvaluativo from '../src/data/asignarPreguntasInforme
 import * as preguntasInformeAlumno from '../src/data/asignarPreguntasInformeAlumnos.json'
 import * as preguntasInformeConfidencial from '../src/data/asignarPreguntasInformeConfidencial.json'
 import * as asignaturas from '../src/data/asignaturas.json'
-import { crearAsignaturaDto } from 'src/modules/asignaturas/dto/crear-asignatura.dto';
-import { CrearPreguntaDto } from 'src/modules/preguntas/dto/crear-pregunta.dto';
-import { AsignarPreguntaDto } from 'src/modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 import { encrypt } from '../src/auth/libs/bcryp';
+import { AsignarPreguntaDto, crearAsignaturaDto, CrearPreguntaDto } from './dto/dto';
 const prisma = new PrismaClient();
 
 async function main() {
@@ -31,6 +29,28 @@ async function main() {
     },
   });
 
+  const secretariaDepartamento = await prisma.administrador.upsert({
+    where: { correo: 'diis@gestion.uta.cl'},
+    update: {},
+    create: {
+      nombre: 'Secretaria Departamento',
+      correo: 'diis@gestion.uta.cl',
+      password: hashedPassword,
+      tipo_usuario: Tipo_usuario.SECRETARIA_DEPARTAMENTO,
+      primerSesion: true
+    }
+  })
+  const secretariaCarrera = await prisma.administrador.upsert({
+    where: { correo: 'ici@gestion.uta.cl'},
+    update: {},
+    create: {
+      nombre: 'Secretaria Carrera',
+      correo: 'ici@gestion.uta.cl',
+      password: hashedPassword,
+      tipo_usuario: Tipo_usuario.SECRETARIA_DEPARTAMENTO,
+      primerSesion: true
+    }
+  })
   const jefeDepartamento = await prisma.administrador.upsert({
     where: { correo: 'jefe@departamento.com' },
     update: {},
