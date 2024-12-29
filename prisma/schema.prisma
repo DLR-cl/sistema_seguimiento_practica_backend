@@ -7,6 +7,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["typedSql"]
+  
 }
 
 datasource db {
@@ -220,16 +221,18 @@ model InformeConfidencial {
 
 model InformeEvaluacionAcademicos {
   id_informe              Int @id @default(autoincrement())
-  id_academico            Int
-  id_informe_alumno       Int @unique
+  id_academico            Int 
+  id_informe_alumno       Int? @unique
   id_informe_confidencial Int @unique
 
   fecha_revision DateTime @db.Date
 
   academico            Academico                     @relation(fields: [id_academico], references: [id_user])
-  informe_alumno       InformesAlumno                @relation(fields: [id_informe_alumno], references: [id_informe])
+  informe_alumno       InformesAlumno?               @relation(fields: [id_informe_alumno], references: [id_informe])
   informe_confidencial InformeConfidencial           @relation(fields: [id_informe_confidencial], references: [id_informe_confidencial])
   respuestas           RespuestasInformeEvaluacion[]
+  @@unique([id_informe_alumno, id_informe_confidencial])
+
 }
 
 model PreguntasImplementadasInformeEvaluacion {
