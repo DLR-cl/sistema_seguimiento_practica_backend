@@ -17,9 +17,6 @@ export class EvaluacionAcademicaService {
             throw new BadRequestException('El informe evaluativo debe incluir respuestas.');
         }
 
-        const prisma = new PrismaClient({
-            log: ['query', 'info', 'warn', 'error'],
-        });
         // Validar informe del alumno
         const informeAlumno = await this.obtenerInformeAlumno(informe.id_informe_alumno);
         // Validar estado del informe
@@ -43,21 +40,23 @@ export class EvaluacionAcademicaService {
         }
 
         // Registrar el informe evaluativo
-        const informeEvaluativo = await this.registrarInformeEvaluativo(informe);
+        const informeEvaluativo: number = await this.registrarInformeEvaluativo(informe);
 
 
         // Registrar respuestas
         if (!informeEvaluativo) {
             throw new BadRequestException('No existe informe evaluativo o no se creo correctamente');
         }
-        await this.crearRespuestasInformeEvaluativo(informe.respuestas, informeEvaluativo.id_informe);
+        console.log('Se creo tu informe')
+        await this.crearRespuestasInformeEvaluativo(informe.respuestas, informeEvaluativo);
 
         // Actualizar estados
-        await this.actualizarEstados(informe, informeAlumno, informeEvaluativo);
+        
+        await this.actualizarEstados(informe.id_informe_confidencial, informeAlumno.id_informe, informeAlumno.id_practica);
 
         return {
             message: 'Registro del informe exitoso',
-            id_informe: informeEvaluativo.id_informe,
+            id_informe: informeEvaluativo,
             status: HttpStatus.OK,
         };
     }
@@ -122,68 +121,64 @@ export class EvaluacionAcademicaService {
 
         return null; // Continua si no hay respuestas deficientes
     }
-    async registrarInformeEvaluativo(
-        informe: InformeEvaluativoDto,
-    ): Promise<any> {
-        // Verificar existencia de un informe asociado
-        try {
 
-            const informeExistente = await this._databaseService.informeEvaluacionAcademicos.findFirst({
-                where: {
-                    OR: [
-                        { id_informe_alumno: informe.id_informe_alumno },
-                        { id_informe_confidencial: informe.id_informe_confidencial },
-                    ],
-                },
+    async registrarInformeEvaluativo(informe: InformeEvaluativoDto): Promise<number> {
+        console.log("hola uno")
+
+
+        try {
+            // Validar si ya existe un informe con id_informe_confidencial
+            const existeConfidencial = await this._databaseService.informeEvaluacionAcademicos.findFirst({
+                where: { id_informe_confidencial: informe.id_informe_confidencial },
             });
 
-            if (informeExistente) {
-                throw new ConflictException(
-                    `Ya existe un informe evaluativo relacionado con el informe alumno ${informe.id_informe_alumno} o el informe confidencial ${informe.id_informe_confidencial}.`,
-                );
+            if (existeConfidencial) {
+                throw new ConflictException(`El id_informe_confidencial ${informe.id_informe_confidencial} ya está en uso.`);
+            }
+
+            // Validar si ya existe un informe con id_informe_alumno (si está presente)
+            if (informe.id_informe_alumno) {
+                const existeAlumno = await this._databaseService.informeEvaluacionAcademicos.findFirst({
+                    where: { id_informe_alumno: informe.id_informe_alumno },
+                });
+
+                if (existeAlumno) {
+                    throw new ConflictException(`El id_informe_alumno ${informe.id_informe_alumno} ya está en uso.`);
+                }
             }
 
             // Crear el informe evaluativo
-            const informeBase = await this._databaseService.informeEvaluacionAcademicos.create({
+            const data = await this._databaseService.informeEvaluacionAcademicos.create({
                 data: {
                     id_academico: +informe.id_academico,
                     id_informe_confidencial: +informe.id_informe_confidencial,
+                    id_informe_alumno: informe.id_informe_alumno ? +informe.id_informe_alumno : null,
                     fecha_revision: informe.fecha_revision,
                 },
             });
-
-            return this._databaseService.informeEvaluacionAcademicos.update({
-                where: { id_informe: informeBase.id_informe },
-                data: {
-                    id_informe_alumno: +informe.id_informe_alumno,
-                },
-            });
-            
-        } catch (error) {
-            if (error instanceof PrismaClientKnownRequestError) {
-                console.log("hola soy un error inutil")
-            }
+            return data.id_informe;
+        }catch(error){
+            throw error;
         }
     }
 
-
     private async actualizarEstados(
-        informe: InformeEvaluativoDto,
-        informeAlumno: any,
-        informeEvaluativo: any,
+        id_informe_confidencial: number,
+        id_informe_alumno: number,
+        id_practica: number
     ) {
         await this._databaseService.informesAlumno.update({
-            where: { id_informe: +informeEvaluativo.id_informe_alumno },
+            where: { id_informe: id_informe_alumno },
             data: { estado: Estado_informe.APROBADA },
         });
 
         await this._databaseService.informeConfidencial.update({
-            where: { id_informe_confidencial: +informe.id_informe_confidencial },
+            where: { id_informe_confidencial: id_informe_confidencial },
             data: { estado: Estado_informe.APROBADA },
         });
 
         await this._databaseService.practicas.update({
-            where: { id_practica: +informeAlumno.practica.id_practica },
+            where: { id_practica: id_practica },
             data: { estado: Estado_practica.FINALIZADA },
         });
     }
@@ -226,7 +221,8 @@ export class EvaluacionAcademicaService {
                 data: respuestasConIdInforme,
             });
         } catch (error) {
-
+            console.log(error)
+            console.log('me caí acá')
         }
     }
 
