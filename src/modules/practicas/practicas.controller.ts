@@ -15,7 +15,7 @@ export class PracticasController {
 
     @Get('obtener/reporte')
     public async getobtena(){
-        return await this._reporteService.generarReporte();
+        //return await this._reporteService.generarReporteSemestral();
     }
     @Post()
     public generarPractica(@Body() practica: createPracticaDto){
