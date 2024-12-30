@@ -33,11 +33,11 @@ export class InformeStorageService {
           user: process.env.USER_FTP,
           password: process.env.PASSWORD_FTP,
           secure: false,
-      });
+        });
 
-        
 
-  
+
+
         // Define la carpeta y ruta remota según la práctica
         const practicaFolder =
           data.tipo_practica === 'PRACTICA_UNO'
@@ -51,9 +51,9 @@ export class InformeStorageService {
         try {
           await client.ensureDir(practicaFolder);
           console.log(`Directorio remoto asegurado: ${practicaFolder}`);
-      } catch (err) {
+        } catch (err) {
           console.warn(`El directorio remoto ya existe o no pudo ser creado: ${err.message}`);
-      }
+        }
 
         // Sube el archivo al servidor remoto
         // Inicia una transacción
@@ -79,16 +79,16 @@ export class InformeStorageService {
             // Elimina el archivo anterior si existe
             if (informeEnCorreccion.archivo) {
               try {
-                  await client.remove(informeEnCorreccion.archivo);
-                  console.warn(`Archivo anterior eliminado del FTP: ${informeEnCorreccion.archivo}`);
+                await client.remove(informeEnCorreccion.archivo);
+                console.warn(`Archivo anterior eliminado del FTP: ${informeEnCorreccion.archivo}`);
               } catch (deleteError) {
-                  console.error(
-                      `Error al intentar eliminar el archivo anterior del FTP (${informeEnCorreccion.archivo}):`,
-                      deleteError
-                  );
+                console.error(
+                  `Error al intentar eliminar el archivo anterior del FTP (${informeEnCorreccion.archivo}):`,
+                  deleteError
+                );
               }
-          }
-          // actualiza
+            }
+            // actualiza
             const stream = Readable.from(file.buffer)
             await client.uploadFrom(stream, remoteFilePath);
 
@@ -166,13 +166,13 @@ export class InformeStorageService {
         // Compensación: elimina el archivo del FTP si ya fue subido
         if (remoteFilePath) {
           try {
-              await client.remove(remoteFilePath);
-              console.warn(`Archivo eliminado del FTP: ${remoteFilePath}`);
+            await client.remove(remoteFilePath);
+            console.warn(`Archivo eliminado del FTP: ${remoteFilePath}`);
           } catch (deleteError) {
-              console.error('Error al intentar eliminar el archivo del FTP:', deleteError);
+            console.error('Error al intentar eliminar el archivo del FTP:', deleteError);
           }
-      }
-      throw error;
+        }
+        throw error;
       } finally {
         client.close();
       }
@@ -181,84 +181,36 @@ export class InformeStorageService {
 
   private async crearRespuesta(prisma, respuestas: CreateRespuestaInformAlumnoDto[]) {
     try {
-      for (let res of respuestas) {
-        if (res.asignaturas) {
-          // Crea la respuesta principal
-          const respuesta = await prisma.respuestasInformeAlumno.create({
-            data: {
-              id_informe: res.id_informe,
-              id_pregunta: res.id_pregunta,
-            },
-          });
 
-          // Maneja asignaturas relacionadas con la respuesta
-          await this.asignarRespuestasAsignaturasRespuesta(
-            prisma,
-            res.asignaturas,
-            res.id_informe,
-            res.id_pregunta
-          );
-        } else if (res.puntaje) {
-          console.log(res)
-          // Verifica si la pregunta es de tipo evaluativa
-          const findPregunta = await prisma.preguntasImplementadasInformeAlumno.findUnique({
-            where: {
-              id_pregunta: res.id_pregunta,
-            },
-            include: {
-              preguntas: true,
-            },
-          });
+      // las respuestas se generan aun cuando no tengan asignaturas
+      const data = respuestas.map((res) => ({
+        id_informe: res.id_informe,
+        id_pregunta: res.id_pregunta,
+        puntaje: res.puntaje || null,
+        texto: res.texto || null,
+      }));
 
-          // Crea la respuesta con puntaje
-          await prisma.respuestasInformeAlumno.create({
-            data: {
-              id_informe: res.id_informe,
-              id_pregunta: res.id_pregunta,
-              puntaje: res.puntaje,
-            },
-          });
-        } else if (res.texto) {
-          console.log("res", res)
+      await prisma.respuestasInformeAlumno.createMany({
+        data: data
+      });
 
-          // Crea una respuesta con texto
-          await prisma.respuestasInformeAlumno.create({
-            data: {
-              id_informe: res.id_informe,
-              id_pregunta: res.id_pregunta,
-              texto: res.texto,
-            },
-          });
-        }
-      }
+      const respuestasConAsignaturas = respuestas.filter((res) => res.asignaturas);
+
+      const dataAsignaturas = respuestasConAsignaturas[0].asignaturas.map((res) => ({
+        id_informe: respuestasConAsignaturas[0].id_informe,
+        id_pregunta: respuestasConAsignaturas[0].id_pregunta,
+        nombre_asignatura: res
+      }))
+
+      await prisma.asignaturasEnRespuestasInforme.createMany({
+        data: dataAsignaturas,
+      })
 
       return {
         message: 'Respuestas creadas con éxito',
         statusCode: HttpStatus.OK,
       };
-    } catch (error) {
-      console.error('Error al crear respuestas:', error);
-      throw error;
-    }
-  }
 
-  private async asignarRespuestasAsignaturasRespuesta(
-    prisma,
-    asignaturas: string[],
-    id_informe: number,
-    id_respuesta: number
-  ) {
-    try {
-      const array = asignaturas.map((asig) => ({
-        id_informe: id_informe,
-        id_pregunta: id_respuesta,
-        nombre_asignatura: asig,
-      }));
-
-      // Crea las asignaturas relacionadas en batch
-      await prisma.asignaturasEnRespuestasInforme.createMany({
-        data: array,
-      });
     } catch (error) {
       console.error('Error al asignar respuestas a asignaturas:', error);
       throw error;
