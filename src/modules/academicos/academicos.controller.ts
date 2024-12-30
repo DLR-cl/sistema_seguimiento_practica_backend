@@ -39,19 +39,7 @@ export class AcademicosController {
     }
 
     @Patch('subir-correccion')
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            destination: (req, file, callback) => {
-                // Carpeta temporal para evitar depender de datos del body
-                const folderPath = join(rootPath, 'uploads', 'temp');
-                callback(null, folderPath);
-            },
-            filename: (req, file, callback) => {
-                const tempFileName = `${Date.now()}-${file.originalname}`; // Nombre temporal
-                callback(null, tempFileName);
-            },
-        }),
-    }))
+    @UseInterceptors(FileInterceptor('file'))
     public async subirCorreccion(
         @UploadedFile(
             new ParseFilePipe({
@@ -63,7 +51,6 @@ export class AcademicosController {
         ) file: Express.Multer.File,
         @Body() data: CrearInformeCorreccion,
     ) {
-        const fs = require('fs');
         try {
             console.log('Datos recibidos:', data); // Inspección del body
             console.log('Archivo recibido:', file); // Inspección del archivo
@@ -72,39 +59,9 @@ export class AcademicosController {
                 throw new BadRequestException('Faltan datos obligatorios en la solicitud');
             }
     
-            // Determinar la carpeta final según `tipo_practica`
-            let subFolder = '';
-            if (data.tipo_practica === 'PRACTICA_UNO') {
-                subFolder = 'informes-practica-uno/academicos-correccion';
-            } else if (data.tipo_practica === 'PRACTICA_DOS') {
-                subFolder = 'informes-practica-dos/academicos-correccion';
-            } else {
-                throw new BadRequestException('Tipo de práctica no válido');
-            }
-    
-            const folderPath = join(rootPath, 'uploads', subFolder);
-            if (!fs.existsSync(folderPath)) {
-                fs.mkdirSync(folderPath, { recursive: true }); // Crear la carpeta si no existe
-            }
-    
-            // Renombrar y mover el archivo a la carpeta final
-            const extension = extname(file.originalname);
-            const nuevoNombre = `correccion-informe-${data.nombre_alumno}${extension}`;
-            const nuevoPath = join(folderPath, nuevoNombre);
-    
-            await fs.promises.rename(file.path, nuevoPath);
-    
             // Llamar al servicio para almacenar la información en la base de datos
-            return await this._academicoService.subirCorreccion(
-                { ...file, path: nuevoPath },
-                data,
-                rootPath,
-            );
+            return await this._academicoService.subirCorreccion(file, data, 'archivosBackend');
         } catch (error) {
-            // Eliminar el archivo si ocurre algún error
-            if (fs.existsSync(file.path)) {
-                await fs.promises.unlink(file.path);
-            }
             throw error;
         }
     }

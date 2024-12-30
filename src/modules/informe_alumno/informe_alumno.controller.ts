@@ -28,18 +28,7 @@ export class InformeAlumnoController {
 
 
     @Post('subir-informe')
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            destination: (req, file, callback) => {
-                const practicaFolder = 'uploads/temp'; // Carpeta temporal
-                callback(null, practicaFolder);
-            },
-            filename: (req, file, callback) => {
-                const tempFileName = `${Date.now()}-${file.originalname}`;
-                callback(null, tempFileName);
-            }
-        })
-    }))
+    @UseInterceptors(FileInterceptor('file'))
     async subirInforme(
         @UploadedFile(
             new ParseFilePipe({
@@ -52,7 +41,7 @@ export class InformeAlumnoController {
         ) file: Express.Multer.File,
         @Body() rawData: any
     ) {
-        if(rawData.respuesta){
+        if(rawData.respuestas){
 
             const parsedData = JSON.parse(rawData.respuestas);
             const data: Informe = {
@@ -76,9 +65,9 @@ export class InformeAlumnoController {
                 });
             }
             
-            return this._informestorageService.subirInforme(file, data, 'uploads');
+            return this._informestorageService.subirInforme(file, data, 'archivosBackend');
         }
-        return this._informestorageService.subirInforme(file, rawData, 'uploads')
+        return this._informestorageService.subirInforme(file, rawData, 'archivosbackend')
     }
 
     // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio
