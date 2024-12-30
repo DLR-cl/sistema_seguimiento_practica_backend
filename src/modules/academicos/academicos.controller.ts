@@ -60,9 +60,9 @@ export class AcademicosController {
             }
     
             // Llamar al servicio para almacenar la información en la base de datos
-            return await this._academicoService.subirCorreccion(file, data, 'archivosBackend',);
+            return await this._academicoService.subirCorreccion(file, data, 'archivosBackend');
         } catch (error) {
-
+            throw error;
         }
     }
     

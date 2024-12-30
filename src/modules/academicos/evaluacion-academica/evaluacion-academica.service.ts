@@ -4,6 +4,7 @@ import { DatabaseService } from '../../../database/database/database.service';
 import { Estado_informe, Estado_practica, Prisma, PrismaClient, TipoPractica } from '@prisma/client';
 import { AsignarPreguntaDto } from '../../../modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Informe } from 'modules/informe_alumno/dto/informe_pdf.dto';
 
 @Injectable()
 export class EvaluacionAcademicaService {
@@ -36,10 +37,28 @@ export class EvaluacionAcademicaService {
         // Procesar respuestas deficientes
         const respuesta = await this.procesarRespuestasDeficientes(informe, informeAlumno);
         if (respuesta) {
-            return respuesta; // Detiene la ejecución si hay respuestas deficientes
+            return respuesta // retornará algo solo si se echó la práctica.
         }
 
         // Registrar el informe evaluativo
+        const informeEval = await this._databaseService.informeEvaluacionAcademicos.findFirst({
+            where: {
+                id_informe_alumno: informe.id_informe_alumno,
+                id_informe_confidencial: informe.id_informe_confidencial
+            }
+        });
+        if (informeEval) {
+            await this.actualizarRespuestas(informe.respuestas, informeEval.id_informe, informe.id_informe_alumno)
+
+            // Actualizar estados
+            if (!respuesta) {
+                await this.actualizarEstados(informe.id_informe_confidencial, informeAlumno.id_informe, informeAlumno.id_practica);
+            }
+            return {
+                message: 'Actualización del informe exitoso',
+                status: HttpStatus.OK,
+            };
+        }
         const informeEvaluativo: number = await this.registrarInformeEvaluativo(informe);
 
 
@@ -51,14 +70,55 @@ export class EvaluacionAcademicaService {
         await this.crearRespuestasInformeEvaluativo(informe.respuestas, informeEvaluativo);
 
         // Actualizar estados
-        
-        await this.actualizarEstados(informe.id_informe_confidencial, informeAlumno.id_informe, informeAlumno.id_practica);
+        if (!respuesta) {
+            await this.actualizarEstados(informe.id_informe_confidencial, informeAlumno.id_informe, informeAlumno.id_practica);
+        }
 
         return {
             message: 'Registro del informe exitoso',
             id_informe: informeEvaluativo,
             status: HttpStatus.OK,
         };
+    }
+
+    private async actualizarRespuestas(respuestas: RespuestasInformeEvaluativo[], id_informe_evaluativo: number, id_informe_alumno: number) {
+        const informeAlumno = await this._databaseService.informesAlumno.findUnique({
+            where: { id_informe: id_informe_alumno },
+            include: {
+                informe_academico: true,
+            }
+        });
+        console.log(informeAlumno)
+
+        const respuestasInvalidas = respuestas.filter(
+            (res) => !res.respuesta_texto || !res.pregunta_id,
+        );
+
+        if (respuestasInvalidas.length > 0) {
+            throw new BadRequestException('Algunas respuestas no contienen los campos requeridos.');
+        }
+
+        const respuestasConIdInforme = respuestas.map((respuesta) => ({
+            ...respuesta,
+            informe_id: informeAlumno.informe_academico.id_informe,
+        }));
+
+
+        for (let i of respuestas) {
+            await this._databaseService.respuestasInformeEvaluacion.update({
+                where: {
+                    pregunta_id_informe_id: {
+                        informe_id: id_informe_evaluativo,
+                        pregunta_id: i.pregunta_id
+                    }
+                },
+                data: {
+                    respuesta_texto: i.respuesta_texto
+                }
+            })
+        }
+
+
     }
     private async obtenerInformeAlumno(id_informe_alumno: number) {
         const informeAlumno = await this._databaseService.informesAlumno.findUnique({
@@ -90,6 +150,7 @@ export class EvaluacionAcademicaService {
             const intentosRestantes = informeAlumno.intentos - 1;
 
             if (intentosRestantes > 0) {
+                console.log('Actualizando retante')
                 await this._databaseService.informesAlumno.update({
                     where: { id_informe: informe.id_informe_alumno },
                     data: { estado: Estado_informe.CORRECCION, intentos: intentosRestantes },
@@ -99,6 +160,9 @@ export class EvaluacionAcademicaService {
                     where: { id_practica: informeAlumno.id_practica },
                     data: { estado: Estado_practica.REVISION_GENERAL },
                 });
+                return {
+                    ultimo: false
+                }
             } else {
                 await this._databaseService.informesAlumno.update({
                     where: { id_informe: informe.id_informe_alumno },
@@ -111,12 +175,11 @@ export class EvaluacionAcademicaService {
                 });
 
                 await this.finalizarPractica(informeAlumno);
+                return {
+                    message: 'El informe tiene respuestas deficientes, REPROBADO por intentos fallidos.',
+                    ultimo: true,
+                }
             }
-
-            return {
-                message: 'El informe tiene respuestas deficientes. Informe actualizado.',
-                status: HttpStatus.OK,
-            };
         }
 
         return null; // Continua si no hay respuestas deficientes
@@ -127,6 +190,7 @@ export class EvaluacionAcademicaService {
 
 
         try {
+
             // Validar si ya existe un informe con id_informe_confidencial
             const existeConfidencial = await this._databaseService.informeEvaluacionAcademicos.findFirst({
                 where: { id_informe_confidencial: informe.id_informe_confidencial },
@@ -157,10 +221,11 @@ export class EvaluacionAcademicaService {
                 },
             });
             return data.id_informe;
-        }catch(error){
+        } catch (error) {
             throw error;
         }
     }
+
 
     private async actualizarEstados(
         id_informe_confidencial: number,

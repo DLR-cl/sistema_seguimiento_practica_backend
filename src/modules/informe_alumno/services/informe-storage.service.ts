@@ -28,12 +28,12 @@ export class InformeStorageService {
       let remoteFilePath: string;
       try {
         await client.access({
-          host: 'ftp.diis.cl',
-          port: 21,
-          user: 'backend@diis.cl',
-          password: 'holaAdmin12!',
+          host: process.env.HOST_FTP,
+          port: +process.env.PORT_FTP,
+          user: process.env.USER_FTP,
+          password: process.env.PASSWORD_FTP,
           secure: false,
-        })
+      });
 
         
 

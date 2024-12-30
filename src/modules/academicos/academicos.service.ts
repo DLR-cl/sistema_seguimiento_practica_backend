@@ -116,15 +116,14 @@ export class AcademicosService {
         const client = new Client();
         client.ftp.verbose = true;
         let remoteFilePath: string;
+        console.log(data);
+        console.log(data.id_academico)
         try {
-
-
-
             await client.access({
-                host: 'ftp.diis.cl',
-                port: 21,
-                user: 'backend@diis.cl',
-                password: 'holaAdmin12!',
+                host: process.env.HOST_FTP,
+                port: +process.env.PORT_FTP,
+                user: process.env.USER_FTP,
+                password: process.env.PASSWORD_FTP,
                 secure: false,
             });
 
@@ -150,8 +149,9 @@ export class AcademicosService {
                     estado: Estado_informe.REVISION
                 }
             });
-
+            console.log(existeInforme)
             if (!existeInforme) {
+                console.log('informe no existe')
                 throw new BadRequestException('Solo se puede enviar una vez la corrección');
             }
 
@@ -175,8 +175,12 @@ export class AcademicosService {
                     estado: Estado_informe.CORRECCION
                 }
             });
+            console.log(informe);
             // this._emailAvisosService.notificacionCorreccionInforme(informe.id_alumno, informe.id_informe)
-            return informe;
+            return {
+                message: 'tamos bien',
+                informe: informe
+            };
         } catch (error) {
             if (error instanceof BadRequestException || error instanceof UnauthorizedException) {
                 throw error;

@@ -41,13 +41,12 @@ export class InformeAlumnoService {
     const client = new Client();
     client.ftp.verbose = true;
     await client.access({
-      host: 'ftp.diis.cl',
-      port: 21,
-      user: 'backend@diis.cl',
-      password: 'holaAdmin12!',
+      host: process.env.HOST_FTP,
+      port: +process.env.PORT_FTP,
+      user: process.env.USER_FTP,
+      password: process.env.PASSWORD_FTP,
       secure: false,
-    });
-
+  });
     console.log('Conexión exitosa al FTP');
 
     // Verificar si el archivo existe en el servidor FTP
@@ -164,14 +163,14 @@ export class InformeAlumnoService {
         },
       });
 
-      let existe: boolean = false;
+      let existe: boolean = true;
 
       if (!informe) {
         throw new BadRequestException('Error, el informe no existe o no está enviado.')
       }
 
       if (informe.estado == Estado_informe.REVISION) {
-        existe = true;
+        existe = false;
       }
 
 
