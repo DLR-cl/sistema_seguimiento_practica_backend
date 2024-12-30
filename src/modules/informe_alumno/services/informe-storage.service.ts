@@ -156,6 +156,8 @@ export class InformeStorageService {
           }
 
           throw new BadRequestException('No se puede subir el informe en el estado actual.');
+        }, {
+          timeout: 10000 // Aumenta el tiempo límite a 10 segundos
         });
       } catch (error) {
         console.error('Error al subir el informe:', error);
