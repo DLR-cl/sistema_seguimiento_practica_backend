@@ -182,7 +182,6 @@ export class InformeStorageService {
   private async crearRespuesta(prisma, respuestas: CreateRespuestaInformAlumnoDto[]) {
     try {
       for (let res of respuestas) {
-        console.log(respuestas)
         if (res.asignaturas) {
           // Crea la respuesta principal
           const respuesta = await prisma.respuestasInformeAlumno.create({
