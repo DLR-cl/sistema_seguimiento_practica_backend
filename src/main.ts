@@ -18,7 +18,10 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
   app.enableCors({
-    origin: true,
+    origin: [
+    'https://sistema-practicas.diis.cl',
+    'https://www.sistema-practicas.diis.cl',
+  ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
@@ -27,7 +30,15 @@ async function bootstrap() {
 
   app.use((req, res, next) => {
     if (req.method === 'OPTIONS') {
-      res.header('Access-Control-Allow-Origin', req.headers.origin || '');
+      const allowedOrigins = [
+          'https://sistema-practicas.diis.cl',
+          'https://www.sistema-practicas.diis.cl',
+      ];
+      const origin = req.headers.origin;
+  
+      if (allowedOrigins.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin);
+      }
       res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
       res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       res.header('Access-Control-Allow-Credentials', 'true');
