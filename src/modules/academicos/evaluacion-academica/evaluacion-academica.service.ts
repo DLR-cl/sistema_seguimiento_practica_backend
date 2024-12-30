@@ -232,7 +232,7 @@ export class EvaluacionAcademicaService {
         id_informe_alumno: number,
         id_practica: number
     ) {
-        await this._databaseService.informesAlumno.update({
+        const informeAlumno = await this._databaseService.informesAlumno.update({
             where: { id_informe: id_informe_alumno },
             data: { estado: Estado_informe.APROBADA },
         });
@@ -246,6 +246,7 @@ export class EvaluacionAcademicaService {
             where: { id_practica: id_practica },
             data: { estado: Estado_practica.FINALIZADA },
         });
+        await this.finalizarPractica(informeAlumno);
     }
     private async finalizarPractica(informeAlumno: any) {
         const practica = await this._databaseService.practicas.update({
