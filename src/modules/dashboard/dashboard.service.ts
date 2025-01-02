@@ -410,7 +410,7 @@ export class DashboardService {
     return seguimientoData;
   }
 
-  async obtenerResumenInformes(idAcademico: number) {
+  async   obtenerResumenInformes(idAcademico: number) {
     try {
       const añoActual = new Date().getFullYear();
 
@@ -420,7 +420,7 @@ export class DashboardService {
       const informesRevisados = await this._databaseService.informesAlumno.count({
         where: {
           id_academico: idAcademico,
-          fecha_inicio: {
+          fecha_termino_revision: {
             gte: inicioAño,
             lt: finAño,
           },
