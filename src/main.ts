@@ -21,23 +21,42 @@ app.enableCors({
   origin: (origin, callback) => {
     const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
 
-    if (!origin) {
-      console.warn('No Origin header received. Allowing by default.'); // Log de advertencia
-      return callback(null, true); // Permitir solicitudes internas o sin `Origin`
-    }
-
     console.log('Origin received:', origin); // Log del origen recibido
 
-    if (origin === allowedOrigin) {
-      callback(null, origin); // Permite el dominio específico
+    if (!origin) {
+      console.warn('No Origin header received. Allowing by default.'); // Advertencia para solicitudes internas
+      callback(null, allowedOrigin); // Configura el origen permitido para solicitudes internas
+    } else if (origin === allowedOrigin) {
+      console.log('Access-Control-Allow-Origin:', origin); // Confirmación del origen permitido
+      callback(null, origin); // Permite el origen específico
     } else {
-      console.error('CORS error: Origin not allowed:', origin); // Log del error
+      console.error('CORS error: Origin not allowed:', origin); // Log de error
       callback(new Error('Not allowed by CORS'));
     }
   },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: true, // Habilitar cookies y encabezados personalizados
+  credentials: true, // Permitir cookies y encabezados personalizados
 });
+app.use((req, res, next) => {
+  const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
+  const origin = req.headers.origin;
+
+  if (origin === allowedOrigin) {
+    res.header('Access-Control-Allow-Origin', allowedOrigin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  }
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send(); // Respuesta rápida para solicitudes preflight
+  }
+
+  next();
+});
+
+  
+
 
 
 
