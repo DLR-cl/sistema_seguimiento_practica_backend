@@ -23,7 +23,6 @@ app.enableCors({
     const allowedOrigins = [
 
       'https://sistema-practicas.diis.cl',
-      'https://www.diis.cl', // Dominio principal
       'https://www.sistema-practicas.diis.cl',
     ];
 
