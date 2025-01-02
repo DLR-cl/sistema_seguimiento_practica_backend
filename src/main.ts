@@ -21,6 +21,7 @@ async function bootstrap() {
     origin: [
     'https://sistema-practicas.diis.cl',
     'https://www.sistema-practicas.diis.cl',
+      'https://www.diis.cl',
   ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
