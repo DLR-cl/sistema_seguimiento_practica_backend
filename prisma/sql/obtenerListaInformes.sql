@@ -9,7 +9,7 @@ SELECT
     DATEDIFF(DATE(infA.fecha_termino_revision), CURDATE()) AS dias_para_revision, -- Días para revisión
     DATE(infA.fecha_inicio_revision) AS inicio_revision,
     DATE(infA.fecha_termino_revision) AS fin_revision,
-    infA.intentos AS intentos_restantes -- Intentos restantes
+    infA.intentos AS intentos-- Intentos restantes
 FROM
     Practicas AS p
 LEFT JOIN
