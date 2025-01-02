@@ -17,26 +17,25 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
-app.enableCors({
-  origin: (origin, callback) => {
-    const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
-
-    console.log('Origin received:', origin); // Log para depurar el origen recibido
-
-    if (!origin) {
-      console.warn('No Origin header received. Defaulting to allowedOrigin.');
-      callback(null, allowedOrigin); // Permitir solicitudes internas sin encabezado Origin
-    } else if (origin === allowedOrigin) {
-      console.log('Access-Control-Allow-Origin:', origin); // Log del origen permitido
-      callback(null, origin); // Configura el encabezado correctamente
-    } else {
-      console.error('CORS error: Origin not allowed:', origin); // Log del error
-      callback(new Error('Not allowed by CORS'));
+  app.use((req, res, next) => {
+    const allowedOrigin = 'https://www.diis.cl';
+    const origin = req.headers.origin;
+  
+    if (origin === allowedOrigin) {
+      res.header('Access-Control-Allow-Origin', allowedOrigin);
+      res.header('Access-Control-Allow-Credentials', 'true');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     }
-  },
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: true,
-});
+  
+    if (req.method === 'OPTIONS') {
+      console.log('Preflight request handled for:', origin);
+      return res.status(204).send(); // Responder con éxito a las solicitudes preflight
+    }
+  
+    next();
+  });
+  
 
 
   await app.listen(process.env.PORT ||3000);
