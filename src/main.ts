@@ -18,14 +18,18 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
   app.enableCors({
-    origin: [
-    'https://sistema-practicas.diis.cl',
-    'https://www.sistema-practicas.diis.cl',
-      'https://www.diis.cl',
-  ],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-  });
+  origin: (origin, callback) => {
+    const regex = /^https:\/\/(www\.)?sistema-practicas\.diis\.cl$/;
+    if (regex.test(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  credentials: true,
+});
+
   
   
 
