@@ -7,6 +7,8 @@ const server = express();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+
+  // Configuración de CORS
   app.use((req, res, next) => {
     const allowedOrigin = 'https://www.diis.cl';
     const origin = req.headers.origin;
@@ -28,9 +30,9 @@ async function bootstrap() {
     next();
   });
 
-  await app.init(); // Inicia la aplicación sin `listen` ya que Vercel lo manejará
+  await app.init(); // Inicia la aplicación sin usar `listen`
 }
-bootstrap();
 
-// Exporta el servidor Express para que Vercel lo maneje
+// Exporta el servidor Express como el manejador predeterminado para Vercel
+bootstrap();
 export default server;
