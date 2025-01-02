@@ -24,15 +24,16 @@ app.enableCors({
       'https://www.sistema-practicas.diis.cl',
     ];
 
-    if (allowedOrigins.includes(origin)) {
-      callback(null, origin); // Responde con el origen específico de la solicitud
+    if (origin && allowedOrigins.includes(origin)) {
+      callback(null, origin); // Devuelve solo el origen que realiza la solicitud
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: true, // Necesario si usas cookies o encabezados de autenticación
+  credentials: true, // Permite el uso de cookies o encabezados de autenticación
 });
+
 
 
 
