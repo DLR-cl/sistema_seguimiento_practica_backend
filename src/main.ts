@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
 import * as multer from 'multer';
-import * as cookieParser from 'cookie-parser';
 import { allowedNodeEnvironmentFlags } from 'process';
 
 async function bootstrap() {
@@ -17,50 +16,23 @@ async function bootstrap() {
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-app.enableCors({
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      'https://sistema-practicas.diis.cl',
-      'https://www.sistema-practicas.diis.cl',
-    ];
 
-    if (origin && allowedOrigins.includes(origin)) {
-      callback(null, origin); // Devuelve solo el origen que realiza la solicitud
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: true, // Permite el uso de cookies o encabezados de autenticación
-});
-
-
-
-
-  
-  
-
-  app.use((req, res, next) => {
-    if (req.method === 'OPTIONS') {
+  app.enableCors({
+    origin: (origin, callback) => {
       const allowedOrigins = [
-          'https://sistema-practicas.diis.cl',
-          'https://www.sistema-practicas.diis.cl',
+        'https://sistema-practicas.diis.cl',
+        'https://www.sistema-practicas.diis.cl',
       ];
-      const origin = req.headers.origin;
-  
-      if (allowedOrigins.includes(origin)) {
-        res.header('Access-Control-Allow-Origin', origin);
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true); // Permite el origen
+      } else {
+        callback(new Error('Not allowed by CORS'));
       }
-      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-      res.header('Access-Control-Allow-Credentials', 'true');
-      res.status(204).send();
-    } else {
-      next();
-    }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true, // Habilita el uso de cookies y encabezados personalizados
   });
-  
-  
 
   await app.listen(process.env.PORT ||3000);
 }
