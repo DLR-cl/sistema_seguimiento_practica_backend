@@ -1,14 +1,15 @@
-import { Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { UserFromToken } from '../../auth/decorators/userToken.decorator';
 import { CantidadPracticaPorMesesDto } from './dto/cantidad-practica-meses.dto';
 import { AnaliticaService } from './services/analitica.service';
+import { TipoPractica } from '@prisma/client';
 
 @Controller('dashboard')
 export class DashboardController {
   constructor(private readonly _dashboardService: DashboardService,
     private readonly _analiticaService: AnaliticaService,
-  ) {}
+  ) { }
 
   @Get()
   public async obtenerCantidadEstudiantesEnPractica() {
@@ -16,7 +17,7 @@ export class DashboardController {
   }
 
   @Get('informe-confidencial/resultados-historicos/:id')
-  public async obtenerRespuestasHistoricoInformeConfidencialByDimension(@Param('id', ParseIntPipe) id_dimension: number){
+  public async obtenerRespuestasHistoricoInformeConfidencialByDimension(@Param('id', ParseIntPipe) id_dimension: number) {
     try {
       return await this.obtenerRespuestasHistoricoInformeConfidencialByDimension(id_dimension);
     } catch (error) {
@@ -24,9 +25,9 @@ export class DashboardController {
     }
   }
 
-  
+
   @Get('informe-alumno/respuestas-historicas')
-  public async obtenerRespuestasHistoricasInformeEvaluacion(){
+  public async obtenerRespuestasHistoricasInformeEvaluacion() {
     return await this._analiticaService.obtenerTotalHistoricoRespuestasInformeEvaluacion();
   }
 
@@ -61,7 +62,7 @@ export class DashboardController {
   }
 
   @Get('empresa/estadisticas/tipo-empresas')
-  public async obtenerCantidadPorTipoEmpresa(){
+  public async obtenerCantidadPorTipoEmpresa() {
     try {
       return await this._analiticaService.obtenerCantidadTipoEmpresa();
     } catch (error) {
@@ -70,43 +71,88 @@ export class DashboardController {
   }
 
   @Get('estadistica-practicas-dashboard-jefe-carrera')
-  public async obtenerEstadisticas(){
+  public async obtenerEstadisticas() {
     return await this._dashboardService.estadisticaPractica();
   }
 
   @Get('aprobacion-practicas')
-  public async obtenerAprobacionPracticas(){
+  public async obtenerAprobacionPracticas() {
     return await this._dashboardService.obtenerAprobacionPracticas();
   }
 
   @Get('alumnos-activos-practica')
-  public async obtenerCantidadAlumnosPorPracticaCursando(){
-    return await this._dashboardService.obtenerTotalPracticaAlumnos ();
+  public async obtenerCantidadAlumnosPorPracticaCursando() {
+    return await this._dashboardService.obtenerTotalPracticaAlumnos();
   }
 
   @Get('obtener-detalles-practica')
-  public async obtenerDetallesPracticaTodo(){
+  public async obtenerDetallesPracticaTodo() {
     return await this._dashboardService.obtenerDetallesPracticaTodos();
   }
 
 
   @Get('obtener-practicas-meses/:year')
-  public async obtenerPracticasPorMes(@Param('year', ParseIntPipe) year: number){
+  public async obtenerPracticasPorMes(@Param('year', ParseIntPipe) year: number) {
     return await this._dashboardService.obtenerCantidadPracticasPorTipoPorMesSegunAnno(year);
   }
 
   @Get('obtener-promedio-nota-empresa')
-  public async obtenerPromedioNotas(){
+  public async obtenerPromedioNotas() {
     return await this._dashboardService.obtenerNotaPromedioDeInformesEmpresas();
   }
 
   @Get('obtener-seguimiento-academicos')
-  public async obtenerSeguimientoAcademicos(){
+  public async obtenerSeguimientoAcademicos() {
     return await this._dashboardService.obtenerSeguimientoAcademicos();
   }
 
   @Get('academico/informes/conteo/:id_academico')
-  public async obtenerResumenInformes(@Param('id_academico', ParseIntPipe) id_academico: number){
+  public async obtenerResumenInformes(@Param('id_academico', ParseIntPipe) id_academico: number) {
     return await this._dashboardService.obtenerResumenInformes(id_academico);
+  }
+
+  @Get('empleador/informes/obtener-respuestas')
+  async obtenerRespuestasConfidenciales(
+    @Query('fecha_ini') fechaInicio: string,
+    @Query('fecha_fin') fechaFin: string,
+    @Query('tipo_practica') tipoPractica: string,
+  ) {
+    try {
+      // Validar parámetros obligatorios
+      if (!fechaInicio || !fechaFin || !tipoPractica) {
+        throw new BadRequestException('Los parámetros fecha_ini, fecha_fin y tipo_practica son obligatorios.');
+      }
+
+      // Convertir parámetros a tipos adecuados
+      const fechaIni = new Date(fechaInicio);
+      const fechaFinDate = new Date(fechaFin);
+
+      // Validar fechas
+      if (isNaN(fechaIni.getTime()) || isNaN(fechaFinDate.getTime())) {
+        throw new BadRequestException('Los parámetros fecha_ini y fecha_fin deben ser fechas válidas.');
+      }
+
+      // Validar tipo de práctica
+      if (!['PRACTICA_UNO', 'PRACTICA_DOS'].includes(tipoPractica)) {
+        throw new BadRequestException('El parámetro tipo_practica debe ser PRACTICA_UNO o PRACTICA_DOS.');
+      }
+
+      // Llamar al servicio para obtener los datos
+      const respuestas = await this._analiticaService.obtenerRespuestasConfidencialesPorPeriodoYPractica(
+        fechaIni,
+        fechaFinDate,
+        tipoPractica as TipoPractica,
+      );
+
+      // Retornar los datos al cliente
+      return {
+        success: true,
+        message: 'Datos obtenidos correctamente.',
+        data: respuestas,
+      };
+    } catch (error) {
+      console.error('Error al obtener las respuestas confidenciales:', error);
+      throw new BadRequestException('No se pudo obtener las respuestas confidenciales.');
+    }
   }
 }

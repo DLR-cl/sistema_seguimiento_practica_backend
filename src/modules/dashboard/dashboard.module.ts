@@ -7,6 +7,7 @@ import { AnaliticaService } from './services/analitica.service';
 @Module({
   controllers: [DashboardController],
   providers: [DashboardService, AnaliticaService],
-  imports: [DatabaseModule]
+  imports: [DatabaseModule],
+  exports: [AnaliticaService]
 })
 export class DashboardModule {}
