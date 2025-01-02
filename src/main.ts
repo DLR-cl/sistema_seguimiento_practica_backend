@@ -17,25 +17,24 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    'https://sistema-practicas.diis.cl',
-    'https://www.sistema-practicas.diis.cl',
-  ];
-  const origin = req.headers.origin;
+app.enableCors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'https://www.diis.cl',
+      'https://sistema-practicas.diis.cl',
+    ];
 
-  if (allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
+    console.log('Origin received:', origin); // Depuración
 
-  if (req.method === 'OPTIONS') {
-    return res.status(204).send(); // Respuesta a preflight
-  }
-
-  next();
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin); // Permite el origen de la solicitud
+    } else {
+      console.error('CORS error: Origin not allowed:', origin); // Log para depuración
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  credentials: true, // Habilitar el uso de cookies o encabezados personalizados
 });
 
 
