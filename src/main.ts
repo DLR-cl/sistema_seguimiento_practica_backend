@@ -1,22 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import * as express from 'express';
-import * as multer from 'multer';
-import { allowedNodeEnvironmentFlags } from 'process';
+
+const server = express();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const config = new DocumentBuilder()
-    .setTitle('Documentacion Sistemas de Seguimiento de Práctica')
-    .setDescription('En la documentacion podrá encontrar las funcionalidades de cada función de los servicios')
-    .setVersion('1.0')
-    .addTag('SSP')
-    .build();
-
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
-// arreglar
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
   app.use((req, res, next) => {
     const allowedOrigin = 'https://www.diis.cl';
     const origin = req.headers.origin;
@@ -38,11 +28,9 @@ async function bootstrap() {
     next();
   });
 
-
-
-
-  await app.listen(process.env.PORT || 3000);
+  await app.init(); // Inicia la aplicación sin `listen` ya que Vercel lo manejará
 }
-// Exporta un manejador compatible con Vercel si es necesario
-export const handler = bootstrap();
+bootstrap();
 
+// Exporta el servidor Express para que Vercel lo maneje
+export default server;
