@@ -16,7 +16,7 @@ async function bootstrap() {
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-
+// arreglar
   app.use((req, res, next) => {
     const allowedOrigin = 'https://www.diis.cl';
     const origin = req.headers.origin;
