@@ -73,6 +73,7 @@ export class PracticasController {
     ) {
         try {
             const { practica, fecha_in, fecha_fin } = query;
+            console.log(query)
             return await this._reporteService.generarReporteSemestral(practica, new Date(fecha_in), new Date(fecha_fin), res)
         } catch (error) {
             if (error instanceof BadRequestException) {
@@ -86,17 +87,20 @@ export class PracticasController {
     @Get('reportes/obtener/listar')
     public async listarPorAnoYPractica(
         @Query('practica') tipoPractica: TipoPractica,
-        @Query('ano') ano: number
+        @Query('ano') ano: number,
+        @Query('informe') informe: string
     ): Promise<string[]> {
-        return this._reporteService.listarReportesPorAnoYPractica(ano, tipoPractica);
+        return this._reporteService.listarReportesPorAnoYPractica(ano, tipoPractica, informe);
     }
-
+    
     @Get('reportes/obtener/listar/semanal')
     public async listarReportesSemanalByMes(
         @Query('tipoPractica') tipoPractica: 'PRACTICA_UNO' | 'PRACTICA_DOS',
         @Query('anio') anio: number,
         @Query('mes') mes: string,
     ) {
+        console.log(tipoPractica)
+        console.log(anio, mes)
         return await this._reporteService.listarReportesSemanalesByMes(
             tipoPractica,
             anio,
@@ -123,4 +127,6 @@ export class PracticasController {
             res.status(500).send('No se pudo descargar el archivo.');
         }
     }
+
+
 }

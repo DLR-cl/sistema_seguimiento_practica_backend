@@ -30,6 +30,7 @@ export class InformeConfidencialService {
                     total_horas: total,
                     fecha_inicio_practica: new Date(update.fecha_inicio_practica),
                     fecha_fin_practica: new Date(update.fecha_fin_practica),
+                    fecha_envio: new Date(),
                     estado: Estado_informe.ENVIADA
                 }
             })

@@ -6,7 +6,6 @@ export class GenerarReporteSemestralDto {
     @IsEnum(TipoPractica, { message: 'El tipo de práctica no es válido' })
     practica: TipoPractica;
 
-
     @IsNotEmpty()
     @IsISO8601()
     fecha_in: string;
