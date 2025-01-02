@@ -21,10 +21,10 @@ app.enableCors({
   origin: (origin, callback) => {
     const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
 
-    console.log('Origin received:', origin); // Log para depuración
+    console.log('Origin received:', origin); // Depuración del origen recibido
 
     if (origin === allowedOrigin) {
-      console.log('Access-Control-Allow-Origin:', origin); // Confirmación del origen configurado
+      console.log('Access-Control-Allow-Origin:', origin); // Confirmación del origen permitido
       callback(null, origin); // Permite el dominio específico
     } else {
       console.error('CORS error: Origin not allowed:', origin); // Maneja el error de CORS
