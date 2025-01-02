@@ -1,14 +1,12 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import chromium from 'chrome-aws-lambda';
+import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import chromium from '@sparticuz/chrome-aws-lambda';
 import puppeteer from 'puppeteer-core';
-import { DatabaseService } from '../../../../database/database/database.service';
-import { FormatoRespuestaEvaluativaInterface } from '../interface/responseRespuesta.interface';
-import { obtenerRespuestasInformeEvaluativo } from '@prisma/client/sql';
-import { IdentificacionInterface } from '../interface/identificacion.interface';
-import { RespuestasInformeEvaluativo } from '../../dto/informe-evaluativo.dto';
 import * as fs from 'fs';
 import * as path from 'path';
 import Handlebars from 'handlebars';
+import { DatabaseService } from '../../../../database/database/database.service';
+import { FormatoRespuestaEvaluativaInterface } from '../interface/responseRespuesta.interface';
+import { IdentificacionInterface } from '../interface/identificacion.interface';
 
 @Injectable()
 export class GeneratorPdfService {
@@ -21,53 +19,59 @@ export class GeneratorPdfService {
         id_practica: number,
         id_informe_evaluativo: number,
         id_docente: number
-    ): Promise<ArrayBufferLike> {
-        // Obtener la ruta ejecutable de Chrome para entornos serverless
-        const executablePath = await chromium.executablePath;
-
-        const browser = await puppeteer.launch({
-            args: chromium.args,
-            executablePath,
-            headless: chromium.headless,
-        });
-
-        const page = await browser.newPage();
-
-        // Definir rutas y leer recursos
-        const srcBasePath = path.resolve(
+      ): Promise<ArrayBufferLike> {
+        let executablePath: string | undefined;
+        let args: string[] = [];
+        let headless: boolean = true;
+    
+        // Detectar entorno para configurar Puppeteer
+        if (process.env.AWS_EXECUTION_ENV) {
+          // Entorno serverless
+          executablePath = await chromium.executablePath;
+          args = chromium.args;
+          headless = chromium.headless;
+        } else {
+          // Entorno local
+          const puppeteerLocal = require('puppeteer'); // Requiere Puppeteer estándar
+          executablePath = (await puppeteerLocal.launch()).executablePath();
+          args = ['--no-sandbox', '--disable-setuid-sandbox'];
+        }
+    
+        try {
+          // Lanzar navegador
+          const browser = await puppeteer.launch({ args, executablePath, headless });
+          const page = await browser.newPage();
+    
+          // Preparar rutas de recursos
+          const srcBasePath = path.resolve(
             __dirname,
             '../../../../../../src/modules/academicos/evaluacion-academica'
-        );
-        const logoUtaPath = path.join(srcBasePath,'icon/logo-uta.png');
-        const logoIngenieriaPath = path.join(srcBasePath, 'icon/logo-iici.webp');
-        const templatePath = path.join(srcBasePath, 'services/pdf.html');
-
-        // Validar que los archivos existen
-        if (!fs.existsSync(templatePath)) {
+          );
+          const logoUtaPath = path.join(srcBasePath, 'icon/logo-uta.png');
+          const logoIngenieriaPath = path.join(srcBasePath, 'icon/logo-iici.webp');
+          const templatePath = path.join(srcBasePath, 'services/pdf.html');
+    
+          if (!fs.existsSync(templatePath)) {
             throw new BadRequestException('No se encontró la plantilla HTML para generar el PDF.');
-        }
-
-        const logoUtaBase64 = fs.existsSync(logoUtaPath) ? fs.readFileSync(logoUtaPath, 'base64') : '';
-        const logoIngenieriaBase64 = fs.existsSync(logoIngenieriaPath)
+          }
+    
+          const logoUtaBase64 = fs.existsSync(logoUtaPath) ? fs.readFileSync(logoUtaPath, 'base64') : '';
+          const logoIngenieriaBase64 = fs.existsSync(logoIngenieriaPath)
             ? fs.readFileSync(logoIngenieriaPath, 'base64')
             : '';
-
-        // Obtener datos de la práctica
-        const practica = await this._databaseService.practicas.findUnique({
-            where: { id_practica },
-        });
-
-        if (!practica) {
+    
+          // Obtener datos desde la base de datos
+          const practica = await this._databaseService.practicas.findUnique({ where: { id_practica } });
+          if (!practica) {
             throw new BadRequestException('Error, no existe la práctica seleccionada.');
-        }
-
-        // Obtener datos adicionales
-        const datosIdentificacion: IdentificacionInterface = await this.obtenerDatos(id_practica, id_docente);
-        const datosRespuesta: FormatoRespuestaEvaluativaInterface[] = await this.obtenerRespuestas(id_informe_evaluativo);
-        const aprobacion: boolean = this.estadoAprobacion(datosRespuesta);
-
-        // Preparar datos para la plantilla
-        const dataIdentificacionHTML = {
+          }
+    
+          const datosIdentificacion = await this.obtenerDatos(id_practica, id_docente);
+          const datosRespuesta = await this.obtenerRespuestas(id_informe_evaluativo);
+          const aprobacion = this.estadoAprobacion(datosRespuesta);
+    
+          // Preparar datos para la plantilla HTML
+          const dataIdentificacionHTML = {
             logoUtaBase64,
             logoIngenieriaBase64,
             nombreAlumno: datosIdentificacion.nombre_alumno,
@@ -77,43 +81,52 @@ export class GeneratorPdfService {
             respuestas: datosRespuesta,
             fechaRevision: new Date().toISOString().split('T')[0],
             estadoAprobacion: aprobacion,
-        };
-
-        // Registrar helpers de Handlebars
+          };
+    
+          // Registrar helpers de Handlebars
+          this.registerHandlebarsHelpers();
+    
+          // Compilar plantilla HTML
+          const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
+          const template = Handlebars.compile(htmlTemplate);
+          const htmlContent = template(dataIdentificacionHTML);
+    
+          // Renderizar contenido en Puppeteer
+          await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    
+          // Generar el PDF
+          const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
+    
+          // Cerrar el navegador
+          await browser.close();
+    
+          return pdfBuffer;
+        } catch (error) {
+          console.error('Error al generar el PDF:', error);
+          throw new InternalServerErrorException('No se pudo generar el PDF.');
+        }
+      }
+    
+      private registerHandlebarsHelpers() {
         Handlebars.registerHelper('getFromList', function (list, index, attr) {
-            if (Array.isArray(list) && list[index] !== undefined) {
-                return list[index][attr];
-            }
-            return ''; // Devuelve vacío si no encuentra el atributo
+          if (Array.isArray(list) && list[index] !== undefined) {
+            return list[index][attr];
+          }
+          return ''; // Devuelve vacío si no encuentra el atributo
         });
-
+    
         Handlebars.registerHelper('equals', function (a, b, options) {
-            return a === b ? options.fn(this) : options.inverse(this);
+          return a === b ? options.fn(this) : options.inverse(this);
         });
-
+    
         Handlebars.registerHelper('getFromListWithCondition', function (list, index, attr, conditionValue) {
-            if (Array.isArray(list) && list[index] && list[index][attr] !== undefined) {
-                return list[index][attr] === conditionValue ? 'X' : '';
-            }
-            return ''; // Devuelve vacío si el índice o el atributo no existen
+          if (Array.isArray(list) && list[index] && list[index][attr] !== undefined) {
+            return list[index][attr] === conditionValue ? 'X' : '';
+          }
+          return ''; // Devuelve vacío si el índice o el atributo no existen
         });
-
-        // Compilar plantilla HTML con Handlebars
-        const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
-        const template = Handlebars.compile(htmlTemplate);
-        const htmlContent = template(dataIdentificacionHTML);
-
-        // Renderizar contenido en Puppeteer
-        await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-
-        // Generar el PDF
-        const pdfBuffer = await page.pdf({ format: 'a4', printBackground: true });
-
-        // Cerrar el navegador
-        await browser.close();
-
-        return pdfBuffer;
-    }
+      }
+    
 
 
     private async obtenerDatos(id_practica: number, id_docente: number) {
