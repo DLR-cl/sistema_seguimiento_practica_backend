@@ -19,23 +19,22 @@ async function bootstrap() {
 
 app.enableCors({
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      'https://www.diis.cl',
-      'https://sistema-practicas.diis.cl',
-    ];
+    const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
 
-    console.log('Origin received:', origin); // Depuración
+    console.log('Origin received:', origin); // Log para depurar el origen recibido
 
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin); // Permite el origen de la solicitud
+    if (!origin || origin === allowedOrigin) {
+      console.log('Access-Control-Allow-Origin:', origin); // Log del origen permitido
+      callback(null, origin); // Permite el dominio específico
     } else {
-      console.error('CORS error: Origin not allowed:', origin); // Log para depuración
+      console.error('CORS error: Origin not allowed:', origin); // Log de error
       callback(new Error('Not allowed by CORS'));
     }
   },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: true, // Habilitar el uso de cookies o encabezados personalizados
+  credentials: true, // Habilitar cookies y encabezados personalizados
 });
+
 
 
 
