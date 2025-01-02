@@ -18,25 +18,11 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
 
 app.enableCors({
-  origin: (origin, callback) => {
-    // Patrón para permitir el dominio principal y sus subdominios
-    const allowedOrigins = [
-
-      'https://sistema-practicas.diis.cl',
-      'https://www.sistema-practicas.diis.cl',
-    ];
-
-    console.log('Origin received:', origin); // Depurar el origen recibido
-
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin); // Responde con el origen específico
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: '*', // Permite cualquier origen
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: true, // Habilita cookies y encabezados personalizados
+  credentials: false, // Deshabilitar las credenciales, ya que no son compatibles con '*'
 });
+
 
   await app.listen(process.env.PORT ||3000);
 }
