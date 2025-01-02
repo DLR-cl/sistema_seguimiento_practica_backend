@@ -16,28 +16,33 @@ async function bootstrap() {
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-// arreglar
+  // arreglar
   app.use((req, res, next) => {
     const allowedOrigin = 'https://www.diis.cl';
     const origin = req.headers.origin;
-  
-    if (origin === allowedOrigin) {
+
+    if (!origin || origin === allowedOrigin) {
       res.header('Access-Control-Allow-Origin', allowedOrigin);
       res.header('Access-Control-Allow-Credentials', 'true');
       res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
       res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    } else {
+      console.warn(`Blocked CORS request from origin: ${origin}`);
     }
-  
+
     if (req.method === 'OPTIONS') {
-      console.log('Preflight request handled for:', origin);
-      return res.status(204).send(); // Responder con éxito a las solicitudes preflight
+      console.log('Preflight request handled for:', origin || 'No Origin');
+      return res.status(204).send();
     }
-  
+
     next();
   });
-  
 
 
-  await app.listen(process.env.PORT ||3000);
+
+
+  await app.listen(process.env.PORT || 3000);
 }
-bootstrap();
+// Exporta un manejador compatible con Vercel si es necesario
+export const handler = bootstrap();
+
