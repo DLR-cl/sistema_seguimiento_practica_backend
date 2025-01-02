@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe, Patch, Post, Query, Res, UsePipes, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe, Patch, Post, Query, Res, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
 import { PracticasService } from "./practicas.service";
 import { createPracticaDto } from "./dto/create-practicas.dto";
 import { ReportesExcelService } from "./services/reportes-excel/reportes-excel.service";
@@ -7,6 +7,7 @@ import { ExtensionPractica } from "./dto/practica-response.dto";
 import { Estado_informe, TipoPractica } from "@prisma/client";
 import { GenerarReporteSemestralDto } from "./dto/reportes.dto";
 import { Response } from "express";
+import { CorsInterceptor } from "interceptors/interceptor-cors";
 
 @Controller('practicas')
 export class PracticasController {
@@ -36,8 +37,10 @@ export class PracticasController {
     }
 
     @Get('alumno/:id')
+    @UseInterceptors(new CorsInterceptor()) // Aplica lógica CORS específica si es necesario
     public async getPracticaByAlumno(@Param('id') id_alumno: string) {
-        return await this._practicaService.getPracticaAlumno(+id_alumno);
+      console.log('Handling CORS for alumno route');
+      return await this._practicaService.getPracticaAlumno(+id_alumno);
     }
 
     @Get('informes/generar')
