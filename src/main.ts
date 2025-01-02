@@ -21,8 +21,9 @@ app.enableCors({
   origin: (origin, callback) => {
     // Patrón para permitir el dominio principal y sus subdominios
     const allowedOrigins = [
-      'https://www.diis.cl', // Dominio principal
+
       'https://sistema-practicas.diis.cl',
+      'https://www.diis.cl', // Dominio principal
       'https://www.sistema-practicas.diis.cl',
     ];
 
