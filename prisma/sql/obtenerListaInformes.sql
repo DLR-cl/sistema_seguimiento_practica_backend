@@ -5,7 +5,10 @@ SELECT
     infA.id_informe AS id_informe_alumno,
     infA.estado AS estado_informe,
     iea.id_informe AS id_informe_evaluacion,
-    DATE(iea.fecha_revision) AS fecha_revision
+    DATE(iea.fecha_revision) AS fecha_revision,
+    DATEDIFF(DATE(infA.fecha_termino_revision), CURDATE()) AS dias_para_revision, -- Cálculo de días para revisión
+    DATE(infA.fecha_inicio_revision) AS inicio_revision,
+    DATE(infA.fecha_termino_revision) AS fin_revision
 FROM
     Practicas AS p
 LEFT JOIN
