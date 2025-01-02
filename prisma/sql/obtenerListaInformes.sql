@@ -13,7 +13,8 @@ LEFT JOIN
 LEFT JOIN
     InformesAlumno AS infA ON infA.id_practica = p.id_practica
 LEFT JOIN
-    InformeEvaluacionAcademicos AS iea ON iea.id_informe_alumno = infA.id_informe
+    InformeEvaluacionAcademicos AS iea 
+      ON iea.id_informe_alumno = infA.id_informe
+      AND iea.id_academico = ? -- Filtrar solo por académico asignado en esta relación
 WHERE
-    iea.id_academico = ? -- Reemplazar con el ID del académico
-    AND p.estado != 'CURSANDO';
+    p.estado != 'CURSANDO';
