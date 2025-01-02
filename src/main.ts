@@ -21,19 +21,20 @@ app.enableCors({
   origin: (origin, callback) => {
     const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
 
-    console.log('Origin received:', origin); // Log para depurar el origen recibido
+    console.log('Origin received:', origin); // Log para depuración
 
-    if (!origin || origin === allowedOrigin) {
-      console.log('Access-Control-Allow-Origin:', origin); // Log del origen permitido
+    if (origin === allowedOrigin) {
+      console.log('Access-Control-Allow-Origin:', origin); // Confirmación del origen configurado
       callback(null, origin); // Permite el dominio específico
     } else {
-      console.error('CORS error: Origin not allowed:', origin); // Log de error
+      console.error('CORS error: Origin not allowed:', origin); // Maneja el error de CORS
       callback(new Error('Not allowed by CORS'));
     }
   },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: true, // Habilitar cookies y encabezados personalizados
+  credentials: true, // Permitir cookies y encabezados personalizados
 });
+
 
 
 
