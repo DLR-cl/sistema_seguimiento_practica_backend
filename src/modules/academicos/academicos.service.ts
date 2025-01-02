@@ -117,7 +117,6 @@ export class AcademicosService {
         client.ftp.verbose = true;
         let remoteFilePath: string;
         console.log(data);
-        console.log(data.id_academico)
         try {
             await client.access({
                 host: process.env.HOST_FTP,
@@ -143,12 +142,12 @@ export class AcademicosService {
                 console.warn(`El directorio remoto ya existe o no pudo ser creado: ${err.message}`);
             }
 
-            const existeInforme = await this._databaseService.informesAlumno.findUnique({
+            const existeInforme = await this._databaseService.informeEvaluacionAcademicos.findUnique({
                 where: {
-                    id_informe: +data.id_informe,
-                    estado: Estado_informe.REVISION
+                    id_informe: +data.id_informe_evaluativa,
                 }
             });
+
             console.log(existeInforme)
             if (!existeInforme) {
                 console.log('informe no existe')
@@ -166,13 +165,11 @@ export class AcademicosService {
 
             const informe = await this._databaseService.informesAlumno.update({
                 where: {
-                    id_informe: +data.id_informe,
+                    id_informe: +data.id_informe_alumno,
                     id_academico: +data.id_academico,
-                    estado: Estado_informe.REVISION
                 },
                 data: {
                     archivo_correccion: remoteFilePath,
-                    estado: Estado_informe.CORRECCION
                 }
             });
             console.log(informe);
@@ -224,4 +221,4 @@ export class AcademicosService {
         });
     }
 
-}
+ }

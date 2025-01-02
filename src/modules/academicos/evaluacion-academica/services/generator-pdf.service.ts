@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import * as puppeteer from 'puppeteer';
+import chromium from 'chrome-aws-lambda';
+import puppeteer from 'puppeteer-core';
 import { DatabaseService } from '../../../../database/database/database.service';
 import { FormatoRespuestaEvaluativaInterface } from '../interface/responseRespuesta.interface';
 import { obtenerRespuestasInformeEvaluativo } from '@prisma/client/sql';
@@ -15,44 +16,70 @@ export class GeneratorPdfService {
         private readonly _databaseService: DatabaseService,
     ) { }
 
-    async generatePdf(id_practica: number, id_informe_evaluativo: number, id_docente: number): Promise<ArrayBufferLike> {
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
-        const page = await browser.newPage()
 
-        const srcBasePath = path.resolve(__dirname, '../../../../../../src/modules/academicos/evaluacion-academica');
-        const logoUtaPath = path.join(srcBasePath, 'icon/logo-uta.png');
+    async generatePdf(
+        id_practica: number,
+        id_informe_evaluativo: number,
+        id_docente: number
+    ): Promise<ArrayBufferLike> {
+        // Obtener la ruta ejecutable de Chrome para entornos serverless
+        const executablePath = await chromium.executablePath;
+
+        const browser = await puppeteer.launch({
+            args: chromium.args,
+            executablePath,
+            headless: chromium.headless,
+        });
+
+        const page = await browser.newPage();
+
+        // Definir rutas y leer recursos
+        const srcBasePath = path.resolve(
+            __dirname,
+            '../../../../../../src/modules/academicos/evaluacion-academica'
+        );
+        const logoUtaPath = path.join(srcBasePath,'icon/logo-uta.png');
         const logoIngenieriaPath = path.join(srcBasePath, 'icon/logo-iici.webp');
         const templatePath = path.join(srcBasePath, 'services/pdf.html');
 
+        // Validar que los archivos existen
+        if (!fs.existsSync(templatePath)) {
+            throw new BadRequestException('No se encontró la plantilla HTML para generar el PDF.');
+        }
 
+        const logoUtaBase64 = fs.existsSync(logoUtaPath) ? fs.readFileSync(logoUtaPath, 'base64') : '';
+        const logoIngenieriaBase64 = fs.existsSync(logoIngenieriaPath)
+            ? fs.readFileSync(logoIngenieriaPath, 'base64')
+            : '';
 
+        // Obtener datos de la práctica
         const practica = await this._databaseService.practicas.findUnique({
-            where: { id_practica: id_practica }
+            where: { id_practica },
         });
 
         if (!practica) {
-            throw new BadRequestException('Error, no existe la practica seleccionada');
+            throw new BadRequestException('Error, no existe la práctica seleccionada.');
         }
 
+        // Obtener datos adicionales
         const datosIdentificacion: IdentificacionInterface = await this.obtenerDatos(id_practica, id_docente);
         const datosRespuesta: FormatoRespuestaEvaluativaInterface[] = await this.obtenerRespuestas(id_informe_evaluativo);
         const aprobacion: boolean = this.estadoAprobacion(datosRespuesta);
 
+        // Preparar datos para la plantilla
         const dataIdentificacionHTML = {
-            logoUtaBase64: fs.readFileSync(logoUtaPath, 'base64'),
-            logoIngenieriaBase64: fs.readFileSync(logoIngenieriaPath, 'base64'),
+            logoUtaBase64,
+            logoIngenieriaBase64,
             nombreAlumno: datosIdentificacion.nombre_alumno,
             empresa: datosIdentificacion.nombre_empresa,
             tipoPractica: datosIdentificacion.tipo_practica,
             profesorRevisor: datosIdentificacion.profesor_revisor,
             respuestas: datosRespuesta,
-            fechaRevision: new Date(),
+            fechaRevision: new Date().toISOString().split('T')[0],
             estadoAprobacion: aprobacion,
-        }
-        console.log(datosRespuesta)
+        };
+
+        // Registrar helpers de Handlebars
         Handlebars.registerHelper('getFromList', function (list, index, attr) {
             if (Array.isArray(list) && list[index] !== undefined) {
                 return list[index][attr];
@@ -63,26 +90,27 @@ export class GeneratorPdfService {
         Handlebars.registerHelper('equals', function (a, b, options) {
             return a === b ? options.fn(this) : options.inverse(this);
         });
+
         Handlebars.registerHelper('getFromListWithCondition', function (list, index, attr, conditionValue) {
             if (Array.isArray(list) && list[index] && list[index][attr] !== undefined) {
                 return list[index][attr] === conditionValue ? 'X' : '';
             }
             return ''; // Devuelve vacío si el índice o el atributo no existen
         });
-        
-        
 
-
+        // Compilar plantilla HTML con Handlebars
         const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
         const template = Handlebars.compile(htmlTemplate);
         const htmlContent = template(dataIdentificacionHTML);
+
+        // Renderizar contenido en Puppeteer
         await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-        console.log('Ruta de pdf.html:', templatePath);
+        // Generar el PDF
+        const pdfBuffer = await page.pdf({ format: 'a4', printBackground: true });
 
-        const pdfBuffer = await page.pdf({ format: 'A4' });
+        // Cerrar el navegador
         await browser.close();
-        console.log('Tamaño del PDF Buffer:', pdfBuffer.length);
 
         return pdfBuffer;
     }
@@ -131,10 +159,10 @@ export class GeneratorPdfService {
         }
     }
 
-    private estadoAprobacion(respuestas: FormatoRespuestaEvaluativaInterface[]){
+    private estadoAprobacion(respuestas: FormatoRespuestaEvaluativaInterface[]) {
         let aprobacion = true;
-        for(let res of respuestas){
-            if(res.respuesta == 'Deficiente'){
+        for (let res of respuestas) {
+            if (res.respuesta == 'Deficiente') {
                 aprobacion = false
             };
         };
