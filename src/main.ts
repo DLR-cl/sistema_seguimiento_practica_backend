@@ -21,47 +21,22 @@ app.enableCors({
   origin: (origin, callback) => {
     const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
 
-    console.log('Origin received:', origin); // Log del origen recibido
+    console.log('Origin received:', origin); // Log para depurar el origen recibido
 
     if (!origin) {
-      console.warn('No Origin header received. Allowing by default.'); // Advertencia para solicitudes internas
-      callback(null, allowedOrigin); // Configura el origen permitido para solicitudes internas
+      console.warn('No Origin header received. Defaulting to allowedOrigin.');
+      callback(null, allowedOrigin); // Permitir solicitudes internas sin encabezado Origin
     } else if (origin === allowedOrigin) {
-      console.log('Access-Control-Allow-Origin:', origin); // Confirmación del origen permitido
-      callback(null, origin); // Permite el origen específico
+      console.log('Access-Control-Allow-Origin:', origin); // Log del origen permitido
+      callback(null, origin); // Configura el encabezado correctamente
     } else {
-      console.error('CORS error: Origin not allowed:', origin); // Log de error
+      console.error('CORS error: Origin not allowed:', origin); // Log del error
       callback(new Error('Not allowed by CORS'));
     }
   },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: true, // Permitir cookies y encabezados personalizados
+  credentials: true,
 });
-app.use((req, res, next) => {
-  const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
-  const origin = req.headers.origin;
-
-  if (origin === allowedOrigin) {
-    res.header('Access-Control-Allow-Origin', allowedOrigin);
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  }
-
-  if (req.method === 'OPTIONS') {
-    return res.status(204).send(); // Respuesta rápida para solicitudes preflight
-  }
-
-  next();
-});
-
-  
-
-
-
-
-
-
 
 
   await app.listen(process.env.PORT ||3000);
