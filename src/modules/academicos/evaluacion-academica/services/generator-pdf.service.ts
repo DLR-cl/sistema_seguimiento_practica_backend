@@ -8,6 +8,24 @@ import { DatabaseService } from '../../../../database/database/database.service'
 import { FormatoRespuestaEvaluativaInterface } from '../interface/responseRespuesta.interface';
 import { IdentificacionInterface } from '../interface/identificacion.interface';
 
+
+async function launchBrowser() {
+    const executablePath = await chromium.executablePath;
+  
+    if (!executablePath) {
+      throw new Error('No se pudo encontrar el ejecutable de Chrome en el entorno serverless.');
+    }
+  
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath,
+      headless: chromium.headless,
+      defaultViewport: chromium.defaultViewport,
+    });
+  
+    return browser;
+  }
+  
 @Injectable()
 export class GeneratorPdfService {
     constructor(
@@ -20,45 +38,24 @@ export class GeneratorPdfService {
         id_informe_evaluativo: number,
         id_docente: number
       ): Promise<ArrayBufferLike> {
-        let executablePath: string | undefined;
-        let args: string[] = [];
-        let headless: boolean = true;
-    
-        // Detectar entorno para configurar Puppeteer
-        if (process.env.AWS_EXECUTION_ENV) {
-          // Entorno serverless
-          executablePath = await chromium.executablePath;
-          args = chromium.args;
-          headless = chromium.headless;
-        } else {
-          // Entorno local
-          const puppeteerLocal = require('puppeteer'); // Requiere Puppeteer estándar
-          executablePath = (await puppeteerLocal.launch()).executablePath();
-          args = ['--no-sandbox', '--disable-setuid-sandbox'];
-        }
-    
         try {
-          // Lanzar navegador
-          const browser = await puppeteer.launch({ args, executablePath, headless });
-          const page = await browser.newPage();
-    
-          // Preparar rutas de recursos
-          const srcBasePath = path.resolve(
-            __dirname,
-            '../../../../../../src/modules/academicos/evaluacion-academica'
-          );
-          const logoUtaPath = path.join(srcBasePath, 'icon/logo-uta.png');
-          const logoIngenieriaPath = path.join(srcBasePath, 'icon/logo-iici.webp');
-          const templatePath = path.join(srcBasePath, 'services/pdf.html');
-    
-          if (!fs.existsSync(templatePath)) {
-            throw new BadRequestException('No se encontró la plantilla HTML para generar el PDF.');
+          // Configuración para entorno serverless
+          const executablePath = await chromium.executablePath;
+          if (!executablePath) {
+            throw new Error('No se encontró el ejecutable de Chromium en el entorno.');
           }
     
-          const logoUtaBase64 = fs.existsSync(logoUtaPath) ? fs.readFileSync(logoUtaPath, 'base64') : '';
-          const logoIngenieriaBase64 = fs.existsSync(logoIngenieriaPath)
-            ? fs.readFileSync(logoIngenieriaPath, 'base64')
-            : '';
+          const browser = await puppeteer.launch({
+            args: chromium.args,
+            executablePath,
+            headless: chromium.headless,
+            defaultViewport: chromium.defaultViewport,
+          });
+    
+          const page = await browser.newPage();
+    
+          // Cargar recursos y rutas
+          const { templatePath, logoUtaBase64, logoIngenieriaBase64 } = this.loadResources();
     
           // Obtener datos desde la base de datos
           const practica = await this._databaseService.practicas.findUnique({ where: { id_practica } });
@@ -83,10 +80,8 @@ export class GeneratorPdfService {
             estadoAprobacion: aprobacion,
           };
     
-          // Registrar helpers de Handlebars
+          // Registrar helpers de Handlebars y compilar plantilla
           this.registerHandlebarsHelpers();
-    
-          // Compilar plantilla HTML
           const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
           const template = Handlebars.compile(htmlTemplate);
           const htmlContent = template(dataIdentificacionHTML);
@@ -106,6 +101,50 @@ export class GeneratorPdfService {
           throw new InternalServerErrorException('No se pudo generar el PDF.');
         }
       }
+    
+    
+      private async getBrowserConfig() {
+        let executablePath: string | undefined;
+        let args: string[] = [];
+        let headless = true;
+    
+        if (process.env.AWS_EXECUTION_ENV) {
+          // Configuración para entorno serverless
+          executablePath = await chromium.executablePath;
+          args = chromium.args;
+          headless = chromium.headless;
+        } else {
+          // Configuración para entorno local
+          const puppeteerLocal = require('puppeteer'); // Requiere Puppeteer estándar
+          const browser = await puppeteerLocal.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+          executablePath = browser.executablePath();
+          await browser.close();
+        }
+    
+        return { executablePath, args, headless };
+      }
+    
+      private loadResources() {
+        const srcBasePath = path.resolve(
+          __dirname,
+          '../../../../../../src/modules/academicos/evaluacion-academica'
+        );
+        const logoUtaPath = path.join(srcBasePath, 'icon/logo-uta.png');
+        const logoIngenieriaPath = path.join(srcBasePath, 'icon/logo-iici.webp');
+        const templatePath = path.join(srcBasePath, 'services/pdf.html');
+    
+        if (!fs.existsSync(templatePath)) {
+          throw new BadRequestException('No se encontró la plantilla HTML para generar el PDF.');
+        }
+    
+        const logoUtaBase64 = fs.existsSync(logoUtaPath) ? fs.readFileSync(logoUtaPath, 'base64') : '';
+        const logoIngenieriaBase64 = fs.existsSync(logoIngenieriaPath)
+          ? fs.readFileSync(logoIngenieriaPath, 'base64')
+          : '';
+    
+        return { templatePath, logoUtaBase64, logoIngenieriaBase64 };
+      }
+    
     
       private registerHandlebarsHelpers() {
         Handlebars.registerHelper('getFromList', function (list, index, attr) {
