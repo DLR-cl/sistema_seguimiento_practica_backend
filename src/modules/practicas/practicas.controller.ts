@@ -7,7 +7,7 @@ import { ExtensionPractica } from "./dto/practica-response.dto";
 import { Estado_informe, TipoPractica } from "@prisma/client";
 import { GenerarReporteSemestralDto } from "./dto/reportes.dto";
 import { Response } from "express";
-import { CorsInterceptor } from "interceptors/interceptor-cors";
+import { CorsInterceptor } from "../../interceptors/interceptor-cors";
 
 @Controller('practicas')
 export class PracticasController {
