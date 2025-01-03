@@ -223,10 +223,19 @@ export class AcademicosService {
 
     async getReprobadosYAprobadosByAcademico(id_academico: number) {
         try {
-            // Consultar informes de alumno asociados al académico
+            // Obtener el año actual
+            const currentYear = new Date().getFullYear();
+            const inicioAnio = new Date(`${currentYear}-01-01`);
+            const finAnio = new Date(`${currentYear}-12-31`);
+    
+            // Consultar informes de alumno asociados al académico y al año actual
             const informesAlumno = await this._databaseService.informesAlumno.findMany({
                 where: {
                     id_academico, // Filtrar por académico
+                    fecha_termino_revision: {
+                        gte: inicioAnio, // Desde el inicio del año actual
+                        lte: finAnio,    // Hasta el final del año actual
+                    },
                 },
                 select: {
                     estado: true,
@@ -237,16 +246,15 @@ export class AcademicosService {
                     },
                 },
             });
-
+    
             const conteoPorPractica: Record<string, { aprobados: number; reprobados: number }> = {
                 PRACTICA_UNO: { aprobados: 0, reprobados: 0 },
                 PRACTICA_DOS: { aprobados: 0, reprobados: 0 },
             };
-
-            
+    
             informesAlumno.forEach((informe) => {
                 const tipoPractica = informe.practica?.tipo_practica;
-
+    
                 // Asegurarse de que el tipo de práctica esté inicializado
                 if (!conteoPorPractica[tipoPractica]) {
                     conteoPorPractica[tipoPractica] = {
@@ -254,7 +262,7 @@ export class AcademicosService {
                         reprobados: 0,
                     };
                 }
-
+    
                 // Contar aprobados y reprobados
                 if (informe.estado === Estado_informe.APROBADA) {
                     conteoPorPractica[tipoPractica].aprobados += 1;
@@ -262,11 +270,8 @@ export class AcademicosService {
                     conteoPorPractica[tipoPractica].reprobados += 1;
                 }
             });
-
-            return {
-                mensaje: 'Conteo de aprobados y reprobados por práctica.',
-                data: conteoPorPractica,
-            };
+    
+            return conteoPorPractica;
         } catch (error) {
             console.error('Error al obtener reprobados y aprobados:', error);
             throw new InternalServerErrorException(
@@ -274,5 +279,82 @@ export class AcademicosService {
             );
         }
     }
+    
 
+    async getInformesPorMesYPractica(id_academico: number) {
+        try {
+            const currentYear = new Date().getFullYear();
+            const menor = new Date(`${currentYear}-01-01`);
+            const mayor = new Date(`${currentYear}-12-31`);
+    
+            // Consultar informes de alumno asociados al académico en el año actual
+            const informesAlumno = await this._databaseService.informesAlumno.findMany({
+                where: {
+                    id_academico,
+                    fecha_termino_revision: {
+                        gte: menor, // Desde el inicio del año actual
+                        lte: mayor, // Hasta el final del año actual
+                    },
+                },
+                select: {
+                    estado: true,
+                    fecha_termino_revision: true, // Fecha de término para determinar el mes
+                    practica: {
+                        select: {
+                            tipo_practica: true, // Obtener el tipo de práctica
+                        },
+                    },
+                },
+            });
+    
+            // Meses definidos con inicialización
+            const meses = [
+                { nombre: 'enero', valor: 1 },
+                { nombre: 'febrero', valor: 2 },
+                { nombre: 'marzo', valor: 3 },
+                { nombre: 'abril', valor: 4 },
+                { nombre: 'mayo', valor: 5 },
+                { nombre: 'junio', valor: 6 },
+                { nombre: 'julio', valor: 7 },
+                { nombre: 'agosto', valor: 8 },
+                { nombre: 'septiembre', valor: 9 },
+                { nombre: 'octubre', valor: 10 },
+                { nombre: 'noviembre', valor: 11 },
+                { nombre: 'diciembre', valor: 12 },
+            ];
+    
+            // Inicializar el conteo por mes y práctica
+            const conteoPorMes: Record<string, Record<string, number>> = {};
+            meses.forEach((mes) => {
+                conteoPorMes[mes.nombre] = {
+                    PRACTICA_UNO: 0,
+                    PRACTICA_DOS: 0,
+                };
+            });
+    
+            // Procesar los informes
+            informesAlumno.forEach((informe) => {
+                const fecha = new Date(informe.fecha_termino_revision); // Usar fecha_termino_revision en lugar de fecha_inicio
+                const mesNumero = fecha.getMonth() + 1; // Mes en base 1
+                const mesNombre = meses.find((mes) => mes.valor === mesNumero)?.nombre;
+    
+                if (mesNombre) {
+                    const tipoPractica = informe.practica?.tipo_practica;
+    
+                    // Incrementar el conteo para el tipo de práctica
+                    if (tipoPractica) {
+                        conteoPorMes[mesNombre][tipoPractica] += 1;
+                    }
+                }
+            });
+    
+            return conteoPorMes;
+        } catch (error) {
+            console.error('Error al obtener informes por mes y práctica:', error);
+            throw new InternalServerErrorException(
+                'Error al obtener los informes por mes y práctica.',
+            );
+        }
+    }
+    
  }
