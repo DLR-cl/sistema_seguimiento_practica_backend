@@ -111,6 +111,20 @@ export class AcademicosController {
                 throw new InternalServerErrorException('Error interno al obtener la cantidad de aprobados y reprobados')
             }
         }
+
+        @Get('data/resultados-practica/conteo')
+        async obtenerResultadoPracticasByAcademico(@Query('id_academico') id_academico: number){
+            const data = await this._academicoService.getReprobadosYAprobadosByAcademico(+id_academico)
+            return data;
+        }
+        
+        @Get('data/resultados-practica/conteo/informes-practica')
+        async obtenerInformesPracticasByAcademicoPorMes(@Query('id_academico') id_academico: number){
+            console.log(id_academico)
+            const data = await this._academicoService.getInformesPorMesYPractica(+id_academico);
+            console.log(data)
+            return data;
+        }
 }
 
 

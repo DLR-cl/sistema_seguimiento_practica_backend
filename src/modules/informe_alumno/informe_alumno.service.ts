@@ -219,7 +219,7 @@ export class InformeAlumnoService {
   async getArchivoCorreccion(id_informe: number): Promise<Readable> {
     // Obtener el informe por ID desde la base de datos
     const informe = await this._databaseService.informesAlumno.findUnique({
-        where: { id_informe },
+        where: { id_informe:  +id_informe },
         select: { archivo: true },
     });
 
