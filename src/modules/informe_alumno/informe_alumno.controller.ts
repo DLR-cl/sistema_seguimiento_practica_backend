@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Res, UploadedFile, UseInterceptors, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, FileTypeValidator, Get, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseIntPipe, Patch, Post, Res, UploadedFile, UseInterceptors, Req, Query } from '@nestjs/common';
 import { CreateInformeAlumnoDto } from './dto/create-informe-alumno.dto';
 import { InformeAlumnoService } from './informe_alumno.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -142,5 +142,17 @@ export class InformeAlumnoController {
     public async obtenerRespuestaInforme(@Param('id', ParseIntPipe) informe_id: number) {
         console.log(informe_id)
         return await this._informeAlumnoService.obtenerRespuestasInforme(informe_id);
+    }
+
+    @Get('archivo/obtener/correccion')
+    public async obtenerArchivoCorreccion(@Query('id_informe_alumno') id_informe: number,  @Res() res: Response,){
+        const readableStream = await this._informeAlumnoService.getArchivoCorreccion(id_informe);
+        res.set({
+            'Content-Type': 'application/pdf', // Cambiar según el tipo de archivo esperado
+            'Content-Disposition': `attachment; filename="informe_${id_informe}.pdf"`,
+        });
+
+        // Enviar el flujo como respuesta
+        readableStream.pipe(res);
     }
 }
