@@ -221,4 +221,58 @@ export class AcademicosService {
         });
     }
 
+    async getReprobadosYAprobadosByAcademico(id_academico: number) {
+        try {
+            // Consultar informes de alumno asociados al académico
+            const informesAlumno = await this._databaseService.informesAlumno.findMany({
+                where: {
+                    id_academico, // Filtrar por académico
+                },
+                select: {
+                    estado: true,
+                    practica: {
+                        select: {
+                            tipo_practica: true, // Obtener el tipo de práctica
+                        },
+                    },
+                },
+            });
+
+            const conteoPorPractica: Record<string, { aprobados: number; reprobados: number }> = {
+                PRACTICA_UNO: { aprobados: 0, reprobados: 0 },
+                PRACTICA_DOS: { aprobados: 0, reprobados: 0 },
+            };
+
+            
+            informesAlumno.forEach((informe) => {
+                const tipoPractica = informe.practica?.tipo_practica;
+
+                // Asegurarse de que el tipo de práctica esté inicializado
+                if (!conteoPorPractica[tipoPractica]) {
+                    conteoPorPractica[tipoPractica] = {
+                        aprobados: 0,
+                        reprobados: 0,
+                    };
+                }
+
+                // Contar aprobados y reprobados
+                if (informe.estado === Estado_informe.APROBADA) {
+                    conteoPorPractica[tipoPractica].aprobados += 1;
+                } else if (informe.estado === Estado_informe.DESAPROBADA) {
+                    conteoPorPractica[tipoPractica].reprobados += 1;
+                }
+            });
+
+            return {
+                mensaje: 'Conteo de aprobados y reprobados por práctica.',
+                data: conteoPorPractica,
+            };
+        } catch (error) {
+            console.error('Error al obtener reprobados y aprobados:', error);
+            throw new InternalServerErrorException(
+                'Error al obtener los reprobados y aprobados por práctica.',
+            );
+        }
+    }
+
  }
