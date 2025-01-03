@@ -7,6 +7,7 @@ import { EvaluacionInforme } from '../interface/responseRespuesta.interface';
 import { Response } from 'express';
 import { TipoPractica } from '@prisma/client';
 import { RespuestasConfidenciales } from '../../../dashboard/interface/dashboard.interface';
+import { EstadisticaService } from 'modules/academicos/services/estadistica.service';
 
 @Injectable()
 export class ReportesExcelService {
@@ -25,6 +26,7 @@ export class ReportesExcelService {
     constructor(
         private readonly _databaseService: DatabaseService,
         private readonly _analiticaService: AnaliticaService,
+        private readonly _estadisticaService: EstadisticaService,
     ) { }
 
 
@@ -298,4 +300,53 @@ export class ReportesExcelService {
         res.send(Buffer.from(buffer));
     }
     
+    async generarExcelReporteAcademicoInformes(fecha_in: Date, fecha_fin: Date, res: Response) {
+        const workbook = new ExcelJS.Workbook();
+    
+        try {
+            // Obtener los datos para Práctica 1
+            const practicaUnoData = await this._estadisticaService.obtenerConteoInformesAcademicosPorPractica(fecha_in, fecha_fin, TipoPractica.PRACTICA_UNO);
+    
+            // Crear hoja para Práctica 1
+            const worksheetUno = workbook.addWorksheet('Práctica 1');
+            worksheetUno.columns = [
+                { header: 'Nombre Académico', key: 'nombre_academico', width: 25 },
+                { header: 'Correo Académico', key: 'correo_academico', width: 25 },
+                { header: 'Informes Aprobados', key: 'cantidad_informes_aprobados', width: 20 },
+                { header: 'Informes Reprobados', key: 'cantidad_informes_reprobados', width: 20 },
+            ];
+    
+            practicaUnoData.forEach((data) => {
+                worksheetUno.addRow(data);
+            });
+    
+            // Obtener los datos para Práctica 2
+            const practicaDosData = await this._estadisticaService.obtenerConteoInformesAcademicosPorPractica(fecha_in, fecha_fin, TipoPractica.PRACTICA_DOS);
+    
+            // Crear hoja para Práctica 2
+            const worksheetDos = workbook.addWorksheet('Práctica 2');
+            worksheetDos.columns = [
+                { header: 'Nombre Académico', key: 'nombre_academico', width: 25 },
+                { header: 'Correo Académico', key: 'correo_academico', width: 25 },
+                { header: 'Informes Aprobados', key: 'cantidad_informes_aprobados', width: 20 },
+                { header: 'Informes Reprobados', key: 'cantidad_informes_reprobados', width: 20 },
+            ];
+    
+            practicaDosData.forEach((data) => {
+                worksheetDos.addRow(data);
+            });
+    
+            // Convertir el workbook a un buffer
+            const buffer = await workbook.xlsx.writeBuffer();
+    
+            // Configurar la respuesta HTTP
+            res.setHeader('Content-Disposition', 'attachment; filename="reporte_informes_academicos.xlsx"');
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.send(Buffer.from(buffer));
+        } catch (error) {
+            console.error('Error al generar el reporte en Excel:', error);
+            res.status(500).send('Error al generar el reporte en Excel.');
+        }
+    }
+
 }

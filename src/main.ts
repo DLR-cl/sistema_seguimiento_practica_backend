@@ -19,7 +19,7 @@ async function bootstrap() {
 
 app.enableCors({
   origin: (origin, callback) => {
-    const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
+    const allowedOrigin = 'http://localhost:4200'; // Dominio único permitido
 
     console.log('Origin received:', origin); // Log para depurar el origen recibido
 

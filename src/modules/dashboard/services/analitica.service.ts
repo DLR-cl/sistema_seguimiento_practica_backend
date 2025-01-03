@@ -328,14 +328,14 @@ export class AnaliticaService {
                 pregunta: true,
             },
         });
-    
+
         // Agrupar las respuestas por el nombre de la pregunta y contar cada tipo
         const resultado = respuestas.reduce((acc, item) => {
             const nombrePregunta = item.pregunta?.enunciado_pregunta || 'Pregunta desconocida';
-    
+
             item.respuestas.forEach((respuestaItem) => {
                 const respuesta = respuestaItem.respuesta_texto || 'Sin respuesta';
-    
+
                 if (!acc[nombrePregunta]) {
                     acc[nombrePregunta] = {
                         Total: 0,
@@ -344,15 +344,15 @@ export class AnaliticaService {
                         Regular: 0,
                     };
                 }
-    
+
                 // Incrementar el contador correspondiente
                 acc[nombrePregunta][respuesta] = (acc[nombrePregunta][respuesta] || 0) + 1;
                 acc[nombrePregunta].Total += 1; // Incrementar el total general
             });
-    
+
             return acc;
         }, {});
-    
+
         return resultado;
     }
 
@@ -403,23 +403,23 @@ export class AnaliticaService {
     //             `No se encontraron respuestas confidenciales para el periodo ${fecha_ini} - ${fecha_fin} y la práctica ${tipoPractica}`,
     //         );
     //     }
-    
+
     //     // Tipos de preguntas a procesar
     //     const tiposPreguntasProcesar = ['CERRADA', 'HABILIDADES_TECNICAS', 'VINCULACION_MEDIO', 'SALARIO_ESTIMADO'];
-    
+
     //     // Contenedores para los conteos
     //     const conteoCerradas: Record<number, number> = {};
     //     const conteoHabilidadesTecnicas: Record<string, number> = {};
     //     const conteoVinculacionMedio: Record<string, number> = {};
     //     const conteoSalarioEstimado: Record<string, number> = {};
-    
+
     //     // Procesar las respuestas según el tipo de pregunta
     //     respuestas.forEach((dimension) => {
     //         dimension.lista_preguntas.forEach((pregunta) => {
     //             if (tiposPreguntasProcesar.includes(pregunta.tipo_pregunta)) {
     //                 const respuestasConfidenciales =
     //                     pregunta.preguntas_implementadas_confidencial?.respuesta || [];
-    
+
     //                 if (pregunta.tipo_pregunta === 'CERRADA') {
     //                     respuestasConfidenciales.forEach((respuesta) => {
     //                         const valor = respuesta.puntos;
@@ -455,7 +455,7 @@ export class AnaliticaService {
     //             }
     //         });
     //     });
-    
+
     //     // Retornar los conteos finales
     //     return {
     //         conteoCerradas,
@@ -464,7 +464,7 @@ export class AnaliticaService {
     //         conteoSalarioEstimado,
     //     };
     // }
-    
+
     async obtenerRespuestasConfidencialesPorPeriodoYPractica(
         fecha_ini: Date,
         fecha_fin: Date,
@@ -503,18 +503,18 @@ export class AnaliticaService {
                 },
             },
         });
-    
+
         // Si no hay respuestas, retornar un arreglo vacío
         if (!respuestas || respuestas.length === 0) {
             return [];
         }
-    
+
         // Tipos de preguntas a procesar
         const tiposPreguntasProcesar = ['CERRADA', 'HABILIDADES_TECNICAS', 'VINCULACION_MEDIO', 'SALARIO_ESTIMADO'];
-    
+
         // Resultado final con preguntas y respuestas
         const resultado: RespuestaConfidencial[] = [];
-    
+
         // Escala Likert
         const getLikertText = (value: number): string => {
             switch (value) {
@@ -526,14 +526,14 @@ export class AnaliticaService {
                 default: return '';
             }
         };
-    
+
         // Procesar las preguntas y respuestas
         respuestas.forEach((dimension) => {
             dimension.lista_preguntas.forEach((pregunta) => {
                 if (tiposPreguntasProcesar.includes(pregunta.tipo_pregunta)) {
                     const respuestasConfidenciales =
                         pregunta.preguntas_implementadas_confidencial?.respuesta || [];
-    
+
                     if (pregunta.tipo_pregunta === 'CERRADA') {
                         // Generar escala Likert del 1 al 5
                         const escalaLikert = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -543,7 +543,7 @@ export class AnaliticaService {
                                 escalaLikert[valor]++;
                             }
                         });
-    
+
                         // Mapear a texto
                         const respuestasMapeadas = Object.entries(escalaLikert).reduce((acc, [key, count]) => {
                             const texto = getLikertText(Number(key));
@@ -552,7 +552,7 @@ export class AnaliticaService {
                             }
                             return acc;
                         }, {});
-    
+
                         // Agregar al resultado
                         resultado.push({
                             tipo: 'CERRADA',
@@ -566,7 +566,7 @@ export class AnaliticaService {
                             acc[texto] = (acc[texto] || 0) + 1;
                             return acc;
                         }, {});
-    
+
                         resultado.push({
                             tipo: pregunta.tipo_pregunta,
                             pregunta: pregunta.enunciado_pregunta,
@@ -576,11 +576,11 @@ export class AnaliticaService {
                 }
             });
         });
-    
+
         // Retornar preguntas y respuestas
         return resultado;
     }
-    
-    
+
+
     
 }

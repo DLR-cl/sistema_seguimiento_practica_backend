@@ -1,10 +1,11 @@
-import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe, Post, Query, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Param, ParseIntPipe, Post, Query, Res } from '@nestjs/common';
 import { EvaluacionAcademicaService } from './evaluacion-academica.service';
 import { InformeEvaluativoDto } from '../dto/informe-evaluativo.dto';
 import { AsignarPreguntaDto } from '../../../modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 import { GeneratorPdfService } from './services/generator-pdf.service';
 import { Response } from 'express';
 import { ReportesExcelService } from './services/reportes-excel.service';
+import { TipoPractica } from '@prisma/client';
 
 @Controller('evaluacion-academica')
 export class EvaluacionAcademicaController {
@@ -146,6 +147,51 @@ export class EvaluacionAcademicaController {
         }
     }   
 
+    @Get('generar/academicos/informes/fechas')
+    public async generarReportesPorFecha(
+      @Query('fecha_in') fecha_in: string,
+      @Query('fecha_fin') fecha_fin: string,
+      @Res() res: Response
+    ) {
+      try {
+        // Validar fechas
+        if (!fecha_in || !fecha_fin) {
+          throw new HttpException(
+            'Los parámetros fecha_in y fecha_fin son obligatorios.',
+            HttpStatus.BAD_REQUEST
+          );
+        }
+  
+        const fechaInicio = new Date(fecha_in);
+        const fechaFin = new Date(fecha_fin);
+  
+        if (isNaN(fechaInicio.getTime()) || isNaN(fechaFin.getTime())) {
+          throw new HttpException(
+            'Las fechas proporcionadas no son válidas.',
+            HttpStatus.BAD_REQUEST
+          );
+        }
+  
+        // Generar el archivo Excel
+        const buffer = await this._reporteexcelService.generarExcelReporteAcademicoInformes(
+          fechaInicio,
+          fechaFin,
+          res,
+        );
+  
+        // Configurar la respuesta para la descarga del archivo
+        const fileName = `reporte_informes_academicos_${fecha_in}_a_${fecha_fin}.xlsx`;
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        res.send(buffer);
+      } catch (error) {
+        console.error('Error al generar el reporte:', error);
+        throw new HttpException(
+          'Ocurrió un error al generar el reporte.',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+    }
 
 
 }

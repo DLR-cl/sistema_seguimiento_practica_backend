@@ -186,7 +186,6 @@ export class EvaluacionAcademicaService {
     }
 
     async registrarInformeEvaluativo(informe: InformeEvaluativoDto): Promise<number> {
-        console.log("hola uno")
 
 
         try {

@@ -155,4 +155,5 @@ export class DashboardController {
       throw new BadRequestException('No se pudo obtener las respuestas confidenciales.');
     }
   }
+
 }
