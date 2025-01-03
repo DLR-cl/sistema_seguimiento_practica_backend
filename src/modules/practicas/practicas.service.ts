@@ -269,7 +269,7 @@ export class PracticasService {
             throw new BadRequestException(`Error, la práctica con id ${id_practica} no existe`);
         }
 
-        if(fecha_fin_ext < practica.fecha_termino){
+        if(new Date(fecha_fin_ext) <= new Date(practica.fecha_termino)){
             throw new BadRequestException('Error, la fecha de extensión debe ser después de la fecha de termino')
         }
         if(practica.estado == Estado_practica.ESPERA_INFORMES){
