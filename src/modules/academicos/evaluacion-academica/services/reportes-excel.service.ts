@@ -7,7 +7,7 @@ import { EvaluacionInforme } from '../interface/responseRespuesta.interface';
 import { Response } from 'express';
 import { TipoPractica } from '@prisma/client';
 import { RespuestasConfidenciales } from '../../../dashboard/interface/dashboard.interface';
-import { EstadisticaService } from 'modules/academicos/services/estadistica.service';
+import { EstadisticaService } from '../../../academicos/services/estadistica.service';
 
 @Injectable()
 export class ReportesExcelService {

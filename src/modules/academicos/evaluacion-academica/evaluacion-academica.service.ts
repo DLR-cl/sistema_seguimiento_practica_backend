@@ -4,7 +4,6 @@ import { DatabaseService } from '../../../database/database/database.service';
 import { Estado_informe, Estado_practica, Prisma, PrismaClient, TipoPractica } from '@prisma/client';
 import { AsignarPreguntaDto } from '../../../modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { Informe } from 'modules/informe_alumno/dto/informe_pdf.dto';
 
 @Injectable()
 export class EvaluacionAcademicaService {
