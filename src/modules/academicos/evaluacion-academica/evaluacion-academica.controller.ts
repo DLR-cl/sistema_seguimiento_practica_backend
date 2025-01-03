@@ -53,34 +53,18 @@ export class EvaluacionAcademicaController {
 
     @Get('generate')
     async generatePdf(
-        @Res() res: Response,
         @Query('id_practica', ParseIntPipe) id_practica: number,
         @Query('id_informe_evaluativo', ParseIntPipe) id_informe_evaluativo: number,
         @Query('id_docente', ParseIntPipe) id_docente: number
         ) {
-        const data = {
-            items: [
-                { aspecto: 'Formato', calificacion: 'T' },
-                { aspecto: 'Redacción', calificacion: 'R' },
-                { aspecto: 'Portada', calificacion: 'S' },
-            ],
-        };
+
 
         try {
-            const pdfBuffer = await this._generatePdfService.generatePdf(id_practica, id_informe_evaluativo, id_docente);
+            console.log(id_practica, id_informe_evaluativo, id_docente)
+            return await this._generatePdfService.darDatosParaPdf(id_practica, id_informe_evaluativo, id_docente);
 
-            // Configurar encabezados
-            res.set({
-                'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename="evaluacion-${id_docente || 'usuario'}.pdf"`,
-                'Content-Length': pdfBuffer.byteLength, // Asegura el tamaño correcto
-            });
-
-            // Enviar el buffer
-            res.end(pdfBuffer);
         } catch (error) {
             console.error('Error al generar el PDF:', error);
-            res.status(500).send('Error al generar el PDF');
         }
     }
 

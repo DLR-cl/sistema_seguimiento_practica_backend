@@ -9,7 +9,7 @@ SELECT
     DATEDIFF(DATE(infA.fecha_termino_revision), CURDATE()) AS dias_para_revision, -- Días para revisión
     DATE(infA.fecha_inicio_revision) AS inicio_revision,
     DATE(infA.fecha_termino_revision) AS fin_revision,
-    infA.intentos AS intentos-- Intentos restantes
+    infA.intentos AS intentos -- Intentos restantes
 FROM
     Practicas AS p
 LEFT JOIN
@@ -17,8 +17,7 @@ LEFT JOIN
 LEFT JOIN
     InformesAlumno AS infA ON infA.id_practica = p.id_practica
 LEFT JOIN
-    InformeEvaluacionAcademicos AS iea 
-      ON iea.id_informe_alumno = infA.id_informe
-      AND iea.id_academico = ? -- Filtrar solo por académico asignado en esta relación
+    InformeEvaluacionAcademicos AS iea ON iea.id_informe_alumno = infA.id_informe
 WHERE
-    p.estado != 'CURSANDO';
+    p.estado != 'CURSANDO'
+    AND (iea.id_academico = ? OR iea.id_academico IS NULL);

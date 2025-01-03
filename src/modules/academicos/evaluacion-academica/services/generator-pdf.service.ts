@@ -167,6 +167,13 @@ export class GeneratorPdfService {
       }
     
 
+      async darDatosParaPdf(id_practica: number,  id_informe_evaluativo: number, id_docente: number){
+        const datosIdentificacion = await this.obtenerDatos(id_practica, id_docente);
+        const datosRespuesta = await this.obtenerRespuestas(id_informe_evaluativo);
+        const aprobacion = this.estadoAprobacion(datosRespuesta);
+
+        return { datosIdentificacion, datosRespuesta, aprobacion };
+      }
 
     private async obtenerDatos(id_practica: number, id_docente: number) {
         try {
@@ -223,7 +230,7 @@ export class GeneratorPdfService {
     }
     private async obtenerRespuestas(id_informe_evaluativo: number) {
         try {
-
+          console.log(id_informe_evaluativo)
             if (
                 !(await this._databaseService.informeEvaluacionAcademicos.findUnique({
                     where: { id_informe: id_informe_evaluativo }

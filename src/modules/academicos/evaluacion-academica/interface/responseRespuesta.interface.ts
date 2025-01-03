@@ -31,3 +31,5 @@ export interface ConteoPracticas {
     PRACTICA_DOS: PracticaResultado; // Resultados para PRACTICA_DOS
 }
 
+
+
