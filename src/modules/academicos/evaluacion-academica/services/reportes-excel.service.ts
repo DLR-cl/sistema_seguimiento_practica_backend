@@ -1,12 +1,12 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
 import { Client } from 'basic-ftp';
-import { DatabaseService } from 'database/database/database.service';
-import { AnaliticaService } from 'modules/dashboard/services/analitica.service';
+import { DatabaseService } from '../../../../database/database/database.service';
+import { AnaliticaService } from '../../../dashboard/services/analitica.service';
 import { EvaluacionInforme } from '../interface/responseRespuesta.interface';
 import { Response } from 'express';
 import { TipoPractica } from '@prisma/client';
-import { RespuestasConfidenciales } from 'modules/dashboard/interface/dashboard.interface';
+import { RespuestasConfidenciales } from '../../../dashboard/interface/dashboard.interface';
 
 @Injectable()
 export class ReportesExcelService {

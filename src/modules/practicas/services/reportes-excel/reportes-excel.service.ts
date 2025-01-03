@@ -188,7 +188,7 @@ export class ReportesExcelService {
   }
 
 
-  async listarReportesPorAnoYPractica(year: number, tipo_practica: TipoPractica) {
+  async listarReportesPorAnoYPractica(year: number, tipo_practica: TipoPractica, tipo_informe: string) {
     const client = new Client();
 
     const basePath = tipo_practica === TipoPractica.PRACTICA_UNO ? `reportes/practica-uno/${year}`
@@ -354,48 +354,49 @@ export class ReportesExcelService {
     }
   }
   @Cron('0 8 * * 0')
-  private async generarReporteSemanal(
-    tipo_practica: TipoPractica,
-  ) {
+  public async generarReporteSemanal() {
     const client = new Client();
 
     try {
-      // Conexión al servidor FTP
+      console.log('Conectando al servidor FTP...');
       await client.access(this.ftpConfig);
 
-      // Calcular inicio y fin de la semana actual (lunes a domingo)
+      // Configuración para mantener la conexión activa y evitar timeouts
+      // Calcular inicio y fin de la semana actual
       const fechaActual = new Date();
       const inicioSemana = startOfWeek(fechaActual, { weekStartsOn: 1 }); // Lunes
       const finSemana = endOfWeek(fechaActual, { weekStartsOn: 1 }); // Domingo
-
-      // Consultar datos desde Prisma
       const nombreMes = this.meses[fechaActual.getMonth()];
       const numeroSemana = this.obtenerNumeroSemana(fechaActual);
       const year = fechaActual.getFullYear();
 
       // Generar Excel
+      console.log('Generando archivo Excel...');
       const workbookExcel = new ExcelJS.Workbook();
-      const workbookLlenado = await this.generarExcel(workbookExcel, tipo_practica, inicioSemana, finSemana);
-      const buffer = Buffer.from(await workbookLlenado.xlsx.writeBuffer());
-      const stream = Readable.from([buffer]);
+      const workbookLlenado = await this.generarExcel(
+        workbookExcel,
+        TipoPractica.PRACTICA_UNO,
+        inicioSemana,
+        finSemana
+      );
+
+      // Escribir el archivo a un buffer
+      const buffer = await workbookLlenado.xlsx.writeBuffer();
 
       // Construir ruta del directorio
-      const directory = tipo_practica === 'PRACTICA_UNO'
-        ? `/reportes/practica-uno/${year}/semanal/${nombreMes}`
-        : `/reportes/practica-dos/${year}/semanal/${nombreMes}`;
-
+      const directory = `/reportes/practica-uno/${year}/semanal/${nombreMes}`;
       const fileName = `reporte_semana_${numeroSemana}.xlsx`;
       const remotePath = `${directory}/${fileName}`;
 
-      console.log(`Creando o asegurando directorio: ${directory}`);
+      console.log(`Asegurando directorio remoto: ${directory}`);
       await client.ensureDir(directory);
 
       console.log(`Subiendo archivo a: ${remotePath}`);
-      await client.uploadFrom(stream, remotePath);
+      await client.uploadFrom(Readable.from([buffer]), remotePath);
 
       console.log('Archivo subido exitosamente.');
     } catch (error) {
-      console.error('Error durante la generación o subida del archivo:', error);
+      console.error('Error durante la generación o subida del archivo:', error.message);
       throw new Error('No se pudo generar y subir el reporte semanal.');
     } finally {
       client.close();
@@ -499,6 +500,7 @@ export class ReportesExcelService {
     tipo_practica: TipoPractica,
     anio: number,
     mes: string): Promise<string[]> {
+    console.log("tipopractica:",tipo_practica)
     const client = new Client();
     const directorioBase =
       tipo_practica === 'PRACTICA_UNO'

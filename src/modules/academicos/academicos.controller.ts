@@ -55,9 +55,7 @@ export class AcademicosController {
             console.log('Datos recibidos:', data); // Inspección del body
             console.log('Archivo recibido:', file); // Inspección del archivo
     
-            if (!data.tipo_practica || !data.nombre_alumno || !data.id_informe || !data.id_academico) {
-                throw new BadRequestException('Faltan datos obligatorios en la solicitud');
-            }
+            
     
             // Llamar al servicio para almacenar la información en la base de datos
             return await this._academicoService.subirCorreccion(file, data, 'archivosBackend');

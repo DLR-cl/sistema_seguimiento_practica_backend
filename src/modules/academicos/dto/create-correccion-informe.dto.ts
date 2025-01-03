@@ -4,7 +4,11 @@ import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
 export class CrearInformeCorreccion {
     @IsNotEmpty()
     @IsNumber()
-    id_informe: number;
+    id_informe_alumno: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    id_informe_evaluativa: number;
 
     @IsNotEmpty()
     @IsNumber()

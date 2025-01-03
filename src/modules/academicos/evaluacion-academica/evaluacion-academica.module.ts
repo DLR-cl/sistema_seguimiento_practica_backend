@@ -4,7 +4,7 @@ import { EvaluacionAcademicaService } from './evaluacion-academica.service';
 import { DatabaseModule } from '../../../database/database/database.module';
 import { GeneratorPdfService } from './services/generator-pdf.service';
 import { ReportesExcelService } from './services/reportes-excel.service';
-import { DashboardModule } from 'modules/dashboard/dashboard.module';
+import { DashboardModule } from '../../dashboard/dashboard.module';
 
 @Module({
   controllers: [EvaluacionAcademicaController],

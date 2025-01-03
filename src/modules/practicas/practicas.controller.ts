@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe, Patch, Post, Query, Res, UsePipes, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe, Patch, Post, Query, Res, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
 import { PracticasService } from "./practicas.service";
 import { createPracticaDto } from "./dto/create-practicas.dto";
 import { ReportesExcelService } from "./services/reportes-excel/reportes-excel.service";
@@ -7,6 +7,7 @@ import { ExtensionPractica } from "./dto/practica-response.dto";
 import { Estado_informe, TipoPractica } from "@prisma/client";
 import { GenerarReporteSemestralDto } from "./dto/reportes.dto";
 import { Response } from "express";
+import { CorsInterceptor } from "../../interceptors/interceptor-cors";
 
 @Controller('practicas')
 export class PracticasController {
@@ -36,8 +37,10 @@ export class PracticasController {
     }
 
     @Get('alumno/:id')
+    @UseInterceptors(new CorsInterceptor()) // Aplica lógica CORS específica si es necesario
     public async getPracticaByAlumno(@Param('id') id_alumno: string) {
-        return await this._practicaService.getPracticaAlumno(+id_alumno);
+      console.log('Handling CORS for alumno route');
+      return await this._practicaService.getPracticaAlumno(+id_alumno);
     }
 
     @Get('informes/generar')
@@ -70,6 +73,7 @@ export class PracticasController {
     ) {
         try {
             const { practica, fecha_in, fecha_fin } = query;
+            console.log(query)
             return await this._reporteService.generarReporteSemestral(practica, new Date(fecha_in), new Date(fecha_fin), res)
         } catch (error) {
             if (error instanceof BadRequestException) {
@@ -83,17 +87,20 @@ export class PracticasController {
     @Get('reportes/obtener/listar')
     public async listarPorAnoYPractica(
         @Query('practica') tipoPractica: TipoPractica,
-        @Query('ano') ano: number
+        @Query('ano') ano: number,
+        @Query('informe') informe: string
     ): Promise<string[]> {
-        return this._reporteService.listarReportesPorAnoYPractica(ano, tipoPractica);
+        return this._reporteService.listarReportesPorAnoYPractica(ano, tipoPractica, informe);
     }
-
+    
     @Get('reportes/obtener/listar/semanal')
     public async listarReportesSemanalByMes(
         @Query('tipoPractica') tipoPractica: 'PRACTICA_UNO' | 'PRACTICA_DOS',
         @Query('anio') anio: number,
         @Query('mes') mes: string,
     ) {
+        console.log(tipoPractica)
+        console.log(anio, mes)
         return await this._reporteService.listarReportesSemanalesByMes(
             tipoPractica,
             anio,
@@ -120,4 +127,6 @@ export class PracticasController {
             res.status(500).send('No se pudo descargar el archivo.');
         }
     }
+
+
 }

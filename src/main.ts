@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
 import * as multer from 'multer';
-import * as cookieParser from 'cookie-parser';
 import { allowedNodeEnvironmentFlags } from 'process';
 
 async function bootstrap() {
@@ -17,38 +16,28 @@ async function bootstrap() {
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
-  app.enableCors({
-    origin: [
-    'https://sistema-practicas.diis.cl',
-    'https://www.sistema-practicas.diis.cl',
-  ],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-  });
-  
-  
 
-  app.use((req, res, next) => {
-    if (req.method === 'OPTIONS') {
-      const allowedOrigins = [
-          'https://sistema-practicas.diis.cl',
-          'https://www.sistema-practicas.diis.cl',
-      ];
-      const origin = req.headers.origin;
-  
-      if (allowedOrigins.includes(origin)) {
-        res.header('Access-Control-Allow-Origin', origin);
-      }
-      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-      res.header('Access-Control-Allow-Credentials', 'true');
-      res.status(204).send();
+app.enableCors({
+  origin: (origin, callback) => {
+    const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
+
+    console.log('Origin received:', origin); // Log para depurar el origen recibido
+
+    if (!origin) {
+      console.warn('No Origin header received. Defaulting to allowedOrigin.');
+      callback(null, allowedOrigin); // Permitir solicitudes internas sin encabezado Origin
+    } else if (origin === allowedOrigin) {
+      console.log('Access-Control-Allow-Origin:', origin); // Log del origen permitido
+      callback(null, origin); // Configura el encabezado correctamente
     } else {
-      next();
+      console.error('CORS error: Origin not allowed:', origin); // Log del error
+      callback(new Error('Not allowed by CORS'));
     }
-  });
-  
-  
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  credentials: true,
+});
+
 
   await app.listen(process.env.PORT ||3000);
 }

@@ -479,7 +479,7 @@ export class AnaliticaService {
                             respuesta: {
                                 some: {
                                     informe: {
-                                        fecha_termino_revision: {
+                                        fecha_envio: {
                                             gte: fecha_ini, // Mayor o igual a la fecha inicial
                                             lte: fecha_fin, // Menor o igual a la fecha final
                                         },
