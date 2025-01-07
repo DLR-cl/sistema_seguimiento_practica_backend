@@ -40,7 +40,7 @@ export class InformeRevisionService {
                 }
             });
 
-            // await this._emailService.notificacionCambioEstado(informeCambio.id_informe, informeCambio.estado);
+            await this._emailService.notificacionCambioEstado(informeCambio.id_informe, informeCambio.estado);
 
 
             return {

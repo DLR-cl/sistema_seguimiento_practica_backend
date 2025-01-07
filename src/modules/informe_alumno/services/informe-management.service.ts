@@ -57,7 +57,7 @@ export class InformeManagementService {
 
             await this.actualizarEstadoPractica(asignacion.id_practica);
             // Notificar SOLO al acádemico
-            // this._emailService.notificacionAsignacion(asignarInformeAlumno.id_academico, asignarInformeAlumno.id_informe);
+            this._emailService.notificacionAsignacion(asignarInformeAlumno.id_academico, asignarInformeAlumno.id_informe);
 
             return {
                 message: `Se asignó exitosamente la revisión del informe, a partir de la fecha actual tiene 14 días para revisión.`
