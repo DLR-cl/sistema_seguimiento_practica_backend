@@ -1,4 +1,8 @@
 [
+    {
+        "nombre": "Antecedentes de la Empresa",
+        "descripcion": "Datos la empresa de provenientes del supervisor."
+    },
     { 
         "nombre": "Evaluación del desempeño del practicante",
         "descripcion": "Se evalúan las habilidades, conocimientos y actitudes del practicante, considerando su nivel de profesionalismo y desempeño durante la ejecución de sus actividades prácticas."
@@ -16,10 +20,17 @@
         "descripcion": "Abarca el contenido del informe del alumno."
     },
     {
+        "nombre": "Evaluación General Informe Alumno",
+        "descripcion": "Se determina el resultado de la evaluación del alumno"
+    },
+    {
         "nombre": "Evaluación General Informe Confidencial",
         "descripcion": "Dado la evaluación del informe confidencial se determina la aprobación o desaprobación"
     },
-    
+    {
+        "nombre": "Observaciones Informe Evaluativo",
+        "descripcion": "Contempla los comentarios para que el alumno pueda identificar los errores durante su informe"
+    },
     {
         "nombre": "Satisfacción con la experiencia de práctica",
         "descripcion": "---"

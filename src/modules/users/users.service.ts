@@ -219,5 +219,27 @@ export class UsersService {
     return { message: 'Contraseña actualizada exitosamente' };
   }
 
-  
+  async actualizarCorreoAdmin(correoAnterior: string, correoActual: string){
+    const user = await this.databaseService.administrador.findUnique({
+      where: {
+        correo: correoAnterior
+      }
+    });
+    if(!user){
+      throw new BadRequestException('Error, correo desconocido');
+    }
+    await this.databaseService.administrador.update({
+      where: {
+        correo: correoAnterior,
+      },
+      data: {
+        correo: correoActual,
+      }
+    });
+
+    return {
+      message: 'Cambio de correo Exitoso',
+      status: HttpStatus.OK,
+    }
+  }
 }

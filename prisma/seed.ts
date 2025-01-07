@@ -30,7 +30,7 @@ async function main() {
   });
 
   const secretariaDepartamento = await prisma.administrador.upsert({
-    where: { correo: 'diis@gestion.uta.cl'},
+    where: { correo: 'diis@gestion.uta.cl' },
     update: {},
     create: {
       nombre: 'Secretaria Departamento',
@@ -41,13 +41,13 @@ async function main() {
     }
   })
   const secretariaCarrera = await prisma.administrador.upsert({
-    where: { correo: 'ici@gestion.uta.cl'},
+    where: { correo: 'ici@gestion.uta.cl' },
     update: {},
     create: {
       nombre: 'Secretaria Carrera',
       correo: 'ici@gestion.uta.cl',
       password: hashedPassword,
-      tipo_usuario: Tipo_usuario.SECRETARIA_DEPARTAMENTO,
+      tipo_usuario: Tipo_usuario.SECRETARIA_CARRERA,
       primerSesion: true
     }
   })
@@ -89,19 +89,19 @@ async function main() {
 
 
 
-    await prisma.preguntasImplementadasInformeAlumno.createMany({
-      data: preguntasInformeAlumno,
-      skipDuplicates: true,
-    });
+  await prisma.preguntasImplementadasInformeAlumno.createMany({
+    data: preguntasInformeAlumno,
+    skipDuplicates: true,
+  });
 
-    await prisma.preguntasImplementadasInformeEvaluacion.createMany({
-      data: preguntasInformeEvaluativo as AsignarPreguntaDto[],
-      skipDuplicates: true
-    })
+  await prisma.preguntasImplementadasInformeEvaluacion.createMany({
+    data: preguntasInformeEvaluativo as AsignarPreguntaDto[],
+    skipDuplicates: true
+  })
 
-    await prisma.preguntasImplementadasInformeConfidencial.createMany({
-      data: preguntasInformeConfidencial
-    })
+  await prisma.preguntasImplementadasInformeConfidencial.createMany({
+    data: preguntasInformeConfidencial
+  })
 
   await prisma.asignaturas.createMany({
     data: asignaturas as crearAsignaturaDto[],

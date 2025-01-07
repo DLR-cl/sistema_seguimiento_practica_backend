@@ -39,7 +39,7 @@ import { AlumnosNominaModule } from './modules/alumnos-nomina/alumnos-nomina.mod
     AlumnoPracticaDto,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`
+      envFilePath: '.env', // Usar directamente el archivo único
     }),
     InformeAlumnoModule,
     InformeConfidencialModule,

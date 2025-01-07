@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotAcceptableException, Logger } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, NotAcceptableException, Logger, HttpStatus } from "@nestjs/common";
 import { createPracticaDto } from "./dto/create-practicas.dto";
 import { DatabaseService } from "../../database/database/database.service";
 import { PracticaDetalle, PracticaResponseDto } from "./dto/practica-response.dto";
@@ -313,5 +313,25 @@ export class PracticasService {
         await this._databaseService.informesAlumno.delete({
             where: {id_informe: id_informe_al }
         });
+    }
+
+    async eliminarPractica(id_practica: number){
+        const practica = await this._databaseService.practicas.findUnique({
+            where: { id_practica }
+        });
+
+        if(!practica){
+            throw new BadRequestException('Error, la práctica no existe');
+        }
+        // asegurarse que la practica no esté con informes
+    
+        await this._databaseService.practicas.delete({
+            where: {id_practica}
+        });
+
+        return {
+            message: 'Practica eliminada con éxito',
+            status: HttpStatus.OK,
+        }
     }
 }

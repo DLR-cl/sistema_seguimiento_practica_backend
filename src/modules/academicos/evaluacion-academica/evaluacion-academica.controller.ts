@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Param, ParseIntPipe, Post, Query, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, InternalServerErrorException, Param, ParseIntPipe, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { EvaluacionAcademicaService } from './evaluacion-academica.service';
 import { InformeEvaluativoDto } from '../dto/informe-evaluativo.dto';
 import { AsignarPreguntaDto } from '../../../modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
@@ -6,6 +6,7 @@ import { GeneratorPdfService } from './services/generator-pdf.service';
 import { Response } from 'express';
 import { ReportesExcelService } from './services/reportes-excel.service';
 import { TipoPractica } from '@prisma/client';
+import { AuthGuard } from 'auth/guards/auth.guard';
 
 @Controller('evaluacion-academica')
 export class EvaluacionAcademicaController {
@@ -193,5 +194,21 @@ export class EvaluacionAcademicaController {
       }
     }
 
-
+    @UseGuards(AuthGuard)
+    @Get('obtener/informes/listar')
+    async listarInformesEvaluativos(@Req() res: any){
+        try {
+            const { rol } = res.user;
+            if(rol === 'ADMINISTRADOR'){
+                return await this._evaluacionAcademicaService.listarInformesEvaluativos();
+            }
+            throw new UnauthorizedException('No está autorizado para realizar esta operación');
+                
+        } catch (error) {
+            if(error instanceof BadRequestException || error instanceof UnauthorizedException){
+                throw error;
+            }       
+            throw new InternalServerErrorException('Error interno al listar los informes');
+        }
+    }
 }

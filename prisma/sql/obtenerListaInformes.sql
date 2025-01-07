@@ -20,4 +20,4 @@ LEFT JOIN
     InformeEvaluacionAcademicos AS iea ON iea.id_informe_alumno = infA.id_informe
 WHERE
     p.estado != 'CURSANDO'
-    AND (iea.id_academico = ? OR iea.id_academico IS NULL);
+    AND infA.id_academico = ?;

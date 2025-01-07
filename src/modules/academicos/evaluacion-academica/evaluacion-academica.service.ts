@@ -354,4 +354,60 @@ export class EvaluacionAcademicaService {
         }
     }
 
+    async listarInformesEvaluativos() {
+        const currentYear = new Date().getFullYear();
+        const startOfYear = new Date(currentYear, 0, 1); // 1 de enero del año actual
+        const endOfYear = new Date(currentYear + 1, 0, 1); // 1 de enero del próximo año
+
+        const informesEvaluativos = await this._databaseService.informeEvaluacionAcademicos.findMany({
+            where: {
+                fecha_revision: {
+                    gte: startOfYear, // Mayor o igual al inicio del año
+                    lt: endOfYear,    // Menor al inicio del próximo año
+                },
+            },
+            include: {
+                academico: {
+                    include: {
+                        usuario: true, // Incluye datos del académico
+                    },
+                },
+                informe_alumno: {
+                    include: {
+                        alumno: {
+                            include: { usuario: true }, // Incluye datos del alumno
+                        },
+                    },
+                },
+                informe_confidencial: {
+                    include: {
+                        supervisor: {
+                            include: {
+                                empresa: true, // Incluye datos de la empresa
+                                usuario: true, // Incluye datos del jefe empleador
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        // Mapeo de los datos a la interfaz deseada
+        const resultado = informesEvaluativos.map((informe) => ({
+            id_practica: informe.informe_confidencial?.id_practica || null,
+            id_informe_evaluativo: informe.id_informe,
+            id_docente: informe.academico?.id_user || null,
+            nombre_academico: informe.academico?.usuario?.nombre || 'No disponible',
+            correo_academico: informe.academico?.usuario?.correo || 'No disponible',
+            nombre_alumno: informe.informe_alumno?.alumno?.usuario?.nombre || 'No disponible',
+            correo_alumno: informe.informe_alumno?.alumno?.usuario?.correo || 'No disponible',
+            datos_empresa: informe.informe_confidencial?.supervisor?.empresa || 'No disponible',
+            nombre_jefe_empleador: informe.informe_confidencial?.supervisor?.usuario?.nombre || 'No disponible',
+            correo_jefe_empleador: informe.informe_confidencial?.supervisor?.usuario?.correo || 'No disponible',
+        }));
+
+        return resultado;
+    }
+
+
 }

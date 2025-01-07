@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { Tipo_usuario } from '@prisma/client';
 import { AuthRegisterDto } from '../../auth/dto/authRegisterDto.dto';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { ChangePasswordDto } from './dto/changePassword.dto';
+import { Path } from 'glob';
+import { Response } from 'express';
+import { CambiarCorreoDto } from './dto/cambiarCorreo.dto';
 
 @Controller('users')
 export class UsersController {
@@ -47,6 +50,23 @@ export class UsersController {
   
     // Si es un usuario regular, cambia la contraseña en el servicio de usuarios
     return this.usersService.changePassword(id_usuario, changePasswordDto);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('cambiar-correo/administrador')
+  async cambiarCorreoAdministradores(@Req() req: any, @Body() cambiarCorreoDto: CambiarCorreoDto){
+    try {
+      const { rol } = req.user;
+      if(rol === 'ADMINISTRADOR'){
+        return this.usersService.actualizarCorreoAdmin(cambiarCorreoDto.correoAnterior, cambiarCorreoDto.correoAnterior);
+      }
+      throw new UnauthorizedException('No está autorizado a realizar esta operación');
+    } catch (error) {
+      if(error instanceof UnauthorizedException || error instanceof BadRequestException){
+        throw error;
+      }
+      throw new InternalServerErrorException('Error interno al cambiar el correo de los administradores');
+    }
   }
   
 }

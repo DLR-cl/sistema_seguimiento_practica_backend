@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Param, ParseIntPipe, Patch, Post, Query, Res, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, InternalServerErrorException, Param, ParseIntPipe, Patch, Post, Query, Req, Res, UnauthorizedException, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from "@nestjs/common";
 import { PracticasService } from "./practicas.service";
 import { createPracticaDto } from "./dto/create-practicas.dto";
 import { ReportesExcelService } from "./services/reportes-excel/reportes-excel.service";
@@ -8,6 +8,7 @@ import { Estado_informe, TipoPractica } from "@prisma/client";
 import { GenerarReporteSemestralDto } from "./dto/reportes.dto";
 import { Response } from "express";
 import { CorsInterceptor } from "../../interceptors/interceptor-cors";
+import { AuthGuard } from "auth/guards/auth.guard";
 
 @Controller('practicas')
 export class PracticasController {
@@ -125,6 +126,23 @@ export class PracticasController {
         } catch (error) {
             console.error('Error al descargar el archivo:', error);
             res.status(500).send('No se pudo descargar el archivo.');
+        }
+    }
+
+    @UseGuards(AuthGuard)
+    @Delete('eliminar-practica/:id_practica')
+    async eliminarPractica(@Req() res: any, @Param('id_practica', ParseIntPipe) id_practica: number){
+        try {
+            const { rol } = res.user;
+            if(rol === 'ADMINISTRADOR' || rol || 'SECRETARIA_CARRERA'){
+                return await this._practicaService.eliminarPractica(id_practica);
+            }
+            throw new UnauthorizedException('No está autorizado a realizar esta operación');
+        } catch (error) {
+            if (error instanceof BadRequestException || error instanceof UnauthorizedException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Error interno al eliminar una práctica');
         }
     }
 
