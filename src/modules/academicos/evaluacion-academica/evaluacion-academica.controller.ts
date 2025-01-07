@@ -6,7 +6,7 @@ import { GeneratorPdfService } from './services/generator-pdf.service';
 import { Response } from 'express';
 import { ReportesExcelService } from './services/reportes-excel.service';
 import { TipoPractica } from '@prisma/client';
-import { AuthGuard } from 'auth/guards/auth.guard';
+import { AuthGuard } from '../../../auth/guards/auth.guard';
 
 @Controller('evaluacion-academica')
 export class EvaluacionAcademicaController {

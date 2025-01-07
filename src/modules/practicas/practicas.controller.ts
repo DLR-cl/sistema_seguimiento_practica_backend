@@ -8,7 +8,7 @@ import { Estado_informe, TipoPractica } from "@prisma/client";
 import { GenerarReporteSemestralDto } from "./dto/reportes.dto";
 import { Response } from "express";
 import { CorsInterceptor } from "../../interceptors/interceptor-cors";
-import { AuthGuard } from "auth/guards/auth.guard";
+import { AuthGuard } from "../../auth/guards/auth.guard";
 
 @Controller('practicas')
 export class PracticasController {
