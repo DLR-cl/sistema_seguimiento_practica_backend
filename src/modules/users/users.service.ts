@@ -8,6 +8,7 @@ import { isRole } from '../../utils/user.roles';
 import { Tipo_usuario, TipoPractica } from '@prisma/client';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
+import { EmailAvisosService } from 'modules/email-avisos/email-avisos.service';
 
 
 @Injectable()
@@ -15,7 +16,8 @@ export class UsersService {
 
   constructor(
     private readonly databaseService: DatabaseService,
-    private readonly _jwtService: JwtService) {
+    private readonly _jwtService: JwtService,
+    private readonly _emailavisosService: EmailAvisosService) {
   }
 
   async signUp(authRegister: AuthRegisterDto) {
@@ -240,6 +242,33 @@ export class UsersService {
     return {
       message: 'Cambio de correo Exitoso',
       status: HttpStatus.OK,
+    }
+  }
+
+
+  async reestablecerContrasena(id_usuario: number){
+    const usuario = await this.databaseService.usuarios.findUnique({
+      where: { id_usuario }
+    });
+
+    if(!usuario){
+      throw new BadRequestException('Error, usuario no encontrado');
+    }
+
+    const password = usuario.rut.substring(0, 8);
+    const hashedPassword = await encrypt(password);
+
+    await this.databaseService.usuarios.update({
+      where: { id_usuario },
+      data: {
+        password: hashedPassword
+      }
+    });
+    
+    await this._emailavisosService.notificacionRestablecimientoContrasena(id_usuario);
+    return {
+      message: 'Contraseña reestablecida con éxito',
+      statusCode: HttpStatus.OK
     }
   }
 }

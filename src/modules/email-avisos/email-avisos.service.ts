@@ -344,15 +344,15 @@ export class EmailAvisosService {
             const alumno = await this._databaseService.usuarios.findUnique({
                 where: { id_usuario: id_alumno },
             });
-    
+
             if (!alumno) {
                 throw new Error(`No se encontró un alumno con el ID ${id_alumno}`);
             }
-    
+
             // Extraer los primeros 8 dígitos del RUT
             const contrasenaTemporal = alumno.rut.substring(0, 8);
             const correoInstitucional = alumno.correo;
-    
+
             // Generar el correo
             const emailAlumno: SendEmailDto = {
                 recipients: [correoInstitucional],
@@ -380,16 +380,16 @@ export class EmailAvisosService {
                 </div>
             `,
             };
-    
+
             // Llamar al servicio de envío de correos
             await this._mailService.sendEmail(emailAlumno);
-    
+
             console.log('Correo de creación de cuenta enviado exitosamente.');
         } catch (error) {
             console.error('Error al enviar la notificación de creación de cuenta:', error.message);
         }
     }
-    
+
 
     public async notificacionCorreccionInforme(id_alumno: number, id_informe: number) {
         try {
@@ -397,24 +397,24 @@ export class EmailAvisosService {
             const alumno = await this._databaseService.usuarios.findUnique({
                 where: { id_usuario: id_alumno },
             });
-    
+
             if (!alumno) {
                 throw new Error(`No se encontró un alumno con el ID ${id_alumno}`);
             }
-    
+
             // Obtener datos del informe
             const informe = await this._databaseService.informesAlumno.findUnique({
                 where: { id_informe: id_informe },
-                include: { academico: {include: { usuario: true}} },
+                include: { academico: { include: { usuario: true } } },
             });
-    
+
             if (!informe || !informe.academico) {
                 throw new Error(`No se encontró un informe con el ID ${id_informe} o no tiene asignado un académico.`);
             }
-    
+
             const correoInstitucional = alumno.correo;
             const academicoNombre = informe.academico.usuario.nombre;
-    
+
             // Generar el correo
             const emailAlumno: SendEmailDto = {
                 recipients: [correoInstitucional],
@@ -435,14 +435,62 @@ export class EmailAvisosService {
                 </div>
             `,
             };
-    
+
             // Llamar al servicio de envío de correos
             await this._mailService.sendEmail(emailAlumno);
-    
+
             console.log('Correo de corrección de informe enviado exitosamente.');
         } catch (error) {
             console.error('Error al enviar la notificación de corrección de informe:', error.message);
         }
     }
-    
+
+
+    public async notificacionRestablecimientoContrasena(id_usuario: number) {
+        try {
+            // Obtener datos del usuario
+            const usuario = await this._databaseService.usuarios.findUnique({
+                where: { id_usuario },
+            });
+
+            if (!usuario) {
+                throw new Error(`No se encontró un usuario con el ID ${id_usuario}`);
+            }
+
+            const correoInstitucional = usuario.correo;
+            const nuevaContrasena = usuario.rut.substring(0, 8); // La contraseña que se genera
+
+            // Generar el correo
+            const emailUsuario: SendEmailDto = {
+                recipients: [correoInstitucional],
+                subject: `Su contraseña ha sido restablecida`,
+                html: `
+            <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px;">
+                    <h2 style="color: #1f2937; font-size: 18px; font-weight: 600;">Hola ${usuario.nombre},</h2>
+                    <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                        Le informamos que su contraseña ha sido restablecida exitosamente.
+                    </p>
+                    <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                        Su nueva contraseña es: <strong>${nuevaContrasena}</strong>
+                    </p>
+                    <p style="color: #374151; font-size: 16px; margin-top: 20px;">
+                        Le recomendamos cambiar esta contraseña inmediatamente después de iniciar sesión.
+                    </p>
+                    <p style="color: #1f2937; font-size: 16px; margin-top: 30px;">Saludos cordiales,</p>
+                    <p style="color: #1f2937; font-size: 16px; font-weight: 600;">El equipo de Gestión de Prácticas</p>
+                </div>
+            </div>
+        `,
+            };
+
+            // Llamar al servicio de envío de correos
+            await this._mailService.sendEmail(emailUsuario);
+
+            console.log('Correo de restablecimiento de contraseña enviado exitosamente.');
+        } catch (error) {
+            console.error('Error al enviar la notificación de restablecimiento de contraseña:', error.message);
+        }
+    }
+
 }
