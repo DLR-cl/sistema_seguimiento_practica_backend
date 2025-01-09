@@ -8,7 +8,7 @@ import { isRole } from '../../utils/user.roles';
 import { Tipo_usuario, TipoPractica } from '@prisma/client';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
-import { EmailAvisosService } from 'modules/email-avisos/email-avisos.service';
+import { EmailAvisosService } from '../email-avisos/email-avisos.service';
 
 
 @Injectable()
