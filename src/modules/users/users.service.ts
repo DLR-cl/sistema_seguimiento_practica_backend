@@ -25,30 +25,30 @@ export class UsersService {
       if (await this.findUser(authRegister.correo)) {
         throw new BadRequestException('Ya existe cuenta con ese correo');
       }
-  
+
       if (!isRole(authRegister.tipo_usuario)) {
         throw new BadRequestException('Rol inválido');
       }
-  
+
       // Generar contraseña predeterminada y hashear
       const password = authRegister.rut.substring(0, 8);
       const hashedPassword = await encrypt(password);
-  
+
       const newUser = await this.databaseService.usuarios.create({
         data: {
           ...authRegister,
           password: hashedPassword,
         },
       });
-  
+
       const { password: _, ...userWithoutPassword } = newUser;
-  
+
       return userWithoutPassword;
     } catch (error) {
       throw error instanceof HttpException ? error : new InternalServerErrorException('Error interno al crear un usuario');
     }
   }
-  
+
 
   private async findUser(email: string) {
     try {
@@ -57,7 +57,7 @@ export class UsersService {
           correo: email,
         }
       });
-      if(!user){
+      if (!user) {
         return false;
       }
       return true;
@@ -69,7 +69,7 @@ export class UsersService {
     }
   }
 
-  public async findUsuario(id_user: number){
+  public async findUsuario(id_user: number) {
     try {
       const user = await this.databaseService.usuarios.findUnique({
         where: {
@@ -79,13 +79,13 @@ export class UsersService {
 
       return user;
     } catch (error) {
-      if(error instanceof BadRequestException){
+      if (error instanceof BadRequestException) {
         throw error;
       }
     }
   }
 
-  public async findUserByEmail(correo: string){
+  public async findUserByEmail(correo: string) {
     const user = await this.databaseService.usuarios.findUnique({
       where: {
         correo: correo,
@@ -93,10 +93,10 @@ export class UsersService {
     });
     return user;
   }
-  public async obtenerUsuario(id: number){
+  public async obtenerUsuario(id: number) {
     try {
       const user = await this.databaseService.usuarios.findUnique({
-        where:{ 
+        where: {
           id_usuario: id,
         },
         select: {
@@ -113,7 +113,7 @@ export class UsersService {
     }
   }
 
-  public async obtenerUsuariosByRol(rol: Tipo_usuario){
+  public async obtenerUsuariosByRol(rol: Tipo_usuario) {
     try {
       const usuarios = await this.databaseService.usuarios.findMany({
         where: {
@@ -134,7 +134,7 @@ export class UsersService {
     }
   }
   //hola
-  public async obtenerSecretarias(){
+  public async obtenerSecretarias() {
     try {
       const usuarios = await this.databaseService.usuarios.findMany({
         where: {
@@ -221,13 +221,13 @@ export class UsersService {
     return { message: 'Contraseña actualizada exitosamente' };
   }
 
-  async actualizarCorreoAdmin(correoAnterior: string, correoActual: string){
+  async actualizarCorreoAdmin(correoAnterior: string, correoActual: string) {
     const user = await this.databaseService.administrador.findUnique({
       where: {
         correo: correoAnterior
       }
     });
-    if(!user){
+    if (!user) {
       throw new BadRequestException('Error, correo desconocido');
     }
     await this.databaseService.administrador.update({
@@ -246,26 +246,35 @@ export class UsersService {
   }
 
 
-  async reestablecerContrasena(id_usuario: number){
-    const usuario = await this.databaseService.usuarios.findUnique({
-      where: { id_usuario }
-    });
+  async reestablecerContrasena(id_usuario: number, rol: string) {
+    const defaultPassword = 'adminiici';
+    if (rol === 'ACADEMICO' || rol === 'ALUMNO_PRACTICA' || rol === 'JEFE_EMPLEADOR') {
+      const usuario = await this.databaseService.usuarios.findUnique({
+        where: { id_usuario }
+      });
+      if (!usuario) {
+        throw new BadRequestException('Error, usuario no encontrado');
+      }
+      const password = usuario.rut.substring(0, 8);
+      const hashedPassword = await encrypt(password);
+      await this.databaseService.usuarios.update({
+        where: { id_usuario },
+        data: {
+          password: hashedPassword,
+          primerSesion: true,
+        }
+      });
+      await this._emailavisosService.notificacionRestablecimientoContrasena(id_usuario);
+    }else {
+      const hashedPassword = await encrypt(defaultPassword);
+      const usuario = await this.databaseService.administrador.update({
+        where: { id: id_usuario},
+        data: { password: hashedPassword, primerSesion: true }
+      });
 
-    if(!usuario){
-      throw new BadRequestException('Error, usuario no encontrado');
+
     }
 
-    const password = usuario.rut.substring(0, 8);
-    const hashedPassword = await encrypt(password);
-
-    await this.databaseService.usuarios.update({
-      where: { id_usuario },
-      data: {
-        password: hashedPassword
-      }
-    });
-    
-    await this._emailavisosService.notificacionRestablecimientoContrasena(id_usuario);
     return {
       message: 'Contraseña reestablecida con éxito',
       statusCode: HttpStatus.OK

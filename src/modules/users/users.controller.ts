@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException, BadRequestException, InternalServerErrorException, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException, BadRequestException, InternalServerErrorException, ParseIntPipe, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { Tipo_usuario } from '@prisma/client';
@@ -70,14 +70,15 @@ export class UsersController {
   }
   
   @UseGuards(AuthGuard)
-  @Patch('reestablecer/contrasena/:id')
+  @Patch('reestablecer/contrasena')
   async reestablecerContrasena(
     @Req() res: any,
-    @Param('id', ParseIntPipe) id_usuario: number){
+    @Query('id', ParseIntPipe) id_usuario: number,
+    @Query('rol_usuario') rol_usuario: Tipo_usuario){
     try {
       const { rol } = res.user; 
       if(rol === 'ADMINISTRADOR'){
-        return await this.usersService.reestablecerContrasena(id_usuario);
+        return await this.usersService.reestablecerContrasena(id_usuario, rol_usuario);
       }
       throw new UnauthorizedException('No tiene permisos paraa ejecutar esta operación');
     } catch (error) {
