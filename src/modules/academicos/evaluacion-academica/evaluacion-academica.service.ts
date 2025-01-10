@@ -285,8 +285,11 @@ export class EvaluacionAcademicaService {
                 data: respuestasConIdInforme,
             });
         } catch (error) {
-            console.log(error)
-            console.log('me caí acá')
+            if(error instanceof BadRequestException){
+                throw error
+            }
+
+            throw new InternalServerErrorException('Error interno al generar las respuestas');
         }
     }
 

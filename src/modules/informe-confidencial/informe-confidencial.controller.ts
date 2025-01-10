@@ -21,7 +21,6 @@ export class InformeConfidencialController {
 
     @Patch('actualizar-informe/:id')
     public async actualizarInforme(@Param('id', ParseIntPipe) id_informe: number, @Body() update: ActualizarInformeConfidencialDto){
-        console.log(update);
         return await this._informeConfidencialService.actualizarInforme(+id_informe, update);
     }
 
