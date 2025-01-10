@@ -353,12 +353,12 @@ export class EvaluacionAcademicaService {
             throw new BadRequestException('Hubo un error al asociar las preguntas al informe.');
         }
     }
-
     async listarInformesEvaluativos() {
         const currentYear = new Date().getFullYear();
-        const startOfYear = new Date(currentYear-1, 0, 1); // 1 de enero del año actual
+        const startOfYear = new Date(currentYear - 1, 0, 1); // 1 de enero del año anterior
         const endOfYear = new Date(currentYear + 1, 0, 1); // 1 de enero del próximo año
 
+        // Obtener todos los informes evaluativos
         const informesEvaluativos = await this._databaseService.informeEvaluacionAcademicos.findMany({
             where: {
                 fecha_revision: {
@@ -392,9 +392,29 @@ export class EvaluacionAcademicaService {
             },
         });
 
-        // Mapeo de los datos a la interfaz deseada
+        // Obtener IDs de prácticas relacionados
+        const idsPracticas = informesEvaluativos
+            .map((informe) => informe.informe_alumno?.id_practica)
+            .filter((id) => id !== undefined); // Excluye valores undefined o null
+
+        // Obtener todos los tipos de práctica relacionados en una sola consulta
+        const practicas = await this._databaseService.practicas.findMany({
+            where: {
+                id_practica: { in: idsPracticas },
+            },
+            select: {
+                id_practica: true,
+                tipo_practica: true,
+            },
+        });
+
+        // Crear un mapa para acceder fácilmente a los tipos de práctica
+        const practicasMap = new Map(practicas.map((p) => [p.id_practica, p.tipo_practica]));
+
+        // Mapear los datos a la estructura deseada
         const resultado = informesEvaluativos.map((informe) => ({
             id_practica: informe.informe_confidencial?.id_practica || null,
+            tipo_practica: practicasMap.get(informe.informe_alumno?.id_practica) || 'No disponible',
             id_informe_evaluativo: informe.id_informe,
             id_docente: informe.academico?.id_user || null,
             nombre_academico: informe.academico?.usuario?.nombre || 'No disponible',
@@ -408,6 +428,5 @@ export class EvaluacionAcademicaService {
 
         return resultado;
     }
-
 
 }
