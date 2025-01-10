@@ -329,6 +329,14 @@ export class PracticasService {
             where: {id_practica}
         });
 
+        await this._databaseService.alumnosPractica.update({
+            where: {id_user: practica.id_alumno },
+            data: {
+                primer_practica: false,
+                segunda_practica: false,
+            }
+        })
+
         return {
             message: 'Practica eliminada con éxito',
             status: HttpStatus.OK,

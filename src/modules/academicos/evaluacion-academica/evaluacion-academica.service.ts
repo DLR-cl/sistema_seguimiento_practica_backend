@@ -356,7 +356,7 @@ export class EvaluacionAcademicaService {
 
     async listarInformesEvaluativos() {
         const currentYear = new Date().getFullYear();
-        const startOfYear = new Date(currentYear, 0, 1); // 1 de enero del año actual
+        const startOfYear = new Date(currentYear-1, 0, 1); // 1 de enero del año actual
         const endOfYear = new Date(currentYear + 1, 0, 1); // 1 de enero del próximo año
 
         const informesEvaluativos = await this._databaseService.informeEvaluacionAcademicos.findMany({
