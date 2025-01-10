@@ -280,4 +280,20 @@ export class UsersService {
       statusCode: HttpStatus.OK
     }
   }
+
+  async obtenerAdministradores(){
+    const listaAdministradores = await this.databaseService.administrador.findMany({
+      where: { NOT: {
+        tipo_usuario: Tipo_usuario.ADMINISTRADOR
+      }},
+      select: {
+        nombre: true,
+        correo: true,
+        tipo_usuario: true,
+        id: true,
+      }
+    });
+
+    return listaAdministradores;
+  }
 }

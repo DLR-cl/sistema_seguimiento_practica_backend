@@ -88,4 +88,21 @@ export class UsersController {
       throw new InternalServerErrorException('Error interno al actualizar la contrasena');
     }
   }
+
+  @UseGuards(AuthGuard)
+  @Get('administradores/obtener/lista')
+  async obtenerListaAdministradores(@Req() res: any){
+    try {
+      const { rol } = res.user; 
+      if(rol === 'ADMINISTRADOR'){
+        return await this.usersService.obtenerAdministradores();
+      }
+      throw new UnauthorizedException('No tiene permisos paraa ejecutar esta operación');
+    } catch (error) {
+      if(error instanceof BadRequestException || error instanceof UnauthorizedException){
+        throw error;
+      }
+      throw new InternalServerErrorException('Error interno al actualizar la contrasena');
+    }
+  }
 }
