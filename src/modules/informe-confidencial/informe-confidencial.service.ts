@@ -15,61 +15,59 @@ export class InformeConfidencialService {
     ){}
 
 
-    public async actualizarInforme(id_informe: number, update: ActualizarInformeConfidencialDto){
+    public async actualizarInforme(id_informe: number, update: ActualizarInformeConfidencialDto) {
         try {
+            // Buscar el informe confidencial
             const informe = await this._databaseService.informeConfidencial.findUnique({
-                where: { id_informe_confidencial: id_informe }
+                where: { id_informe_confidencial: id_informe },
             });
-            if(!(informe.estado === Estado_informe.ESPERA)){
+    
+            if (!(informe.estado === Estado_informe.ESPERA)) {
                 throw new BadRequestException('Error, el informe confidencial no está en estado de espera');
             }
-
-            await this.actualizarInformeConfidencial(id_informe, update);
-            
-
+    
+            // Actualizar el informe confidencial en paralelo
+            const informeActualizacion = this.actualizarInformeConfidencial(id_informe, update);
+    
+            // Buscar la práctica asociada
             const practica = await this._databaseService.practicas.findUnique({
-                where: {
-                    id_practica: informe.id_practica
-                },
-                include: {
-                    informe_alumno: true,
-                }
+                where: { id_practica: informe.id_practica },
+                include: { informe_alumno: true },
             });
-
-            if(!practica){
+    
+            if (!practica) {
                 throw new BadRequestException('No se encontró práctica para este informe');
             }
-
-            if(practica.estado == Estado_practica.ESPERA_INFORMES && practica.informe_alumno.estado == Estado_informe.ENVIADA){
-                await this._databaseService.practicas.update({
-                    where: {
-                        id_practica: practica.id_practica,
-                    },
-                    data: {
-                        estado: Estado_practica.INFORMES_RECIBIDOS,
-                    }
-                })
-            };
-
+    
+            // Actualizar el estado de la práctica si corresponde (en paralelo)
+            let practicaActualizacion: Promise<any> | null = null;
+            if (practica.estado === Estado_practica.ESPERA_INFORMES && practica.informe_alumno.estado === Estado_informe.ENVIADA) {
+                practicaActualizacion = this._databaseService.practicas.update({
+                    where: { id_practica: practica.id_practica },
+                    data: { estado: Estado_practica.INFORMES_RECIBIDOS },
+                });
+            }
+    
+            // Esperar a que todas las operaciones paralelas finalicen
+            await Promise.all([informeActualizacion, practicaActualizacion]);
+    
             return {
                 message: 'Actualización del informe realizada',
-                status: HttpStatus.OK
-            }
+                status: HttpStatus.OK,
+            };
         } catch (error) {
-            if(error instanceof BadRequestException){
+            if (error instanceof BadRequestException) {
                 throw error;
             }
-
+    
             throw new InternalServerErrorException('Error interno al actualizar el informe');
         }
     }
-
-    private async actualizarInformeConfidencial(id_informe: number, update: ActualizarInformeConfidencialDto){
-        const total = update.horas_practicas_extraordinarias + update.horas_practicas_regulares - update.horas_inasistencia
+    
+    private async actualizarInformeConfidencial(id_informe: number, update: ActualizarInformeConfidencialDto) {
+        const total = update.horas_practicas_extraordinarias + update.horas_practicas_regulares - update.horas_inasistencia;
         await this._databaseService.informeConfidencial.update({
-            where: {
-                id_informe_confidencial:id_informe
-            },
+            where: { id_informe_confidencial: id_informe },
             data: {
                 horas_practicas_regulares: update.horas_practicas_regulares,
                 horas_practicas_extraordinarias: update.horas_practicas_extraordinarias,
@@ -79,10 +77,11 @@ export class InformeConfidencialService {
                 fecha_inicio_practica: new Date(update.fecha_inicio_practica),
                 fecha_fin_practica: new Date(update.fecha_fin_practica),
                 fecha_envio: new Date(),
-                estado: Estado_informe.ENVIADA
-            }
-        })
+                estado: Estado_informe.ENVIADA,
+            },
+        });
     }
+    
     public async getInformeConfidencial(id_informe: number){
         try {
             const informe = await this._databaseService.informeConfidencial.findUnique({
