@@ -58,7 +58,7 @@ export class UsersController {
     try {
       const { rol } = req.user;
       if(rol === 'ADMINISTRADOR'){
-        return this.usersService.actualizarCorreoAdmin(cambiarCorreoDto.correoAnterior, cambiarCorreoDto.correoAnterior);
+        return this.usersService.actualizarCorreoAdmin(cambiarCorreoDto.correoAnterior, cambiarCorreoDto.correoActual);
       }
       throw new UnauthorizedException('No está autorizado a realizar esta operación');
     } catch (error) {
