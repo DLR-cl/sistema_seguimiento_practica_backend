@@ -83,9 +83,9 @@ model Empresas {
   id_empresa          Int           @id @default(autoincrement())
   nombre_razon_social String        @db.VarChar(100)
   ubicacion           String        @db.VarChar(100)
-  rubro               String        @db.VarChar(100)
-  caracter_empresa    TipoEmpresa
-  tamano_empresa      String        @db.VarChar(100)
+  rubro               String?        @db.VarChar(100)
+  caracter_empresa    TipoEmpresa?
+  tamano_empresa      String?        @db.VarChar(100)
   jefe_supervisor     JefesAlumno[]
 }
 
