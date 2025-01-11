@@ -201,12 +201,14 @@ export class ReportesExcelService {
       // Listar archivos en "aprobados" y "desaprobados"
       const reportes = await this.listarArchivos(client, `${basePath}`);
 
+      client.close();
       return reportes
     } catch (error) {
       console.error('Error al listar reportes:', error);
       throw new Error('No se pudieron listar los reportes desde el servidor.');
     } finally {
       client.close();
+
       console.log('Conexión FTP cerrada.');
     }
 
@@ -221,6 +223,7 @@ export class ReportesExcelService {
       console.warn(`No se pudieron listar archivos en ${directory}:`, error);
       return []; // Si no existe la carpeta, devolver lista vacía
     }
+  
   }
 
   async obtenerReporte(filePath: string) {

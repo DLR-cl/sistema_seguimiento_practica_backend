@@ -32,6 +32,7 @@ CREATE TABLE `usuario` (
     `nombre` VARCHAR(200) NOT NULL,
     `rut` CHAR(10) NOT NULL,
     `primerSesion` BOOLEAN NOT NULL DEFAULT true,
+    `estado` BOOLEAN NOT NULL DEFAULT true,
     `tipo_usuario` ENUM('JEFE_CARRERA', 'ALUMNO_PRACTICA', 'JEFE_DEPARTAMENTO', 'SECRETARIA_DEPARTAMENTO', 'SECRETARIA_CARRERA', 'JEFE_EMPLEADOR', 'ACADEMICO', 'ADMINISTRADOR') NOT NULL,
 
     UNIQUE INDEX `usuario_correo_key`(`correo`),
@@ -55,6 +56,7 @@ CREATE TABLE `jefe_alumno` (
     `id_empresa` INTEGER NOT NULL,
     `numero_telefono` VARCHAR(30) NOT NULL,
 
+    INDEX `jefe_alumno_id_empresa_fkey`(`id_empresa`),
     PRIMARY KEY (`id_user`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -90,6 +92,8 @@ CREATE TABLE `Practicas` (
     `id_alumno` INTEGER NOT NULL,
     `id_supervisor` INTEGER NOT NULL,
 
+    INDEX `Practicas_id_alumno_fkey`(`id_alumno`),
+    INDEX `Practicas_id_supervisor_fkey`(`id_supervisor`),
     PRIMARY KEY (`id_practica`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -108,6 +112,8 @@ CREATE TABLE `InformesAlumno` (
     `fecha_termino_revision` DATE NULL,
 
     UNIQUE INDEX `InformesAlumno_id_practica_key`(`id_practica`),
+    INDEX `InformesAlumno_id_academico_fkey`(`id_academico`),
+    INDEX `InformesAlumno_id_alumno_fkey`(`id_alumno`),
     PRIMARY KEY (`id_informe`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -117,6 +123,7 @@ CREATE TABLE `comentariosPractica` (
     `id_informe` INTEGER NOT NULL,
     `id_usuario` INTEGER NOT NULL,
 
+    INDEX `comentariosPractica_id_usuario_fkey`(`id_usuario`),
     PRIMARY KEY (`id_informe`, `id_usuario`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -128,6 +135,7 @@ CREATE TABLE `RespuestasInformeAlumno` (
     `puntaje` INTEGER NULL,
     `nota` DECIMAL(5, 1) NULL,
 
+    INDEX `RespuestasInformeAlumno_id_pregunta_fkey`(`id_pregunta`),
     PRIMARY KEY (`id_informe`, `id_pregunta`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -137,6 +145,7 @@ CREATE TABLE `AsignaturasEnRespuestasInforme` (
     `id_pregunta` INTEGER NOT NULL,
     `nombre_asignatura` VARCHAR(191) NOT NULL,
 
+    INDEX `AsignaturasEnRespuestasInforme_nombre_asignatura_fkey`(`nombre_asignatura`),
     PRIMARY KEY (`id_informe`, `id_pregunta`, `nombre_asignatura`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -163,6 +172,8 @@ CREATE TABLE `InformeConfidencial` (
     `id_academico` INTEGER NULL,
 
     UNIQUE INDEX `InformeConfidencial_id_practica_key`(`id_practica`),
+    INDEX `InformeConfidencial_id_academico_fkey`(`id_academico`),
+    INDEX `InformeConfidencial_id_supervisor_fkey`(`id_supervisor`),
     PRIMARY KEY (`id_informe_confidencial`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -170,12 +181,13 @@ CREATE TABLE `InformeConfidencial` (
 CREATE TABLE `InformeEvaluacionAcademicos` (
     `id_informe` INTEGER NOT NULL AUTO_INCREMENT,
     `id_academico` INTEGER NOT NULL,
-    `id_informe_alumno` INTEGER NOT NULL,
+    `id_informe_alumno` INTEGER NULL,
     `id_informe_confidencial` INTEGER NOT NULL,
     `fecha_revision` DATE NOT NULL,
 
     UNIQUE INDEX `InformeEvaluacionAcademicos_id_informe_alumno_key`(`id_informe_alumno`),
     UNIQUE INDEX `InformeEvaluacionAcademicos_id_informe_confidencial_key`(`id_informe_confidencial`),
+    INDEX `InformeEvaluacionAcademicos_id_academico_fkey`(`id_academico`),
     PRIMARY KEY (`id_informe`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -193,6 +205,7 @@ CREATE TABLE `RespuestasInformeEvaluacion` (
     `pregunta_id` INTEGER NOT NULL,
     `informe_id` INTEGER NOT NULL,
 
+    INDEX `RespuestasInformeEvaluacion_informe_id_fkey`(`informe_id`),
     PRIMARY KEY (`pregunta_id`, `informe_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -211,6 +224,7 @@ CREATE TABLE `Preguntas` (
     `id_dimension` INTEGER NOT NULL,
 
     UNIQUE INDEX `Preguntas_enunciado_pregunta_key`(`enunciado_pregunta`),
+    INDEX `Preguntas_id_dimension_fkey`(`id_dimension`),
     PRIMARY KEY (`id_pregunta`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -228,6 +242,7 @@ CREATE TABLE `RespuestasInformeConfidencial` (
     `pregunta_id` INTEGER NOT NULL,
     `informe_id` INTEGER NOT NULL,
 
+    INDEX `RespuestasInformeConfidencial_informe_id_fkey`(`informe_id`),
     PRIMARY KEY (`pregunta_id`, `informe_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -254,10 +269,10 @@ CREATE TABLE `Asignaturas` (
 ALTER TABLE `alumno_practica` ADD CONSTRAINT `alumno_practica_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `usuario`(`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `jefe_alumno` ADD CONSTRAINT `jefe_alumno_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `usuario`(`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `jefe_alumno` ADD CONSTRAINT `jefe_alumno_id_empresa_fkey` FOREIGN KEY (`id_empresa`) REFERENCES `Empresas`(`id_empresa`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `jefe_alumno` ADD CONSTRAINT `jefe_alumno_id_empresa_fkey` FOREIGN KEY (`id_empresa`) REFERENCES `Empresas`(`id_empresa`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `jefe_alumno` ADD CONSTRAINT `jefe_alumno_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `usuario`(`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `academico` ADD CONSTRAINT `academico_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `usuario`(`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -269,13 +284,13 @@ ALTER TABLE `Practicas` ADD CONSTRAINT `Practicas_id_alumno_fkey` FOREIGN KEY (`
 ALTER TABLE `Practicas` ADD CONSTRAINT `Practicas_id_supervisor_fkey` FOREIGN KEY (`id_supervisor`) REFERENCES `jefe_alumno`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `InformesAlumno` ADD CONSTRAINT `InformesAlumno_id_practica_fkey` FOREIGN KEY (`id_practica`) REFERENCES `Practicas`(`id_practica`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `InformesAlumno` ADD CONSTRAINT `InformesAlumno_id_academico_fkey` FOREIGN KEY (`id_academico`) REFERENCES `academico`(`id_user`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InformesAlumno` ADD CONSTRAINT `InformesAlumno_id_alumno_fkey` FOREIGN KEY (`id_alumno`) REFERENCES `alumno_practica`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `InformesAlumno` ADD CONSTRAINT `InformesAlumno_id_academico_fkey` FOREIGN KEY (`id_academico`) REFERENCES `academico`(`id_user`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `InformesAlumno` ADD CONSTRAINT `InformesAlumno_id_practica_fkey` FOREIGN KEY (`id_practica`) REFERENCES `Practicas`(`id_practica`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `comentariosPractica` ADD CONSTRAINT `comentariosPractica_id_informe_fkey` FOREIGN KEY (`id_informe`) REFERENCES `InformesAlumno`(`id_informe`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -284,22 +299,22 @@ ALTER TABLE `comentariosPractica` ADD CONSTRAINT `comentariosPractica_id_informe
 ALTER TABLE `comentariosPractica` ADD CONSTRAINT `comentariosPractica_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `usuario`(`id_usuario`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `RespuestasInformeAlumno` ADD CONSTRAINT `RespuestasInformeAlumno_id_informe_fkey` FOREIGN KEY (`id_informe`) REFERENCES `InformesAlumno`(`id_informe`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `RespuestasInformeAlumno` ADD CONSTRAINT `RespuestasInformeAlumno_id_informe_fkey` FOREIGN KEY (`id_informe`) REFERENCES `InformesAlumno`(`id_informe`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `RespuestasInformeAlumno` ADD CONSTRAINT `RespuestasInformeAlumno_id_pregunta_fkey` FOREIGN KEY (`id_pregunta`) REFERENCES `PreguntasImplementadasInformeAlumno`(`id_pregunta`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `AsignaturasEnRespuestasInforme` ADD CONSTRAINT `AsignaturasEnRespuestasInforme_id_informe_id_pregunta_fkey` FOREIGN KEY (`id_informe`, `id_pregunta`) REFERENCES `RespuestasInformeAlumno`(`id_informe`, `id_pregunta`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `AsignaturasEnRespuestasInforme` ADD CONSTRAINT `AsignaturasEnRespuestasInforme_id_informe_id_pregunta_fkey` FOREIGN KEY (`id_informe`, `id_pregunta`) REFERENCES `RespuestasInformeAlumno`(`id_informe`, `id_pregunta`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `AsignaturasEnRespuestasInforme` ADD CONSTRAINT `AsignaturasEnRespuestasInforme_nombre_asignatura_fkey` FOREIGN KEY (`nombre_asignatura`) REFERENCES `Asignaturas`(`nombre`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `InformeConfidencial` ADD CONSTRAINT `InformeConfidencial_id_practica_fkey` FOREIGN KEY (`id_practica`) REFERENCES `Practicas`(`id_practica`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `InformeConfidencial` ADD CONSTRAINT `InformeConfidencial_id_academico_fkey` FOREIGN KEY (`id_academico`) REFERENCES `academico`(`id_user`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `InformeConfidencial` ADD CONSTRAINT `InformeConfidencial_id_academico_fkey` FOREIGN KEY (`id_academico`) REFERENCES `academico`(`id_user`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `InformeConfidencial` ADD CONSTRAINT `InformeConfidencial_id_practica_fkey` FOREIGN KEY (`id_practica`) REFERENCES `Practicas`(`id_practica`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InformeConfidencial` ADD CONSTRAINT `InformeConfidencial_id_supervisor_fkey` FOREIGN KEY (`id_supervisor`) REFERENCES `jefe_alumno`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -308,7 +323,7 @@ ALTER TABLE `InformeConfidencial` ADD CONSTRAINT `InformeConfidencial_id_supervi
 ALTER TABLE `InformeEvaluacionAcademicos` ADD CONSTRAINT `InformeEvaluacionAcademicos_id_academico_fkey` FOREIGN KEY (`id_academico`) REFERENCES `academico`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `InformeEvaluacionAcademicos` ADD CONSTRAINT `InformeEvaluacionAcademicos_id_informe_alumno_fkey` FOREIGN KEY (`id_informe_alumno`) REFERENCES `InformesAlumno`(`id_informe`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `InformeEvaluacionAcademicos` ADD CONSTRAINT `InformeEvaluacionAcademicos_id_informe_alumno_fkey` FOREIGN KEY (`id_informe_alumno`) REFERENCES `InformesAlumno`(`id_informe`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InformeEvaluacionAcademicos` ADD CONSTRAINT `InformeEvaluacionAcademicos_id_informe_confidencial_fkey` FOREIGN KEY (`id_informe_confidencial`) REFERENCES `InformeConfidencial`(`id_informe_confidencial`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -332,7 +347,7 @@ ALTER TABLE `Preguntas` ADD CONSTRAINT `Preguntas_id_dimension_fkey` FOREIGN KEY
 ALTER TABLE `PreguntasImplementadasInformeConfidencial` ADD CONSTRAINT `PreguntasImplementadasInformeConfidencial_id_pregunta_fkey` FOREIGN KEY (`id_pregunta`) REFERENCES `Preguntas`(`id_pregunta`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `RespuestasInformeConfidencial` ADD CONSTRAINT `RespuestasInformeConfidencial_informe_id_fkey` FOREIGN KEY (`informe_id`) REFERENCES `InformeConfidencial`(`id_informe_confidencial`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `RespuestasInformeConfidencial` ADD CONSTRAINT `RespuestasInformeConfidencial_informe_id_fkey` FOREIGN KEY (`informe_id`) REFERENCES `InformeConfidencial`(`id_informe_confidencial`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `RespuestasInformeConfidencial` ADD CONSTRAINT `RespuestasInformeConfidencial_pregunta_id_fkey` FOREIGN KEY (`pregunta_id`) REFERENCES `PreguntasImplementadasInformeConfidencial`(`id_pregunta`) ON DELETE RESTRICT ON UPDATE CASCADE;

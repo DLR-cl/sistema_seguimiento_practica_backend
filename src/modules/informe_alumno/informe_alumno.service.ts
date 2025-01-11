@@ -38,6 +38,8 @@ export class InformeAlumnoService {
   }
 
   async getArchivo(id_informe: number) {
+    const startTime = new Date(); // Marca el inicio
+
     // Obtener el informe por ID
     const informe = await this.getInformePorId(id_informe);
 
@@ -81,7 +83,9 @@ export class InformeAlumnoService {
     // Combinar todos los chunks en un único buffer y crear un flujo legible
     const combinedBuffer = Buffer.concat(buffer);
     const readableStream = Readable.from(combinedBuffer);
-
+    const endTime = new Date(); // Marca el final
+    const elapsedTime = endTime.getTime() - startTime.getTime(); // Tiempo en milisegundos
+    console.log(`Tiempo total de ejecución: ${elapsedTime / 1000} segundos`)
     return readableStream;
   }
 
@@ -219,52 +223,52 @@ export class InformeAlumnoService {
   async getArchivoCorreccion(id_informe: number): Promise<Readable> {
     // Obtener el informe por ID desde la base de datos
     const informe = await this._databaseService.informesAlumno.findUnique({
-        where: { id_informe:  +id_informe },
-        select: { archivo: true },
+      where: { id_informe: +id_informe },
+      select: { archivo: true },
     });
 
     if (!informe || !informe.archivo) {
-        throw new NotFoundException('No se encontró el informe del alumno');
+      throw new NotFoundException('No se encontró el informe del alumno');
     }
 
     const client = new Client();
     client.ftp.verbose = true;
 
     try {
-        // Conectar al servidor FTP
-        await client.access({
-            host: process.env.HOST_FTP,
-            port: +process.env.PORT_FTP,
-            user: process.env.USER_FTP,
-            password: process.env.PASSWORD_FTP,
-            secure: false,
-        });
-        console.log('Conexión exitosa al FTP');
+      // Conectar al servidor FTP
+      await client.access({
+        host: process.env.HOST_FTP,
+        port: +process.env.PORT_FTP,
+        user: process.env.USER_FTP,
+        password: process.env.PASSWORD_FTP,
+        secure: false,
+      });
+      console.log('Conexión exitosa al FTP');
 
-        // Verificar si el archivo existe en el servidor FTP
-        const existeArchivo = await client.size(informe.archivo).catch(() => null);
-        if (!existeArchivo) {
-            throw new NotFoundException('El archivo no existe en el servidor FTP');
-        }
+      // Verificar si el archivo existe en el servidor FTP
+      const existeArchivo = await client.size(informe.archivo).catch(() => null);
+      if (!existeArchivo) {
+        throw new NotFoundException('El archivo no existe en el servidor FTP');
+      }
 
-        // Crear un Writable stream para almacenar el archivo descargado
-        const buffer: Buffer[] = [];
-        const writable = new Writable({
-            write(chunk, encoding, callback) {
-                buffer.push(chunk); // Almacenar cada chunk de datos en el array
-                callback();
-            },
-        });
+      // Crear un Writable stream para almacenar el archivo descargado
+      const buffer: Buffer[] = [];
+      const writable = new Writable({
+        write(chunk, encoding, callback) {
+          buffer.push(chunk); // Almacenar cada chunk de datos en el array
+          callback();
+        },
+      });
 
-        // Descargar el archivo al Writable stream
-        await client.downloadTo(writable, informe.archivo);
+      // Descargar el archivo al Writable stream
+      await client.downloadTo(writable, informe.archivo);
 
-        // Combinar todos los chunks en un único buffer y crear un flujo legible
-        const combinedBuffer = Buffer.concat(buffer);
-        return Readable.from(combinedBuffer);
+      // Combinar todos los chunks en un único buffer y crear un flujo legible
+      const combinedBuffer = Buffer.concat(buffer);
+      return Readable.from(combinedBuffer);
     } finally {
-        // Cerrar la conexión FTP
-        client.close();
+      // Cerrar la conexión FTP
+      client.close();
     }
-}
+  }
 }

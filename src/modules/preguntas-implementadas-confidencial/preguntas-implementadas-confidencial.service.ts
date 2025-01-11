@@ -35,11 +35,17 @@ export class PreguntasImplementadasConfidencialService {
     }
 
     public async mostrarPreguntas(){
-        return await this._databaseService.preguntasImplementadasInformeConfidencial.findMany({
+        const preguntas = await this._databaseService.preguntasImplementadasInformeConfidencial.findMany({
             include:{
-                pregunta: true,
+                pregunta: {
+                    include: {
+                        dimension: true,
+                    }
+                },
             }
         })
+        console.log(preguntas[0].pregunta.dimension);
+        return preguntas;
     };
 
     // public async actualizarPreguntas(preguntas: AsignarPreguntaDto){

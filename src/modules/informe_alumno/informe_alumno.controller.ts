@@ -41,7 +41,7 @@ export class InformeAlumnoController {
         ) file: Express.Multer.File,
         @Body() rawData: any
     ) {
-        if(rawData.respuestas){
+        if (rawData.respuestas) {
 
             const parsedData = JSON.parse(rawData.respuestas);
             const data: Informe = {
@@ -49,7 +49,7 @@ export class InformeAlumnoController {
                 respuestas: parsedData
             }
             // Convertir los datos planos al DTO usando class-transformer
-            
+
             // Validar el DTO
             const errors = await validate(data);
             if (errors.length > 0) {
@@ -58,14 +58,15 @@ export class InformeAlumnoController {
                     property: err.property,
                     constraints: err.constraints,
                 }));
-                
+
                 throw new BadRequestException({
                     message: 'Errores de validación',
                     errors: formattedErrors,
                 });
             }
-            
+
             return this._informestorageService.subirInforme(file, data, 'archivosBackend');
+            
         }
         return this._informestorageService.subirInforme(file, rawData, 'archivosbackend')
     }
@@ -145,7 +146,7 @@ export class InformeAlumnoController {
     }
 
     @Get('archivo/obtener/correccion')
-    public async obtenerArchivoCorreccion(@Query('id_informe_alumno') id_informe: number,  @Res() res: Response,){
+    public async obtenerArchivoCorreccion(@Query('id_informe_alumno') id_informe: number, @Res() res: Response,) {
         const readableStream = await this._informeAlumnoService.getArchivoCorreccion(id_informe);
         res.set({
             'Content-Type': 'application/pdf', // Cambiar según el tipo de archivo esperado

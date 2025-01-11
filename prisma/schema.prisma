@@ -34,6 +34,7 @@ model Usuarios {
   nombre          String                @db.VarChar(200)
   rut             String                @unique @db.Char(10)
   primerSesion    Boolean               @default(true)
+  estado          Boolean               @default(true)
   tipo_usuario    Tipo_usuario
   academico       Academico?
   alumno_practica AlumnosPractica?
@@ -259,7 +260,7 @@ model RespuestasInformeConfidencial {
   puntos          Int?
   pregunta_id     Int
   informe_id      Int
-  informe         InformeConfidencial                       @relation(fields: [informe_id], references: [id_informe_confidencial])
+  informe         InformeConfidencial                       @relation(fields: [informe_id], references: [id_informe_confidencial], onDelete: Cascade)
   pregunta        PreguntasImplementadasInformeConfidencial @relation(fields: [pregunta_id], references: [id_pregunta])
 
   @@id([pregunta_id, informe_id])

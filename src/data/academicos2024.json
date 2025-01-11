@@ -1,0 +1,73 @@
+[{
+    "correo": "caraneda@academicos.uta.cl",
+    "nombre": "Carmen Aurora Araneda Guirriman",
+    "rut": "14208450-3",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "hbustos@academicos.uta.cl",
+    "nombre": "Hernando Armes Bustos Andreu",
+    "rut": "8738171-4",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "dacatari@academicos.uta.cl",
+    "nombre": "David Alejandro Catari Vargas",
+    "rut": "12608927-9",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "gcolucciop@academicos.uta.cl",
+    "nombre": "Guiliani Paolo Coluccio Piñones",
+    "rut": "17115344-1",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "akarbassiy@academicos.uta.cl",
+    "nombre": "Amir Yazdi Karbassi",
+    "rut": "28130663-4",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "imarchio@academicos.uta.cl",
+    "nombre": "Italo Andres Marchioni Choque",
+    "rut": "12209769-2",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "gpaz@academicos.uta.cl",
+    "nombre": "Gregorio Reinaldo Paz Segura",
+    "rut": "7766552-8",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "lpedraja@academicos.uta.cl",
+    "nombre": "Liliana Marina Pedraja Rejas",
+    "rut": "14482971-9",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "lperez@academicos.uta.cl",
+    "nombre": "Laura Milena Pérez Fuentes",
+    "rut": "21518997-K",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "gvaldes@academicos.uta.cl",
+    "nombre": "Gonzalo Daniel Valdes Gonzales",
+    "rut": "14134877-9",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "jvegav@academicos.uta.cl",
+    "nombre": "Juan Antonio Vega Vargas",
+    "rut": "8533904-4",
+    "tipo_usuario": "ACADEMICO"
+},
+{
+    "correo": "dvillagra@academicos.uta.cl",
+    "nombre": "Diego Andres Villagra Gil",
+    "rut": "10381289-5",
+    "tipo_usuario": "ACADEMICO"
+}
+]

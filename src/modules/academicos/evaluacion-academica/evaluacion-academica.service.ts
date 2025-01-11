@@ -102,20 +102,17 @@ export class EvaluacionAcademicaService {
             informe_id: informeAlumno.informe_academico.id_informe,
         }));
 
-
-        for (let i of respuestas) {
-            await this._databaseService.respuestasInformeEvaluacion.update({
-                where: {
-                    pregunta_id_informe_id: {
-                        informe_id: id_informe_evaluativo,
-                        pregunta_id: i.pregunta_id
-                    }
-                },
-                data: {
-                    respuesta_texto: i.respuesta_texto
-                }
-            })
-        }
+        console.log(respuestas);
+        await this._databaseService.respuestasInformeEvaluacion.createMany({
+            data: respuestas.map((i) => ({
+                informe_id: id_informe_evaluativo,
+                pregunta_id: i.pregunta_id,
+                respuesta_texto: i.respuesta_texto,
+            })),
+            skipDuplicates: true, // Esto evita errores si ya existe un registro con la misma clave única
+        });
+        
+        
 
 
     }
