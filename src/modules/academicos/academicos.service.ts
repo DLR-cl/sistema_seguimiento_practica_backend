@@ -1,7 +1,7 @@
 import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from '../../database/database/database.service';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
-import { Estado_informe, PrismaClient, Tipo_usuario, TipoPractica } from '@prisma/client';
+import { Estado_informe, Estado_practica, PrismaClient, Tipo_usuario, TipoPractica } from '@prisma/client';
 import { CantidadInformesPorAcademico } from './dto/cantidad-informes.dto';
 import { obtenerAcademico, obtenerCantidadInformes } from '@prisma/client/sql'
 import { UsersService } from '../users/users.service';
@@ -356,5 +356,54 @@ export class AcademicosService {
             );
         }
     }
+
+    async reprobarPractica(id_practica: number) {
+        // Verificar si la práctica existe
+        const practica = await this._databaseService.practicas.findUnique({
+            where: { id_practica },
+        });
+    
+        if (!practica) {
+            throw new BadRequestException('Práctica no encontrada');
+        }
+    
+        // Actualizar el estado de la práctica
+        await this._databaseService.practicas.update({
+            where: { id_practica },
+            data: { estado: Estado_practica.FINALIZADA },
+        });
+    
+        // Ejecutar actualizaciones de informes en paralelo
+        await Promise.all([
+            (async () => {
+                const informeAlumno = await this._databaseService.informesAlumno.findUnique({
+                    where: { id_practica },
+                });
+                if (informeAlumno) {
+                    await this._databaseService.informesAlumno.update({
+                        where: { id_practica },
+                        data: { estado: Estado_informe.DESAPROBADA },
+                    });
+                }
+            })(),
+            (async () => {
+                const informeConfidencial = await this._databaseService.informeConfidencial.findUnique({
+                    where: { id_practica },
+                });
+                if (informeConfidencial) {
+                    await this._databaseService.informeConfidencial.update({
+                        where: { id_practica },
+                        data: { estado: Estado_informe.DESAPROBADA },
+                    });
+                }
+            })(),
+        ]);
+    
+        return {
+            message: 'Práctica desaprobada con éxito',
+            statusCode: HttpStatus.OK,
+        };
+    }
+    
     
  }

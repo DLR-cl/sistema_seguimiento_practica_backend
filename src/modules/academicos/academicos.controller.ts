@@ -7,6 +7,7 @@ import { extname, join } from 'path';
 import { CrearInformeCorreccion } from './dto/create-correccion-informe.dto';
 import { Response } from 'express';
 import { EstadisticaService } from './services/estadistica.service';
+import internal from 'stream';
 const rootPath = process.cwd();
 
 @Controller('academicos')
@@ -124,6 +125,18 @@ export class AcademicosController {
             const data = await this._academicoService.getInformesPorMesYPractica(+id_academico);
             console.log(data)
             return data;
+        }
+
+        @Post('practicas/actualizar/desaprobar')
+        async reprobarPractica(@Query('id_practica', ParseIntPipe) id_practica: number){
+            try {
+                return await this._academicoService.reprobarPractica(id_practica);
+            } catch (error) {
+                if(error instanceof BadRequestException) {
+                    throw error;
+                }
+                throw new InternalServerErrorException('Error interno al desaprobar práctica')
+            }
         }
 }
 
