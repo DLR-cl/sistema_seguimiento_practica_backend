@@ -13,7 +13,7 @@ import { InformeRevisionService } from './services/informe-revision.service';
 import { InformeStorageService } from './services/informe-storage.service';
 
 @Module({
-  providers: [InformeAlumnoService,Object, InformeManagementService, InformeRevisionService, InformeStorageService],
+  providers: [InformeAlumnoService, InformeManagementService, InformeRevisionService, InformeStorageService],
   controllers: [InformeAlumnoController],
   exports: [InformeAlumnoService],
   imports: [DatabaseModule, AlumnoPracticaModule, PracticasModule, AuthModule, UsersModule, EmailAvisosModule]

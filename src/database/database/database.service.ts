@@ -6,12 +6,12 @@ export class DatabaseService extends PrismaClient implements OnModuleInit, OnMod
 
 
     async onModuleInit() {
-        await this.$connect(); // Conectar a la base de datos al iniciar el módulo
-        console.log('Prisma conectado a la base de datos');
+        await this.$connect();
     }
 
     async onModuleDestroy() {
-        await this.$disconnect(); // Desconectar de la base de datos al destruir el módulo
-        console.log('Prisma desconectado de la base de datos');
+        await this.$disconnect();
     }
 }
+
+

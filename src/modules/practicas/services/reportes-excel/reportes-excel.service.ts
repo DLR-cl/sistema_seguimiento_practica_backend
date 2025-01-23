@@ -305,18 +305,17 @@ export class ReportesExcelService {
 
 
   private async obtenerAlumnosAprobadosReprobadosPorFechayPractica(
-    practica: TipoPractica, fecha_ini: Date, fecha_fin: Date
+    practica: TipoPractica,
+    fecha_ini: Date,
+    fecha_fin: Date
   ) {
-    const informesFiltradosAprobados = await this._databaseService.practicas.findMany({
+    const informesFiltrados = await this._databaseService.practicas.findMany({
       where: {
         estado: Estado_practica.FINALIZADA,
         tipo_practica: practica,
         fecha_termino: {
           gte: fecha_ini,
           lt: fecha_fin,
-        },
-        informe_alumno: {
-          estado: Estado_informe.APROBADA,
         },
       },
       include: {
@@ -328,34 +327,21 @@ export class ReportesExcelService {
         informe_alumno: true,
       },
     });
-
-    const informesFiltradosReprobados = await this._databaseService.practicas.findMany({
-      where: {
-        estado: Estado_practica.FINALIZADA,
-        tipo_practica: practica,
-        fecha_termino: {
-          gte: fecha_ini,
-          lt: fecha_fin,
-        },
-        informe_alumno: {
-          estado: Estado_informe.DESAPROBADA,
-        },
-      },
-      include: {
-        alumno: {
-          include: {
-            usuario: true,
-          },
-        },
-        informe_alumno: true,
-      },
-    });
-
+  
+    const aprobados = informesFiltrados.filter(
+      (informe) => informe.informe_alumno?.estado === Estado_informe.APROBADA
+    );
+  
+    const reprobados = informesFiltrados.filter(
+      (informe) => informe.informe_alumno?.estado === Estado_informe.DESAPROBADA
+    );
+  
     return {
-      aprobados: informesFiltradosAprobados,
-      reprobados: informesFiltradosReprobados
-    }
+      aprobados,
+      reprobados,
+    };
   }
+  
   @Cron('0 8 * * 0')
   public async generarReporteSemanal() {
     const client = new Client();

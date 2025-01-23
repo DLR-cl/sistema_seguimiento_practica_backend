@@ -12,7 +12,6 @@ import { CreateInformeConfidencialDto } from "../informe-confidencial/dto/create
 
 @Injectable()
 export class PracticasService {
-    private readonly logger = new Logger(PracticasService.name);
     constructor(
         private readonly _databaseService: DatabaseService,
         private readonly _alumnoService: AlumnoPracticaService,
@@ -71,8 +70,6 @@ export class PracticasService {
         }
     }
 
-
-
     public async existePractica(id_practica: number) {
         const existePractica = await this._databaseService.practicas.findUnique({
             where: {
@@ -85,7 +82,6 @@ export class PracticasService {
         }
         return true;
     }
-
 
     public async activarPractica(id_alumno: number, tipo_practica: TipoPractica) {
 

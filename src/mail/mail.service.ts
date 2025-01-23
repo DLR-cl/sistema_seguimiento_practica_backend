@@ -11,8 +11,9 @@ export class MailService {
     constructor(
         private readonly _configService: ConfigService,
     ){}
+    
     emailTransport(){
-        const tranporter = nodemailer.createTransport({
+        const transporter = nodemailer.createTransport({
             host: this._configService.get<string>('MAIL_HOST'),
             port: this._configService.get<number>('MAIL_PORT'),
             secure: false,
@@ -24,7 +25,7 @@ export class MailService {
             logger: true,
             debug: true,
         })
-        return tranporter;
+        return transporter;
     }
 
 

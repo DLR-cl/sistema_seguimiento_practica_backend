@@ -16,3 +16,5 @@ import { AutoFuncService } from "./services/auto-func/auto-func.service";
     imports: [DatabaseModule, AlumnoPracticaModule, AuthModule, UsersModule, MailModule]
 })
 export class PracticasModule {}
+
+

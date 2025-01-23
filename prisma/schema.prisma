@@ -9,6 +9,11 @@ datasource db {
   shadowDatabaseUrl = env("DATABASE_URL_SHADOW")
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
+
 model AlumnasNomina {
   id_alumno Int    @id @default(autoincrement())
   rut       String @unique @db.VarChar(10)
@@ -83,9 +88,9 @@ model Empresas {
   id_empresa          Int           @id @default(autoincrement())
   nombre_razon_social String        @db.VarChar(100)
   ubicacion           String        @db.VarChar(100)
-  rubro               String?        @db.VarChar(100)
+  rubro               String?       @db.VarChar(100)
   caracter_empresa    TipoEmpresa?
-  tamano_empresa      String?        @db.VarChar(100)
+  tamano_empresa      String?       @db.VarChar(100)
   jefe_supervisor     JefesAlumno[]
 }
 
@@ -191,7 +196,7 @@ model InformeConfidencial {
   academico                       Academico?                      @relation(fields: [id_academico], references: [id_user])
   practica                        Practicas                       @relation(fields: [id_practica], references: [id_practica])
   supervisor                      JefesAlumno                     @relation(fields: [id_supervisor], references: [id_user])
-  informe_academico               InformeEvaluacionAcademicos?
+  informe_academico               InformeEvaluacionAcademicos?    
   respuestas                      RespuestasInformeConfidencial[]
 
   @@index([id_academico], map: "InformeConfidencial_id_academico_fkey")

@@ -10,8 +10,9 @@ import { EstadisticaService } from '../services/estadistica.service';
 
 @Module({
   controllers: [EvaluacionAcademicaController],
-  providers: [EvaluacionAcademicaService, GeneratorPdfService, ReportesExcelService, EstadisticaService],
+  providers: [EvaluacionAcademicaService, ReportesExcelService, EstadisticaService],
   exports: [EvaluacionAcademicaService],
   imports: [DatabaseModule, DashboardModule]
 })
 export class EvaluacionAcademicaModule {}
+

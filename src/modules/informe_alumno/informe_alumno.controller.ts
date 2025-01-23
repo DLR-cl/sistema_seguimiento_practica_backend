@@ -26,7 +26,6 @@ export class InformeAlumnoController {
         private readonly _informestorageService: InformeStorageService
     ) { }
 
-
     @Post('subir-informe')
     @UseInterceptors(FileInterceptor('file'))
     async subirInforme(
@@ -71,9 +70,6 @@ export class InformeAlumnoController {
         return this._informestorageService.subirInforme(file, rawData, 'archivosbackend')
     }
 
-    // hacer otra ruta para poder subir el archivo, la creación del informe contemplará lo demás sin el archivo, es por medio
-    // del servicio que se cambiará parte del informe añadiendole la ruta en la cual se encuentra.
-
     @Get('ver-informe/:id_informe')
     async verInforme(@Param('id_informe', ParseIntPipe) id_informe: number, @Res() res: Response) {
         try {
@@ -93,7 +89,6 @@ export class InformeAlumnoController {
             throw new Error('Error al intentar mostrar el archivo');
         }
     }
-
 
     @Get('descargar-informe/:id_informe')
     async descargarInforme(@Param('id_informe') id_informe: number, @Res() res: Response) {

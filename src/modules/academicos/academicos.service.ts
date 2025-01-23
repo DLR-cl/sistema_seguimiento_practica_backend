@@ -19,9 +19,7 @@ export class AcademicosService {
         private readonly _databaseService: DatabaseService,
         private readonly _userService: UsersService,
         private readonly _emailAvisosService: EmailAvisosService
-    ) {
-
-    }
+    ) { }
 
     public async obtenerAcademicos() {
         try {
@@ -111,7 +109,7 @@ export class AcademicosService {
             throw error;
         }
     }
-    // despues crear dto y el pepe setch
+
     async subirCorreccion(file: Express.Multer.File, data: CrearInformeCorreccion, rootPath: string) {
         const client = new Client();
         client.ftp.verbose = true;

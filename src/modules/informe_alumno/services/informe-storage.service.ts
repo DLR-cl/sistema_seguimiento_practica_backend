@@ -20,10 +20,8 @@ export class InformeStorageService {
       if (!file || !file.buffer) {
         throw new BadRequestException('El archivo no existe o no está accesible.');
       }
-
       const client = new Client();
       client.ftp.verbose = true;
-
 
       let remoteFilePath: string;
       try {
