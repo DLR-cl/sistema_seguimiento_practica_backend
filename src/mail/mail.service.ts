@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { MailerService } from '@nestjs-modules/mailer';
 import { mailConstant } from '../constants/email.constant';
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { SendEmailDto } from './dto/mail.dto';

@@ -2,7 +2,6 @@ import { BadRequestException, Body, Controller, Get, HttpException, HttpStatus, 
 import { EvaluacionAcademicaService } from './evaluacion-academica.service';
 import { InformeEvaluativoDto } from '../dto/informe-evaluativo.dto';
 import { AsignarPreguntaDto } from '../../../modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
-import { GeneratorPdfService } from './services/generator-pdf.service';
 import { Response } from 'express';
 import { ReportesExcelService } from './services/reportes-excel.service';
 import { TipoPractica } from '@prisma/client';
@@ -13,7 +12,6 @@ export class EvaluacionAcademicaController {
 
     constructor(
         private readonly _evaluacionAcademicaService: EvaluacionAcademicaService,
-        private readonly _generatePdfService: GeneratorPdfService,
         private readonly _reporteexcelService: ReportesExcelService,
     ) { }
 
@@ -53,22 +51,6 @@ export class EvaluacionAcademicaController {
     }
 
 
-    @Get('generate')
-    async generatePdf(
-        @Query('id_practica', ParseIntPipe) id_practica: number,
-        @Query('id_informe_evaluativo', ParseIntPipe) id_informe_evaluativo: number,
-        @Query('id_docente', ParseIntPipe) id_docente: number
-        ) {
-
-
-        try {
-            console.log(id_practica, id_informe_evaluativo, id_docente)
-            return await this._generatePdfService.darDatosParaPdf(id_practica, id_informe_evaluativo, id_docente);
-
-        } catch (error) {
-            console.error('Error al generar el PDF:', error);
-        }
-    }
 
 
     @Get('reportes/generar/historico')

@@ -9,9 +9,6 @@ datasource db {
   shadowDatabaseUrl = env("DATABASE_URL_SHADOW")
 }
 
-generator erd {
-  provider = "prisma-erd-generator"
-}
 
 
 model AlumnasNomina {

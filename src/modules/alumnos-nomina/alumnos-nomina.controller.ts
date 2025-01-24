@@ -1,40 +1,45 @@
-import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors, Res } from '@nestjs/common';
 import { AlumnosNominaService } from './alumnos-nomina.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as XLSX from 'xlsx'
-import { BuscarAlumnoDto } from './dto/alumnos-nomina.dto';
+import * as ExcelJS from 'exceljs'; // Solo usamos ExcelJS
+import { Response } from 'express';
+
 @Controller('alumnos-nomina')
 export class AlumnosNominaController {
+  constructor(private readonly _alumnoNominaService: AlumnosNominaService) {}
 
-    constructor(
-        private readonly _alumnoNominaService: AlumnosNominaService
-    ){}
+  @Post('excel')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<string> {
+    // Crear un Workbook para leer el archivo
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(file.buffer);
 
-    @Post('excel')
-    @UseInterceptors(FileInterceptor('file'))
-    async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<string> {
-      // Leer el archivo Excel
-      const workbook = XLSX.read(file.buffer, { type: 'buffer' });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-  
-      // Convertir a JSON
-      const jsonData: any[] = XLSX.utils.sheet_to_json(sheet);
-  
-      // Filtrar los datos relevantes
-      const usuarios = jsonData.map((row) => {
-        return {
-          rut: row['Rut'] || '',
-          nombre: row['Nombre'] || '',
-          email: row['E-mail'] || '',
-        };
-      }).filter((row) => row.rut && row.nombre && row.email); // Asegurarse de que los datos no estén vacíos
-      // Guardar en la base de datos
-     return await this._alumnoNominaService.guardarUsuarios(usuarios);
-    }
+    // Obtener la primera hoja
+    const sheet = workbook.worksheets[0];
 
-    @Get('alumno/:rut')
-    async buscarAlumnoNomina(@Param('rut') rut: string){
-        return await this._alumnoNominaService.obtenerAlumnoNomina(rut);
-    }
+    // Leer las filas y convertirlas a JSON
+    const usuarios = [];
+    sheet.eachRow((row, rowIndex) => {
+      // Ignorar la primera fila si es de encabezados
+      if (rowIndex === 1) return;
+
+      usuarios.push({
+        rut: row.getCell(1).text.trim(),
+        nombre: row.getCell(2).text.trim(),
+        email: row.getCell(3).text.trim(),
+      });
+    });
+
+    // Guardar en la base de datos solo las filas válidas
+    const usuariosFiltrados = usuarios.filter(
+      (user) => user.rut && user.nombre && user.email,
+    );
+    return await this._alumnoNominaService.guardarUsuarios(usuariosFiltrados);
+  }
+
+  @Get('alumno/:rut')
+  async buscarAlumnoNomina(@Param('rut') rut: string) {
+    return await this._alumnoNominaService.obtenerAlumnoNomina(rut);
+  }
 }

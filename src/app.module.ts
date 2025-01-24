@@ -17,7 +17,6 @@ import { PreguntasImplementadasConfidencialModule } from './modules/preguntas-im
 import { PreguntasImplementadasInformeAlumnoModule } from './modules/preguntas-implementadas-informe-alumno/preguntas-implementadas-informe-alumno.module';
 import { DimensionesEvaluativasModule } from './modules/dimensiones-evaluativas/dimensiones-evaluativas.module';
 import { MailModule } from './mail/mail.module';
-import { MailerModule } from '@nestjs-modules/mailer';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AsignaturasModule } from './modules/asignaturas/asignaturas.module';
 import { AcademicosModule } from './modules/academicos/academicos.module';
