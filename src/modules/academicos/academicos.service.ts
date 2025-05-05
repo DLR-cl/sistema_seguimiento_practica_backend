@@ -46,7 +46,7 @@ export class AcademicosService {
     }
     public async obtenerAcademico(id_academico: number) {
         try {
-            if (!this.existeAcademico(id_academico)) {
+            if (!this.existeAcademico(id_academico) && !id_academico) {
                 throw new BadRequestException('Academico no existe')
             }
 

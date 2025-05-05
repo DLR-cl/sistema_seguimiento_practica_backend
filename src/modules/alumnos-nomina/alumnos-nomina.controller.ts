@@ -25,9 +25,9 @@ export class AlumnosNominaController {
       if (rowIndex === 1) return;
 
       usuarios.push({
-        rut: row.getCell(1).text.trim(),
-        nombre: row.getCell(2).text.trim(),
-        email: row.getCell(3).text.trim(),
+        rut: row.getCell(2).text.trim(),
+        nombre: row.getCell(3).text.trim(),
+        email: row.getCell(5).text.trim(),
       });
     });
 
@@ -41,5 +41,10 @@ export class AlumnosNominaController {
   @Get('alumno/:rut')
   async buscarAlumnoNomina(@Param('rut') rut: string) {
     return await this._alumnoNominaService.obtenerAlumnoNomina(rut);
+  }
+
+  @Get('alumno')
+  async obtenerAlumnosNomina() {
+    return await this._alumnoNominaService.obtenerTodosAlumnosNomina();
   }
 }

@@ -31,7 +31,13 @@ export class AcademicosController {
 
     @Get(':id')
     public async obtenerAcademico(@Param('id') id_academico: string) {
-        return await this._academicoService.obtenerAcademico(+id_academico);
+        const id = +id_academico; // Convierte a número
+        if (isNaN(id)) {
+            throw new BadRequestException('El ID debe ser un número válido');
+        }
+        console.log(id);
+        return await this._academicoService.obtenerAcademico(id);
+        //return await this._academicoService.obtenerAcademico(+id_academico);
     }
 
     @Get()

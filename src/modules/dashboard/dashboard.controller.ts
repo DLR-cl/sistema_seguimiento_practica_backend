@@ -4,11 +4,15 @@ import { UserFromToken } from '../../auth/decorators/userToken.decorator';
 import { CantidadPracticaPorMesesDto } from './dto/cantidad-practica-meses.dto';
 import { AnaliticaService } from './services/analitica.service';
 import { TipoPractica } from '@prisma/client';
+import { DashboardEstadisticasPracticaService } from './services/dashboard-estadisticas-practica/dashboard-estadisticas-practica.service';
+import type { EstadisticaAprobacionPorPractica } from './interface/dashboard-estadistica.interface';
 
 @Controller('dashboard')
 export class DashboardController {
-  constructor(private readonly _dashboardService: DashboardService,
+  constructor(
+    private readonly _dashboardService: DashboardService,
     private readonly _analiticaService: AnaliticaService,
+    private readonly _dashboardEstadisticaService: DashboardEstadisticasPracticaService,
   ) { }
 
   @Get()
@@ -154,6 +158,11 @@ export class DashboardController {
       console.error('Error al obtener las respuestas confidenciales:', error);
       throw new BadRequestException('No se pudo obtener las respuestas confidenciales.');
     }
+  }
+
+  @Get('estadisticas/practicas')
+  async obtenerEstadisticasAprobacion(): Promise<EstadisticaAprobacionPorPractica> {
+    return this._dashboardEstadisticaService.obtenerEstadisticasAprobacionPorPractica()
   }
 
 }

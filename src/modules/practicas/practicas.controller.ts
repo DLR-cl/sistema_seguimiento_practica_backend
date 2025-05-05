@@ -7,7 +7,6 @@ import { ExtensionPractica } from "./dto/practica-response.dto";
 import { Estado_informe, TipoPractica } from "@prisma/client";
 import { GenerarReporteSemestralDto } from "./dto/reportes.dto";
 import { Response } from "express";
-import { CorsInterceptor } from "../../interceptors/interceptor-cors";
 import { AuthGuard } from "../../auth/guards/auth.guard";
 
 @Controller('practicas')
@@ -38,7 +37,6 @@ export class PracticasController {
     }
 
     @Get('alumno/:id')
-    @UseInterceptors(new CorsInterceptor()) // Aplica lógica CORS específica si es necesario
     public async getPracticaByAlumno(@Param('id') id_alumno: string) {
       console.log('Handling CORS for alumno route');
       return await this._practicaService.getPracticaAlumno(+id_alumno);

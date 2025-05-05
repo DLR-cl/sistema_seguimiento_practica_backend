@@ -18,21 +18,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, documentFactory);
 
 app.enableCors({
-  origin: (origin, callback) => {
-    const allowedOrigin = 'https://www.diis.cl'; // Dominio único permitido
-    //const allowedOrigin = 'http://localhost:4200'; // Dominio único permitido
-
-
-    if (!origin) {
-      console.warn('No Origin header received. Defaulting to allowedOrigin.');
-      callback(null, allowedOrigin); // Permitir solicitudes internas sin encabezado Origin
-    } else if (origin === allowedOrigin) {
-      callback(null, origin); // Configura el encabezado correctamente
-    } else {
-      console.error('CORS error: Origin not allowed:', origin); // Log del error
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: '*', // Permitir solicitudes desde cualquier origen
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   credentials: true,
 });

@@ -67,11 +67,13 @@ export class AlumnosNominaService {
 
       async obtenerAlumnoNomina(rut: string){
         try {
+            console.log(rut);
+            
             const alumno = await this._databaseService.alumnasNomina.findUnique({
-                where: {
-                    rut: rut,
-                }
+                where: { rut }
             });
+
+            console.log(alumno)
             if(!alumno){
                 throw new BadRequestException(`No existe alumno con rut ${rut}`);
             }
@@ -82,5 +84,9 @@ export class AlumnosNominaService {
             }
             throw new InternalServerErrorException('Error al obtener un alumno de la nomina');
         }
+      }
+
+      async obtenerTodosAlumnosNomina() {
+        return await this._databaseService.alumnasNomina.findMany();
       }
 }
