@@ -6,13 +6,16 @@ import { Response } from 'express';
 import { ReportesExcelService } from './services/reportes-excel.service';
 import { TipoPractica } from '@prisma/client';
 import { AuthGuard } from '../../../auth/guards/auth.guard';
-
+import { DataGeneracionInformeService } from './services/data-generacion-informe-pdf/data-generacion-informe.service';
+import { GenerarPdfInformeService } from './services/generar-pdf-informe/generar-pdf-informe.service';
 @Controller('evaluacion-academica')
 export class EvaluacionAcademicaController {
 
     constructor(
         private readonly _evaluacionAcademicaService: EvaluacionAcademicaService,
         private readonly _reporteexcelService: ReportesExcelService,
+        private readonly _dataGeneracionInformeService: DataGeneracionInformeService,
+        private readonly _generarPdfInformeService: GenerarPdfInformeService
     ) { }
 
     @Post()
@@ -192,5 +195,16 @@ export class EvaluacionAcademicaController {
             }       
             throw new InternalServerErrorException('Error interno al listar los informes');
         }
+    }
+
+
+    @Get('obtener-informe/evaluacion-practica')
+    async obtenerInformeEvaluacionPractica(@Res() res: Response, @Query('id_practica') id_practica: number){
+        // descargar pdf
+        const pdf = await this._generarPdfInformeService.generarPdfInforme(+id_practica);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=informe_evaluacion_practica.pdf');
+        res.send(pdf);
+        return pdf;
     }
 }

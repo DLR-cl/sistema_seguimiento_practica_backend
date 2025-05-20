@@ -9,6 +9,8 @@ import { Readable, Writable } from 'stream';
 import { buffer } from 'stream/consumers';
 import path from 'path';
 import { Cron } from '@nestjs/schedule';
+
+// TODO: Modularizar el servicio de reportes
 @Injectable()
 export class ReportesExcelService {
   private readonly ftpConfig = {
@@ -29,6 +31,7 @@ export class ReportesExcelService {
     private readonly _databaseService: DatabaseService
   ) { }
 
+  // Genero un reporte de 
   async generarReporteSemestral(
     tipo_practica: TipoPractica,
     fecha_ini: Date,

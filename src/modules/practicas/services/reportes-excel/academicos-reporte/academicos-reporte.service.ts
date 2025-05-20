@@ -8,7 +8,7 @@ export class AcademicosReporteService {
     constructor(
         private readonly _databaseService: DatabaseService,
     ) { }
-
+    // TODO: Modularizar el servicio de reportes
     private async generarReporteAcademicos() {
         const actualYear = new Date().getFullYear();
 

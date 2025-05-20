@@ -25,7 +25,9 @@ import { EmailAvisosModule } from './modules/email-avisos/email-avisos.module';
 import { RespuestaInformeConfidencialController } from './modules/respuesta-informe-confidencial/respuesta-informe-confidencial.controller';
 import { RespuestaInformeConfidencialModule } from './modules/respuesta-informe-confidencial/respuesta-informe-confidencial.module';
 import { AlumnosNominaModule } from './modules/alumnos-nomina/alumnos-nomina.module';
-
+import { ReportesPracticaModule } from './modules/reportes-practica/reportes-practica.module';
+import { BullModule } from '@nestjs/bull';
+import { bullConfig } from './config/bull.config';
 
 @Module({
   imports: [
@@ -44,6 +46,10 @@ import { AlumnosNominaModule } from './modules/alumnos-nomina/alumnos-nomina.mod
     InformeConfidencialModule,
     PreguntasModule,
     ScheduleModule.forRoot(),
+    BullModule.forRoot(bullConfig),
+    BullModule.registerQueue({
+      name: 'reportes',
+    }),
     PreguntasImplementadasConfidencialModule,
     PreguntasImplementadasInformeAlumnoModule,
     DimensionesEvaluativasModule,
@@ -54,7 +60,8 @@ import { AlumnosNominaModule } from './modules/alumnos-nomina/alumnos-nomina.mod
     DashboardModule,
     EmailAvisosModule,
     RespuestaInformeConfidencialModule,
-    AlumnosNominaModule
+    AlumnosNominaModule,
+    ReportesPracticaModule
   ],
   controllers: [AppController],
   providers: [AppService],

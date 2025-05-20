@@ -42,8 +42,10 @@ export class PracticasController {
       return await this._practicaService.getPracticaAlumno(+id_alumno);
     }
 
+    //TODO: Hacer que los informes se generen en local
     @Get('informes/generar')
     public async creacionPracticas() {
+        console.log('Creando informes...')
         await this._autofuncService.actualizarEstadoPracticas();
         await this._autofuncService.generarInformeConfidencial();
         await this._autofuncService.generarInformeAlumno();
@@ -63,7 +65,7 @@ export class PracticasController {
             throw new InternalServerErrorException('Error interno al extender la práctica');
         }
     }
-
+    //TODO: Hacer que los reportes se guarden en local
     @Get('reportes/generar/semestral')
     @UsePipes(new ValidationPipe({ transform: true }))
     public async generarReporteSemestral(
@@ -82,6 +84,8 @@ export class PracticasController {
             }
         }
     }
+
+    //TODO: Modificar para que los busque en local
 
     @Get('reportes/obtener/listar')
     public async listarPorAnoYPractica(
@@ -107,6 +111,7 @@ export class PracticasController {
           );
     };
     
+    //TODO: Modificar para que los busque en local
     @Get('reportes/archivo/descargar')
     public async descargarArchivo(
         @Query('ruta') ruta: string, // Ruta del archivo en el servidor FTP

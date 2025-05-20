@@ -63,11 +63,11 @@ export class InformeAlumnoController {
                     errors: formattedErrors,
                 });
             }
-
-            return this._informestorageService.subirInforme(file, data, 'archivosBackend');
+            // TODO: Arreglar ruta
+            return this._informestorageService.subirInforme(file, data, 'archivos');
             
         }
-        return this._informestorageService.subirInforme(file, rawData, 'archivosbackend')
+        return this._informestorageService.subirInforme(file, rawData, 'archivos')
     }
 
     @Get('ver-informe/:id_informe')

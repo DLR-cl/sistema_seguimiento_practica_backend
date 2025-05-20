@@ -11,9 +11,10 @@ import { EmailAvisosModule } from '../email-avisos/email-avisos.module';
 import { InformeManagementService } from './services/informe-management.service';
 import { InformeRevisionService } from './services/informe-revision.service';
 import { InformeStorageService } from './services/informe-storage.service';
-
-@Module({
-  providers: [InformeAlumnoService, InformeManagementService, InformeRevisionService, InformeStorageService],
+import { ValidacionInformeAlumnoService } from './services/validacion-informe-alumno/validacion-informe-alumno.service';
+import { AlmacenamientoInformeService } from './services/almacenamiento-informe/almacenamiento-informe.service';
+@Module({   
+  providers: [InformeAlumnoService, InformeManagementService, InformeRevisionService, InformeStorageService, ValidacionInformeAlumnoService, AlmacenamientoInformeService],
   controllers: [InformeAlumnoController],
   exports: [InformeAlumnoService],
   imports: [DatabaseModule, AlumnoPracticaModule, PracticasModule, AuthModule, UsersModule, EmailAvisosModule]

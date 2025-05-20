@@ -47,46 +47,25 @@ export class InformeAlumnoService {
       throw new NotFoundException('No se encontró el informe del alumno');
     }
 
-    const client = new Client();
-    client.ftp.verbose = true;
-    await client.access({
-      host: process.env.HOST_FTP,
-      port: +process.env.PORT_FTP,
-      user: process.env.USER_FTP,
-      password: process.env.PASSWORD_FTP,
-      secure: false,
-    });
-    console.log('Conexión exitosa al FTP');
-
-    // Verificar si el archivo existe en el servidor FTP
-    const existeArchivo = await client.size(informe.archivo).catch(() => null);
-    if (!existeArchivo) {
-      throw new NotFoundException('El archivo no existe en el servidor FTP');
-    }
-
-    // Crear un Writable stream para almacenar el archivo descargado
-    const buffer: Buffer[] = [];
-    const writable = new Writable({
-      write(chunk, encoding, callback) {
-        buffer.push(chunk); // Almacenar cada chunk de datos en el array
-        callback();
+    try {
+      // Verificar si el archivo existe en el sistema de archivos local
+      if (!fs.existsSync(informe.archivo)) {
+        throw new NotFoundException('El archivo no existe en el sistema de archivos local');
       }
-    });
 
-    // Descargar el archivo al Writable stream
-    await client.downloadTo(writable, informe.archivo);
+      // Leer el archivo y crear un stream legible
+      const fileBuffer = fs.readFileSync(informe.archivo);
+      const readableStream = Readable.from(fileBuffer);
 
-    // Cerrar la conexión FTP
-    client.close();
+      const endTime = new Date(); // Marca el final
+      const elapsedTime = endTime.getTime() - startTime.getTime(); // Tiempo en milisegundos
+      console.log(`Tiempo total de ejecución: ${elapsedTime / 1000} segundos`);
 
-
-    // Combinar todos los chunks en un único buffer y crear un flujo legible
-    const combinedBuffer = Buffer.concat(buffer);
-    const readableStream = Readable.from(combinedBuffer);
-    const endTime = new Date(); // Marca el final
-    const elapsedTime = endTime.getTime() - startTime.getTime(); // Tiempo en milisegundos
-    console.log(`Tiempo total de ejecución: ${elapsedTime / 1000} segundos`)
-    return readableStream;
+      return readableStream;
+    } catch (error) {
+      console.error('Error al leer el archivo:', error);
+      throw new InternalServerErrorException('Error al leer el archivo del informe');
+    }
   }
 
   private async getInformePorId(id_informe: number) {

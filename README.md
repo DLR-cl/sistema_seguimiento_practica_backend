@@ -1,72 +1,102 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Sistema de Seguimiento de Prácticas
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Descripción
+Sistema backend desarrollado en NestJS para la gestión y seguimiento de prácticas profesionales de estudiantes. El sistema permite el manejo de informes, evaluaciones y seguimiento de prácticas tanto para alumnos como para académicos.
 
-## Description
+## Propósito Actual: Optimización y Remodelación
+El proyecto se encuentra en fase de optimización y remodelación con los siguientes objetivos:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 1. Mejoras de Rendimiento
+- Implementación de sistema de colas con Redis y Bull para tareas asíncronas
+- Optimización de consultas a base de datos
+- Mejora en la generación de reportes Excel
 
-## Installation
+### 2. Arquitectura Distribuida
+- Preparación para entorno multi-instancia
+- Implementación de patrones de diseño robustos
+- Mejora en la escalabilidad del sistema
 
-```bash
-$ npm install
+### 3. Generación de Reportes
+- Automatización de reportes semanales
+- Mejora en la estructura y presentación de reportes Excel
+- Implementación de reportes por académico
+
+## Características Principales
+- Gestión de prácticas profesionales
+- Seguimiento de informes de alumnos
+- Evaluaciones académicas
+- Generación automática de reportes
+- Sistema de notificaciones
+- Gestión de usuarios y roles
+
+## Tecnologías
+- NestJS
+- TypeScript
+- PostgreSQL
+- Redis
+- Bull (para manejo de colas)
+- ExcelJS (para generación de reportes)
+
+## Estructura del Proyecto
+```
+src/
+├── auth/                 # Autenticación y autorización
+├── database/            # Configuración de base de datos
+├── modules/             # Módulos principales
+├── services/            # Servicios de negocio
+│   └── generacion-reportes/  # Generación de reportes
+└── types/               # Interfaces y tipos
 ```
 
-## Running the app
-
+## Instalación
 ```bash
-# development
-$ npm run start
+# Instalar dependencias
+npm install
 
-# watch mode
-$ npm run start:dev
+# Configurar variables de entorno
+cp .env.example .env
 
-# production mode
-$ npm run start:prod
+# Iniciar en desarrollo
+npm run start:dev
 ```
 
-## Test
+## Variables de Entorno
+```env
+# Base de datos
+DATABASE_URL=
 
-```bash
-# unit tests
-$ npm run test
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# JWT
+JWT_SECRET=
 ```
 
-## Support
+## Optimizaciones Implementadas
+1. **Sistema de Colas**
+   - Implementación de Bull para tareas asíncronas
+   - Manejo de reportes automáticos
+   - Prevención de duplicación de tareas
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+2. **Reportes Excel**
+   - Generación optimizada de reportes
+   - Estructura mejorada por académico
+   - Formato profesional y consistente
 
-## Stay in touch
+3. **Arquitectura**
+   - Preparación para entorno distribuido
+   - Mejora en la gestión de recursos
+   - Optimización de consultas
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
-## License
+## Contribución
+Para contribuir al proyecto:
+1. Fork el repositorio
+2. Crea una rama para tu feature
+3. Commit tus cambios
+4. Push a la rama
+5. Abre un Pull Request
 
-Nest is [MIT licensed](LICENSE).
+## Licencia
+Este proyecto está bajo la Licencia MIT.

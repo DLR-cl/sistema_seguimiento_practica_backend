@@ -4,11 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider          = "mysql"
-  url               = env("DATABASE_URL_DEPLOY")
+  provider = "mysql"
+  url      = env("DATABASE_URL_DEPLOY")
 }
-
-
 
 model AlumnasNomina {
   id_alumno Int    @id @default(autoincrement())
@@ -114,11 +112,12 @@ model InformesAlumno {
   id_informe             Int                          @id @default(autoincrement())
   id_practica            Int                          @unique
   id_alumno              Int
-  archivo                String?                      @db.VarChar(300)
+  archivo_alumno         String?                      @db.VarChar(300)
   archivo_correccion     String?                      @db.VarChar(300)
   estado                 Estado_informe
   id_academico           Int?
   fecha_inicio           DateTime
+  fecha_termino          DateTime
   intentos               Int                          @default(3)
   fecha_inicio_revision  DateTime?                    @db.Date
   fecha_termino_revision DateTime?                    @db.Date
@@ -192,7 +191,7 @@ model InformeConfidencial {
   academico                       Academico?                      @relation(fields: [id_academico], references: [id_user])
   practica                        Practicas                       @relation(fields: [id_practica], references: [id_practica])
   supervisor                      JefesAlumno                     @relation(fields: [id_supervisor], references: [id_user])
-  informe_academico               InformeEvaluacionAcademicos?    
+  informe_academico               InformeEvaluacionAcademicos?
   respuestas                      RespuestasInformeConfidencial[]
 
   @@index([id_academico], map: "InformeConfidencial_id_academico_fkey")

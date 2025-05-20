@@ -55,7 +55,7 @@ export class RespuestaInformeConfidencialService {
             await this._databaseService.empresas.update({
                 where: {id_empresa: supervisor.id_empresa},
                 data: {
-                    rubro: respuestas[0].respuesta_texto,
+                    rubro: respuestas[0].respuesta_texto as TipoEmpresa,
                     caracter_empresa: respuestas[1].respuesta_texto.toUpperCase() as TipoEmpresa,
                     tamano_empresa: respuestas[2].respuesta_texto,
                 }

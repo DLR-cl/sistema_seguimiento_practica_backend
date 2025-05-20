@@ -9,175 +9,58 @@ import { CreateRespuestaInformAlumnoDto } from '../dto/class/respuestas';
 import { Express } from 'express';
 import { Client } from 'basic-ftp'
 import { Readable } from 'stream';
-const informeMutex = new Mutex(); // Mutex para controlar concurrencia
+import { AlmacenamientoInformeService } from './almacenamiento-informe/almacenamiento-informe.service';
+import { ValidacionInformeAlumnoService } from './validacion-informe-alumno/validacion-informe-alumno.service';
 
 @Injectable()
 export class InformeStorageService {
-  constructor(private readonly _databaseService: DatabaseService) { }
+  constructor(
+    private readonly _databaseService: DatabaseService,
+    private readonly _almacenamientoInformeService: AlmacenamientoInformeService,
+    private readonly _validacionInformeAlumnoService: ValidacionInformeAlumnoService
+  ) { }
 
   async subirInforme(file: Express.Multer.File, data: Informe, rootPath: string) {
-    return await informeMutex.runExclusive(async () => {
-      if (!file || !file.buffer) {
-        throw new BadRequestException('El archivo no existe o no está accesible.');
-      }
-      const client = new Client();
-      client.ftp.verbose = true;
+    
+      
 
-      let remoteFilePath: string;
       try {
-        await client.access({
-          host: process.env.HOST_FTP,
-          port: +process.env.PORT_FTP,
-          user: process.env.USER_FTP,
-          password: process.env.PASSWORD_FTP,
-          secure: false,
-        });
 
+        const practica = await this._validacionInformeAlumnoService.obtenerPractica(data.id_informe);
 
-
-
-        // Define la carpeta y ruta remota según la práctica
-        const practicaFolder =
-          data.tipo_practica === 'PRACTICA_UNO'
-            ? `/informes-practica-uno/alumnos`
-            : `/informes-practica-dos/alumnos`;
-
-        const remoteFileName = `informe-${data.nombre_alumno.replace(/\s+/g, '-')}.pdf`;
-        remoteFilePath = `${practicaFolder}/${remoteFileName}`;
-
-        // Crea la carpeta remota si no existe
-        try {
-          await client.ensureDir(practicaFolder);
-          console.log(`Directorio remoto asegurado: ${practicaFolder}`);
-        } catch (err) {
-          console.warn(`El directorio remoto ya existe o no pudo ser creado: ${err.message}`);
+        if(practica.estado === Estado_practica.ESPERA_INFORMES) { // primera vez que se sube el informe
+          await this._almacenamientoInformeService.almacenarInforme(file, data, rootPath);
+        }
+        else {
+          if(practica.estado === Estado_practica.REVISION_GENERAL) { // segunda vez que se sube el informe por rechazo
+            const informeEnCorreccion = await this._validacionInformeAlumnoService.validarInforme(data); // si no hay nada, sigue el flujo.
+            const dataSave = await this._almacenamientoInformeService.almacenarInforme(file, data, rootPath);
+          }else{
+            throw new BadRequestException('El informe no se puede almacenar porque está en estado REVISION_GENERAL ni ESPERA_INFORMES');
+          }
         }
 
-        // Sube el archivo al servidor remoto
-        // Inicia una transacción
-        return await this._databaseService.$transaction(async (prisma) => {
-          // Verifica si el alumno existe
-          const existeAlumno = await prisma.alumnosPractica.findUnique({
-            where: { id_user: +data.id_alumno },
-            include: { usuario: true },
-          });
-
-          if (!existeAlumno) {
-            throw new NotFoundException(`No se encontró un alumno con el ID ${data.id_alumno}`);
-          }
-          // Busca un informe en estado CORRECCIÓN
-          const informeEnCorreccion = await prisma.informesAlumno.findFirst({
-            where: {
-              id_alumno: +data.id_alumno,
-              estado: Estado_informe.CORRECCION,
-            },
-          });
-
-          if (informeEnCorreccion) {
-            // Elimina el archivo anterior si existe
-            if (informeEnCorreccion.archivo) {
-              try {
-                await client.remove(informeEnCorreccion.archivo);
-                console.warn(`Archivo anterior eliminado del FTP: ${informeEnCorreccion.archivo}`);
-              } catch (deleteError) {
-                console.error(
-                  `Error al intentar eliminar el archivo anterior del FTP (${informeEnCorreccion.archivo}):`,
-                  deleteError
-                );
-              }
-            }
-            // actualiza
-            const stream = Readable.from(file.buffer)
-            await client.uploadFrom(stream, remoteFilePath);
-
-
-
-            // Actualiza el registro del informe
-            await prisma.informesAlumno.update({
-              where: { id_informe: informeEnCorreccion.id_informe },
-              data: {
-                archivo: remoteFilePath,
-                estado: Estado_informe.REVISION,
-              },
-            });
-
-            return {
-              message: 'Informe reemplazado exitosamente en estado CORRECCIÓN',
-              filePath: remoteFilePath,
-            };
-          }
-
-          // Busca un informe en estado ESPERA
-          const informeEnEspera = await prisma.informesAlumno.findFirst({
-            where: {
-              id_alumno: +data.id_alumno,
-              estado: Estado_informe.ESPERA,
-            },
-          });
-
-          if (informeEnEspera) {
-            // Mueve el archivo desde la carpeta temporal
-            const stream = Readable.from(file.buffer)
-            await client.uploadFrom(stream, remoteFilePath);
-            // Actualiza el registro del informe
-            await prisma.informesAlumno.update({
-              where: { id_informe: informeEnEspera.id_informe },
-              data: {
-                archivo: remoteFilePath,
-                estado: Estado_informe.ENVIADA,
-              },
-            });
-
-
-
-            // Crea las respuestas
-            await this.crearRespuesta(prisma, data.respuestas);
-            const practica = await this._databaseService.practicas.findUnique({
-              where: {
-                id_practica: informeEnEspera.id_practica,
-              },
-              include: {
-                informe_confidencial: true
-              }
-            });
-
-            if (practica.informe_confidencial.estado == Estado_informe.ENVIADA && practica.informe_confidencial) {
-              await this._databaseService.practicas.update({
-                where: { id_practica: informeEnEspera.id_practica },
-                data: { estado: Estado_practica.INFORMES_RECIBIDOS }
-              })
-            }
-            return {
-              message: 'Informe enviado exitosamente (de ESPERA a ENVIADA).',
-              filePath: remoteFilePath,
-            };
-          }
-
-          throw new BadRequestException('No se puede subir el informe en el estado actual.');
-        }, {
-          timeout: 10000 // Aumenta el tiempo límite a 10 segundos
+        await this.crearRespuesta(data.respuestas);
+        
+        // una vez que finalice todo, se cambia el estado del informe y de la práctica.
+        await this._databaseService.informesAlumno.update({
+          where: { id_informe: +data.id_informe },
+          data: { estado: Estado_informe.ENVIADA }
         });
+
+        await this._databaseService.practicas.update({
+          where: { id_practica: practica.id_practica },
+          data: { estado: Estado_practica.INFORMES_RECIBIDOS }
+        });
+
       } catch (error) {
-        console.error('Error al subir el informe:', error);
-
-        // Elimina el archivo temporal si ocurre un error
-        // Compensación: elimina el archivo del FTP si ya fue subido
-        if (remoteFilePath) {
-          try {
-            await client.remove(remoteFilePath);
-            console.warn(`Archivo eliminado del FTP: ${remoteFilePath}`);
-          } catch (deleteError) {
-            console.error('Error al intentar eliminar el archivo del FTP:', deleteError);
-          }
-        }
         throw error;
-      } finally {
-        client.close();
       }
-    });
-  }
+    }
+  
 
-  private async crearRespuesta(prisma, respuestas: CreateRespuestaInformAlumnoDto[]) {
+
+  private async crearRespuesta(respuestas: CreateRespuestaInformAlumnoDto[]) {
     try {
 
       // las respuestas se generan aun cuando no tengan asignaturas
@@ -188,7 +71,7 @@ export class InformeStorageService {
         texto: res.texto || null,
       }));
 
-      await prisma.respuestasInformeAlumno.createMany({
+      await this._databaseService.respuestasInformeAlumno.createMany({
         data: data
       });
 
@@ -200,7 +83,7 @@ export class InformeStorageService {
         nombre_asignatura: res
       }))
 
-      await prisma.asignaturasEnRespuestasInforme.createMany({
+      await this._databaseService.asignaturasEnRespuestasInforme.createMany({
         data: dataAsignaturas,
       })
 
@@ -214,5 +97,5 @@ export class InformeStorageService {
       throw error;
     }
   }
-
 }
+
