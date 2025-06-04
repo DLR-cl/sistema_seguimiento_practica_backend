@@ -101,7 +101,8 @@ export class AutoFuncService {
                         id_practica: practica.id_practica,
                         id_alumno: practica.id_alumno,
                         estado: Estado_informe.ESPERA,
-                        fecha_inicio: practica.fecha_termino
+                        fecha_inicio: practica.fecha_termino,
+                        fecha_termino: practica.fecha_termino //TODO: Arreglar
                     }
 
                     // Asegurarse de que ambas fechas son objetos Date antes de comparar

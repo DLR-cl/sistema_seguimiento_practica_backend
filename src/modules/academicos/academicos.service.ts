@@ -1,7 +1,7 @@
 import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from '../../database/database/database.service';
 import { CreateAcademicoDto } from './dto/create-academicos.dto';
-import { Estado_informe, Estado_practica, PrismaClient, Tipo_usuario, TipoPractica } from '@prisma/client';
+import { Estado_informe, Estado_practica, Tipo_usuario } from '@prisma/client';
 import { CantidadInformesPorAcademico } from './dto/cantidad-informes.dto';
 import { obtenerAcademico, obtenerCantidadInformes } from '@prisma/client/sql'
 import { UsersService } from '../users/users.service';

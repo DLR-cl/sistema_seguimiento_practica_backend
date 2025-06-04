@@ -29,6 +29,7 @@ model Administrador {
 model Usuarios {
   id_usuario      Int                   @id @default(autoincrement())
   password        String                @db.VarChar(250)
+  perfil          String                @db.VarChar(250) @default("")
   correo          String                @unique @db.VarChar(100)
   nombre          String                @db.VarChar(200)
   rut             String                @unique @db.Char(10)
@@ -112,7 +113,7 @@ model InformesAlumno {
   id_informe             Int                          @id @default(autoincrement())
   id_practica            Int                          @unique
   id_alumno              Int
-  archivo_alumno         String?                      @db.VarChar(300)
+  archivo        String?                      @db.VarChar(300)
   archivo_correccion     String?                      @db.VarChar(300)
   estado                 Estado_informe
   id_academico           Int?

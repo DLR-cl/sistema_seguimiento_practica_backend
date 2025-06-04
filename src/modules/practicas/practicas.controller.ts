@@ -42,7 +42,7 @@ export class PracticasController {
       return await this._practicaService.getPracticaAlumno(+id_alumno);
     }
 
-    //TODO: Hacer que los informes se generen en local
+    //TODO: Hacer que los informes se generen automatica
     @Get('informes/generar')
     public async creacionPracticas() {
         console.log('Creando informes...')

@@ -4,7 +4,7 @@ import { InformeEvaluativoDto } from '../dto/informe-evaluativo.dto';
 import { AsignarPreguntaDto } from '../../../modules/preguntas-implementadas-informe-alumno/dto/asignar-preguntas.dto';
 import { Response } from 'express';
 import { ReportesExcelService } from './services/reportes-excel.service';
-import { TipoPractica } from '@prisma/client';
+
 import { AuthGuard } from '../../../auth/guards/auth.guard';
 import { DataGeneracionInformeService } from './services/data-generacion-informe-pdf/data-generacion-informe.service';
 import { GenerarPdfInformeService } from './services/generar-pdf-informe/generar-pdf-informe.service';

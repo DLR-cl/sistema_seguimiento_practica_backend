@@ -179,8 +179,7 @@ export class DashboardService {
       throw error;
     }
   }
-  
-  
+
 
   public async obtenerCantidadAlumnosAsignadosSupervisor(id_supervisor: number) {
     try {
@@ -262,6 +261,7 @@ export class DashboardService {
       });
 
       const cargaDocente = await this._databaseService.$queryRawTyped<CantidadInformesInterface>(obtenerCargaDocente());
+      
       const cargaDocenteFormatted = cargaDocente.map((docente) => ({
         ...docente,
         cantidad_informes: +docente.cantidad_informes.toString(), // Convertimos BigInt a number
